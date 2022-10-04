@@ -7,8 +7,8 @@ mem_id varchar(30) not null unique,
 mem_passwd varchar(30) not null,
 mem_email varchar(30) unique,
 mem_phon varchar(30),
-mem_RRN varchar(30) not null, unique,
-mem_class int default 100 not nul
+mem_RRN varchar(30) not null unique,
+mem_class int default 100 not null
 );
 
 

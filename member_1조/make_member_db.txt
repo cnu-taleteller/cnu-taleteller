@@ -13,5 +13,5 @@ mem_class int default 100 not null
 
 
 insert into member(mem_name, mem_id, mem_passwd, mem_email,
-mem_phon, mem_RRN)
+mem_phone, mem_RRN)
 values('이름','아이디','비밀번호','이메일','전화번호',주민번호');

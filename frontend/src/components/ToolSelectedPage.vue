@@ -1,9 +1,7 @@
 <template>
-    <div class="selected_page">
-        <!-- <div v-if="backgroundImage!=null" :style="{ 'background-image': `url(@/assets/${backgroundImage})` }"> -->
+    <div class="selected_page" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
         <h3>선택한 페이지</h3>
-        <img class="character_image" v-if="characterImage!=null" :src="require(`@/assets/${characterImage}`)">
-        <!-- </div> -->
+        <img class="character_image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
     </div>
 </template>
 <script>
@@ -11,14 +9,15 @@ export default {
     data(){
         return{
             pageNo: 0,
-            characterImage: null,
-            backgroundImage: null
+            content: {},
         }
     },
     mounted() {
-        this.characterImage = sessionStorage.getItem('uploadCharacter');
-        this.backgroundImage = sessionStorage.getItem('uploadBackgorund');
+        this.pageNo = sessionStorage.getItem('selectedPage');
+        this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
     },
+    methods: {
+    }
 }
 
 </script>

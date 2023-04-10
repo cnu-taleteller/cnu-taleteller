@@ -1,78 +1,93 @@
 <template>
     <div class="menu">
-        <div class="menu_list">
-            <button @click="setSelectedMenu('background')">배경</button>
-            <button @click="setSelectedMenu('character')">캐릭터</button>
-            {{ selectedMenu }}
-        </div>
-        <div v-if="selectedMenu=='background'">
-            <input type="file" @change="setImage()" accept="image/*" id="image">
-            <img v-if="image!=null" :src="require(`@/assets/${image}`)" width="150" @click="uploadBackgorund(image)">
-        </div>
-        <div v-else-if="selectedMenu=='character'">
-            <input type="file" @change="setImage()" accept="image/*" id="image">
-            <img v-if="image!=null" :src="require(`@/assets/${image}`)" width="150" @click="uploadCharacter(image)">
-        </div>
-        </div>
-</template>
-<script>
-import axios from 'axios';
-export default {
-    data(){
-        return{
-            image: null,
-            selectedMenu: null,
-            backgroundImage: null
-        }
+      <div class="menu_list">
+        <button @click="setSelectedMenu('background')">배경</button>
+        <button @click="setSelectedMenu('character')">캐릭터</button>
+        {{ selectedMenu }}
+      </div>
+      <div v-if="selectedMenu == 'background'">
+        <input type="file" @change="setImage('background')" accept="image/*" id="image">
+        <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" @click="uploadBackgorund(content.backgroundImage)">
+      </div>
+      <div v-else-if="selectedMenu == 'character'">
+        <input type="file" @change="setImage('character')" accept="image/*" id="image">
+        <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" @click="uploadCharacter(content.characterImage)">
+      </div>
+    </div>
+  </template>
+  <script>
+  import axios from 'axios';
+  export default {
+    data() {
+      return {
+        image: null,
+        pageNo: 0,
+        content: {
+          backgroundImage: null,
+          characterImage: null
+        },
+        selectedMenu: null
+      }
     },
-    mounted(){
-        this.selectedMenu = sessionStorage.getItem('selectedMenu');
+    mounted() {
+      this.selectedMenu = sessionStorage.getItem('selectedMenu');
+      this.pageNo = sessionStorage.getItem('selectedPage');
+      // 이렇게 해야 새로고침되어도 데이터 소멸 안됨
+      this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
+      this.characterImage = this.content.characterImage;
     },
     methods: {
-        async setImage(){
-            let frm = new FormData();
-            let imageFile = document.getElementById("image");
-            frm.append("image", imageFile.files[0]);
-            
-            await axios.post("/api/users/image", frm, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-            .then((res)=>{
-                this.image = res.data;
-                sessionStorage.setItem('image', this.image);
-                console.log("전송 성공");
-            })
-            .catch((e)=> {
-                console.log(e);
-            })
-        },
-        uploadCharacter(image){
-            sessionStorage.setItem('uploadCharacter', image);
-            location.reload();  
-        },
-        uploadBackgorund(image){
-            sessionStorage.setItem('uploadBackgorund', image);
-            location.reload();  
-        },
-        setSelectedMenu(menu){
-            this.selectedMenu = menu;
-            sessionStorage.setItem('selectedMenu', menu);
+      async setImage(menu) {
+        try {
+          let frm = new FormData();
+          let imageFile = document.getElementById("image");
+          frm.append("image", imageFile.files[0]);
+          const res = await axios.post(`/api/users/image?menu=${menu}`, frm, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+  
+          if (menu === 'background') {
+            this.content.backgroundImage = res.data;
+            sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
+          } else if (menu === 'character') {
+            this.content.characterImage = res.data;
+            sessionStorage.setItem('characterImage', this.content.characterImage);
+          }
+          console.log("전송 성공");
+        } catch (e) {
+          console.log(e);
         }
- }
-}
-
-</script>
-<style scoped>
-.menu{
+      },
+      uploadCharacter(image) {
+        this.content.characterImage = image;
+        sessionStorage.setItem(this.pageNo, JSON.stringify(this.content));
+        location.reload(); 
+      },
+      uploadBackgorund(image) {
+        this.content.backgroundImage = image;
+        sessionStorage.setItem(this.pageNo, JSON.stringify(this.content));
+        location.reload();
+      },
+      setSelectedMenu(menu) {
+        this.selectedMenu = menu;
+        sessionStorage.setItem('selectedMenu', menu);
+      }
+    }
+  }
+  </script>
+  <style scoped>
+  .menu {
     margin: 10px;
     width: 1200px;
     height: 150px;
     /* height: 60vh; */
     border: 1px solid gray;
-}
-.menu_list{
+  }
+  
+  .menu_list {
     text-align: left;
-}
-</style>
+  }
+  </style>
+  

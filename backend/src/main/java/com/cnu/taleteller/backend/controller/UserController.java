@@ -42,20 +42,19 @@ public class UserController {
     }
 
     @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public @ResponseBody String addPhoto(@RequestParam("image") MultipartFile img) {
-
+    public String addPhoto(@RequestParam("image") MultipartFile img) {
         UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid+"_"+img.getOriginalFilename();
+        String imageFileName = uuid + "_" + img.getOriginalFilename();
 
         String path = "D:/project/cnu-taleteller/frontend/src/assets/";
-        Path imagePath = Paths.get(path+imageFileName);
+        Path imagePath = Paths.get(path + imageFileName);
 
-        try{
+        try {
             Files.write(imagePath, img.getBytes());
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
+
         System.out.println(img.getOriginalFilename());
 
         return imageFileName;

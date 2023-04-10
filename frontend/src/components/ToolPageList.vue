@@ -41,7 +41,8 @@ export default {
     clickPage(index) {
       alert('click ' + (index + 1) + ' motion');
       this.currentPageNo = index;
-      sessionStorage.setItem('selectPage', index+1);
+      sessionStorage.clear();
+      sessionStorage.setItem('selectedPage', index+1);
     },
     checkMove(evt) {
       console.log('draggedContext', evt.draggedContext);

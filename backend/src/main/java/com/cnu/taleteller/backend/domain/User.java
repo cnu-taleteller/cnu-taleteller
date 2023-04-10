@@ -26,7 +26,6 @@ public class User {
 
     @Column(nullable = false)
     private String name;
-
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp created_at;
 

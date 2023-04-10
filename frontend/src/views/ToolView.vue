@@ -38,7 +38,12 @@ export default {
 
 </script>
 <style scoped>
+.tool {
+  width: 100%;
+  height: 100%;
+}
 .tool_content {
+  height: 80%;
   display: flex;
   align-items: center;
   justify-content: center;

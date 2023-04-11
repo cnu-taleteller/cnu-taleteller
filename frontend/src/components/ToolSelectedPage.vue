@@ -1,34 +1,53 @@
 <template>
     <div class="selected_page">
+        <h3>{{ selectedPageNo }}</h3>
         <div class="selected_page" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
-        <h3>선택한 페이지</h3>
-        <img class="character_image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
+            <img class="character_image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
         </div>
     </div>
 </template>
 <script>
 export default {
+    props : {
+        selectedPageNo : Number,
+    },
     data(){
         return{
-            pageNo: 0,
+            pageNo: '',
             content: {
                 backgroundImage: null,
                 characterImage : null
             },
+            selectedPageItems : [],
         }
     },
     mounted() {
-        this.pageNo = sessionStorage.getItem('selectedPage');
-        if(sessionStorage.getItem(this.pageNo) == null ){
-            this.content.backgroundImage = null;
-            this.content.characterImage = null;
-        }
-        else {
-            this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
+        // this.pageNo = sessionStorage.getItem('selectedPage');
+        // if(sessionStorage.getItem(this.pageNo) == null ){
+        //     this.content.backgroundImage = null;
+        //     this.content.characterImage = null;
+        // }
+        // else {
+        //     this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
+        // }
+        this.pageNo = this.selectedPageNo;
+        this.updateContent();
+    },
+    watch: {
+        selectedPageNo() {
+            this.updateContent();
         }
     },
     methods: {
-    }
+        updateContent() {
+            if (sessionStorage.getItem(this.selectedPageNo) == null) {
+                this.content.backgroundImage = null;
+                this.content.characterImage = null;
+            } else {
+                this.content = JSON.parse(sessionStorage.getItem(this.selectedPageNo));
+            }
+        }
+    },
 }
 
 </script>

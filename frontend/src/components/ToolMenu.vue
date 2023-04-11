@@ -31,15 +31,17 @@
         selectedMenu: null
       }
     },
+    props : {
+        selectedPageNo : Number,
+    },
     mounted() {
       this.selectedMenu = sessionStorage.getItem('selectedMenu');
-      this.pageNo = sessionStorage.getItem('selectedPage');
+      this.pageNo = this.selectedPageNo;
       if(sessionStorage.getItem(this.pageNo) == null ){
         this.content.backgroundImage = null;
         this.content.characterImage = null;
-      }
-      else {
-        this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
+      } else {
+        this.content = JSON.parse(sessionStorage.getItem(this.selectedPageNo));
       }
     },
     methods: {
@@ -53,7 +55,6 @@
               'Content-Type': 'multipart/form-data'
             }
           });
-  
           if (menu === 'background') {
             this.content.backgroundImage = res.data;
             sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
@@ -68,19 +69,19 @@
       },
       uploadCharacter(image) {
         this.content.characterImage = image;
-        sessionStorage.setItem(this.pageNo, JSON.stringify(this.content));
-        location.reload(); 
+        sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
+        // location.reload();
       },
       uploadBackgorund(image) {
         this.content.backgroundImage = image;
-        sessionStorage.setItem(this.pageNo, JSON.stringify(this.content));
-        location.reload();
+        sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
+        // location.reload();
       },
       setSelectedMenu(menu) {
         this.selectedMenu = menu;
         sessionStorage.setItem('selectedMenu', menu);
-      }
-    }
+      },
+    },
   }
   </script>
   <style scoped>

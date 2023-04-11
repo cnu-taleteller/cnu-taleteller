@@ -2,18 +2,15 @@
   <div class="left_side_bar">
     <h3>페이지</h3>
     <div class="page_all">
-      <!-- <div @click="clickPage(-1)">??</div> -->
-      <draggable v-model="items" handle=".handle" class="page_list">
-        <div v-for="item, index in items" :key="index" class="one_page">
+      <!-- in test -->
+      <draggable v-model="items" :options="{animation:300, handle:'.page_body'}" class="page_list">
+        <li v-for="item, index in items" :key="index" class="one_page">
           <div class="page_body" @click="clickPage(index)"></div>
           <label>
             {{ item.no }}
           </label>
-        </div>
+        </li>
       </draggable>
-      <!-- <div @click="defalutReset()">
-        리셋
-      </div> -->
     </div>
     <button @click="insertItem()">페이지 추가</button>
   </div>
@@ -31,6 +28,7 @@ export default {
     return {
       firstItem: [],
       items: [],
+      // test: JSON.parse(sessionStorage.getItem('pageNumber')),
       currentPageNo: 1,
     }
   },
@@ -39,10 +37,9 @@ export default {
       this.currentPageNo = items.length - 1;
     },
     clickPage(index) {
-      alert('click ' + (index + 1) + ' motion');
       this.currentPageNo = index;
-      sessionStorage.clear();
-      sessionStorage.setItem('selectedPage', index+1);
+      this.$emit('selectedPage', this.items[index].no);
+      // this.$emit('selectedPage', this.test[index].no);
     },
     checkMove(evt) {
       console.log('draggedContext', evt.draggedContext);
@@ -63,15 +60,22 @@ export default {
         0,
         {
           no: newNo,
-          name: '추가' + newNo,
+          name: 'list' + newNo,
         }
       );
+      // sessionStorage.setItem('pageNumber', JSON.stringify(this.items));
+      // this.test = JSON.parse(sessionStorage.getItem('pageNumber'));
       this.currentPageNo += 1;
     },
     deleteItem(item, index) {
       this.items.splice(index, 1);
     },
   },
+  //페이지를 세션 저장해서 불러오기 2023 04 11 일단 기존 방식사용
+  // mounted() {
+  //   this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
+  // }
+
   // created() {
   //     axios.get('/static/list.json').then(response => {
   //       this.firstItem = response.data.clickPageList[0];

@@ -2,13 +2,13 @@
   <div class="tool">
     <ToolHeader></ToolHeader>
     <div class="tool_content">
-      <ToolPageList></ToolPageList>
+      <ToolPageList @selectedPage="handle"></ToolPageList>
       <div class="tool_right">
         <div class="tool_right_top">
-          <ToolSelectedPage></ToolSelectedPage>
+          <ToolSelectedPage :selectedPageNo="this.selectPageNo"></ToolSelectedPage>
           <ToolLayer></ToolLayer>
         </div>
-        <ToolMenu></ToolMenu>
+        <ToolMenu :selectedPageNo="this.selectPageNo"></ToolMenu>
       </div>
     </div>
 
@@ -24,7 +24,7 @@ import toolMenu from '@/components/ToolMenu.vue';
 export default {
   data() {
     return {
-
+      selectPageNo : 0,
     }
   },
   components: {
@@ -33,6 +33,11 @@ export default {
     ToolSelectedPage: toolSelectedPage,
     ToolLayer: toolLayer,
     ToolMenu: toolMenu
+  },
+  methods : {
+    handle(selectedPage) {
+      this.selectPageNo = selectedPage;
+    },
   }
 }
 

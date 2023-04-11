@@ -7,11 +7,13 @@
       </div>
       <div v-if="selectedMenu == 'background'">
         <input type="file" @change="setImage('background')" accept="image/*" id="image">
-        <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" @click="uploadBackgorund(content.backgroundImage)">
+        <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" 
+        @click="uploadBackgorund(content.backgroundImage)">
       </div>
       <div v-else-if="selectedMenu == 'character'">
         <input type="file" @change="setImage('character')" accept="image/*" id="image">
-        <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" @click="uploadCharacter(content.characterImage)">
+        <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" 
+        @click="uploadCharacter(content.characterImage)">
       </div>
     </div>
   </template>
@@ -24,7 +26,7 @@
         pageNo: 0,
         content: {
           backgroundImage: null,
-          characterImage: null
+          characterImage : null
         },
         selectedMenu: null
       }
@@ -32,9 +34,13 @@
     mounted() {
       this.selectedMenu = sessionStorage.getItem('selectedMenu');
       this.pageNo = sessionStorage.getItem('selectedPage');
-      // 이렇게 해야 새로고침되어도 데이터 소멸 안됨
-      this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
-      this.characterImage = this.content.characterImage;
+      if(sessionStorage.getItem(this.pageNo) == null ){
+        this.content.backgroundImage = null;
+        this.content.characterImage = null;
+      }
+      else {
+        this.content = JSON.parse(sessionStorage.getItem(this.pageNo));
+      }
     },
     methods: {
       async setImage(menu) {

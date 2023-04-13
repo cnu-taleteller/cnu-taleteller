@@ -1,5 +1,6 @@
 <template>
     <div>
+        헤더
         <h2>저장하기</h2>
         <input type="text" v-model="contentName" disabled/>
         <button type="submit" @click.prevent="saveToSessionStorage">저장</button>

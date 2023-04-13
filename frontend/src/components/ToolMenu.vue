@@ -8,6 +8,7 @@
       <div class="imageList">
         <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
         <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
+        
       </div>
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
@@ -126,6 +127,15 @@
           if (menu === 'background') {
             this.content.backgroundImage = res.data;
             sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
+            const uploadImage = document.createElement('img');
+            const imageList = document.querySelector('.menu .imageList');
+            console.log(this.content.backgroundImage);
+            uploadImage.src = `/img/${this.content.backgroundImage}`;
+            console.log(uploadImage.src);
+            uploadImage.id = "item"
+            uploadImage.draggable = "true"
+            uploadImage.dataset.id = 'i3';
+            imageList.appendChild(uploadImage);
           } else if (menu === 'character') {
             this.content.characterImage = res.data;
             sessionStorage.setItem('characterImage', this.content.characterImage);
@@ -138,12 +148,10 @@
       uploadCharacter(image) {
         this.content.characterImage = image;
         sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-        // location.reload();
       },
       uploadBackgorund(image) {
         this.content.backgroundImage = image;
         sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-        // location.reload();
       },
       setSelectedMenu(menu) {
         this.selectedMenu = menu;

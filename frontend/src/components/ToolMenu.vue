@@ -138,12 +138,12 @@
       uploadCharacter(image) {
         this.content.characterImage = image;
         sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-        
+        // location.reload();
       },
       uploadBackgorund(image) {
         this.content.backgroundImage = image;
         sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-        
+        // location.reload();
       },
       setSelectedMenu(menu) {
         this.selectedMenu = menu;

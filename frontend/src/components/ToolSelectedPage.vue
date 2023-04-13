@@ -3,7 +3,7 @@
             <div class="dragImage">
                 <h3>{{ selectedPageNo }}</h3>
                 <div class="object" ref="pageObject">
-
+                    
                 </div>
             </div>
             <div class="selected_page2" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">

@@ -45,18 +45,14 @@ public class UserController {
     public String addPhoto(@RequestParam("image") MultipartFile img) {
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + img.getOriginalFilename();
-
-        String path = "D:/project/cnu-taleteller/frontend/src/assets/";
+        String path = "D:/project/cnu-taleteller/frontend/public/images/";
         Path imagePath = Paths.get(path + imageFileName);
-
         try {
             Files.write(imagePath, img.getBytes());
         } catch (Exception e) {
             System.out.println(e);
         }
-
         System.out.println(img.getOriginalFilename());
-
         return imageFileName;
     }
 }

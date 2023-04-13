@@ -28,7 +28,6 @@ export default {
     return {
       firstItem: [],
       items: [],
-      // test: JSON.parse(sessionStorage.getItem('pageNumber')),
       currentPageNo: 1,
     }
   },
@@ -39,7 +38,7 @@ export default {
     clickPage(index) {
       this.currentPageNo = index;
       this.$emit('selectedPage', this.items[index].no);
-      // this.$emit('selectedPage', this.test[index].no);
+      sessionStorage.setItem('recentlyClickPageNo', this.items[index].no);
     },
     checkMove(evt) {
       console.log('draggedContext', evt.draggedContext);
@@ -50,7 +49,6 @@ export default {
       let currnet = this.currentPageNo;
       var self = this;
       var newNo = 1;
-
       if (self.items.concat().length > 0) {
         newNo = Math.max.apply(null, self.items.concat().map(function (item) { return item.no; })) + 1;
       }
@@ -63,8 +61,9 @@ export default {
           name: 'list' + newNo,
         }
       );
-      // sessionStorage.setItem('pageNumber', JSON.stringify(this.items));
-      // this.test = JSON.parse(sessionStorage.getItem('pageNumber'));
+      //배열을 세션에 담아서 추가 할 때마다 세션저장
+      sessionStorage.setItem('pageNumber', JSON.stringify(this.items));
+      this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
       this.currentPageNo += 1;
     },
     deleteItem(item, index) {
@@ -72,10 +71,13 @@ export default {
     },
   },
   //페이지를 세션 저장해서 불러오기 2023 04 11 일단 기존 방식사용
-  // mounted() {
-  //   this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
-  // }
-
+  mounted() {
+    if(JSON.parse(sessionStorage.getItem('pageNumber'))==null) {
+      this.items = [];
+    }else {
+      this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
+    };
+  }
   // created() {
   //     axios.get('/static/list.json').then(response => {
   //       this.firstItem = response.data.clickPageList[0];

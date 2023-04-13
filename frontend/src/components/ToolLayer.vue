@@ -12,7 +12,7 @@ export default {
 <style scoped>
 .layer {
     margin: 10px;
-    width: 230px;
+    width: 20%;
     height: 450px;
     border: 1px solid gray;
   }

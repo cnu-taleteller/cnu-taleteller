@@ -19,7 +19,7 @@ export default {
     methods: {
         saveToSessionStorage() {
             sessionStorage.setItem("projectTitle", this.contentName);
-            this.$router.push("/11");
+            this.$router.push("/my");
         },
     },
 };

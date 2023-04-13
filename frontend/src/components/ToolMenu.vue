@@ -5,7 +5,7 @@
         <button @click="setSelectedMenu('character')">캐릭터</button>
         {{ selectedMenu }}
       </div>
-      <div class="image_list">
+      <div class="image-list">
           <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
           <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
       </div>
@@ -52,8 +52,8 @@
         this.notUploadImageList = true;
       };
       
-      const toolSelectedPageDrag = document.querySelector('.selected_page');
-      const container = document.querySelector('.selected_page .dragImage .object');
+      const toolSelectedPageDrag = document.querySelector('.selected-page');
+      const container = document.querySelector('.selected-page .drag-image .object');
       
       let toolMenu = this;
       let active = false;
@@ -129,7 +129,7 @@
             this.content.backgroundImage = res.data;
             sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
             const uploadImage = document.createElement('img');
-            const imageList = document.querySelector('.menu .image_list');
+            const imageList = document.querySelector('.menu .image-list');
             uploadImage.src = "/images/" + this.content.backgroundImage;
             uploadImage.id = "item"
             uploadImage.draggable = "true"
@@ -164,7 +164,7 @@
       },
       //기존이미지에 이벤트 리스너 추가
       haveImageEvent() {
-        document.querySelectorAll(".menu .image_list #item").forEach((element) => {
+        document.querySelectorAll(".menu .image-list #item").forEach((element) => {
             element.addEventListener("dragstart", (e) => {
                 const x = e.offsetX;
                 const y = e.offsetY;
@@ -183,13 +183,13 @@
         element.addEventListener("drop", (e) => {
             e.preventDefault();
             e.stopPropagation();
-            let rX = e.pageX - document.querySelector('.selected_page').offsetLeft;
-            let rY = e.pageY - document.querySelector('.selected_page').offsetTop;
+            let rX = e.pageX - document.querySelector('.selected-page').offsetLeft;
+            let rY = e.pageY - document.querySelector('.selected-page').offsetTop;
             let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
             if (x != undefined && y != undefined && data != undefined) {
               let newDiv = document.createElement('div');
               newDiv.id = "test";
-              let newElement = document.querySelector(`.menu .image_list #item[data-id=${data}]`);
+              let newElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
               let cloneNewElement = newElement.cloneNode();
               cloneNewElement.style.position = "absolute";
               cloneNewElement.style.left = (rX - x) + "px";
@@ -207,11 +207,11 @@
               this.yOffsetId[imageId] = 0;
               this.$emit('imageList', this.imageList);
               if(this.selectedMenu==='background') {
-                cloneNewElement.style.width = 950 + 'px';
+                cloneNewElement.style.width = 1200 + 'px';
                 cloneNewElement.style.height = 450 + 'px';  
               }
               newDiv.appendChild(cloneNewElement);
-              document.querySelector('.selected_page .dragImage .object').appendChild(newDiv);
+              document.querySelector('.selected-page .drag-image .object').appendChild(newDiv);
             }
         });
       },

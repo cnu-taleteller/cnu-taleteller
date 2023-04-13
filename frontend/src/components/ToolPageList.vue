@@ -1,4 +1,4 @@
-<template>page-all
+<template>
   <div class="left-side-bar">
     <h3>페이지</h3>
     <div class="page-all">

@@ -6,9 +6,9 @@
 
                 </div>
             </div>
-            <!-- <div class="selected_page2" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
+            <div class="selected_page2" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
                 <img class="character_image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
-            </div> -->
+            </div>
         </div>
     </template>
     <script>

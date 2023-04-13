@@ -1,14 +1,20 @@
 <template>
   <div class="tool">
+    <div class="tool-header">
     <ToolHeader></ToolHeader>
-    <div class="tool_content">
+    </div>
+    <div class="tool-content">
+      <div class="tool-left">
       <ToolPageList @selectedPage="handle"></ToolPageList>
-      <div class="tool_right">
-        <div class="tool_right_top">
+    </div>
+      <div class="tool-right">
+        <div class="tool-right-top">
           <ToolSelectedPage :selectedPageNo="Number(this.selectPageNo)" :imageList="this.imageList"></ToolSelectedPage>
           <ToolLayer></ToolLayer>
         </div>
+        <div class="tool-right-bottom">
         <ToolMenu :selectedPageNo="Number(this.selectPageNo)" @imageList="setImageList"></ToolMenu>
+      </div>
       </div>
     </div>
   </div>
@@ -54,15 +60,37 @@ export default {
 .tool {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-.tool_content {
-  height: 80%;
+.tool-header{
+  height: 20%;
+  width: 90%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.tool_right_top {
+.tool-content {
+  height: 80%;
+  width: 80%;
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tool-right{
+  width: 80%;
+}
+.tool-left{
+  width: 20%;
+  height: 100%;
+}
+.tool-right-top {
+  display: flex;
+  height: 70%;
+}
+.tool-right-bottom{
+  height: 30%;
 }
 </style>

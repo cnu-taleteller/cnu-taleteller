@@ -1,6 +1,6 @@
 <template>
     <div class="menu">
-      <div class="menu_list">
+      <div class="menu-list">
         <button @click="setSelectedMenu('background')">배경</button>
         <button @click="setSelectedMenu('character')">캐릭터</button>
         {{ selectedMenu }}
@@ -8,7 +8,7 @@
       <div class="imageList">
         <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
         <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
-      </div>
+      
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
           <input type="file" @change="setImage('background')" accept="image/*" id="image">
@@ -21,6 +21,7 @@
           @click="uploadCharacter(content.characterImage)">
         </div>
       </div>
+    </div>
     </div>
   </template>
   <script>
@@ -204,14 +205,19 @@
   <style scoped>
   .menu {
     margin: 10px;
-    width: 1200px;
+    /* width: 1200px; */
     height: 150px;
-    /* height: 60vh; */
     border: 1px solid gray;
   }
   
-  .menu_list {
+  .menu-list {
     text-align: left;
+  }
+
+  .imageList{
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   </style>
   

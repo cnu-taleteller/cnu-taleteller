@@ -5,21 +5,20 @@
         <button @click="setSelectedMenu('character')">캐릭터</button>
         {{ selectedMenu }}
       </div>
-      <div class="imageList">
-        <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
-        <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
-        
+      <div class="image_list">
+          <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
+          <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
       </div>
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
           <input type="file" @change="setImage('background')" accept="image/*" id="image">
-          <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" 
-          @click="uploadBackgorund(content.backgroundImage)">
+          <!-- <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" 
+          @click="uploadBackgorund(content.backgroundImage)"> -->
         </div>
         <div v-else-if="selectedMenu == 'character'">
           <input type="file" @change="setImage('character')" accept="image/*" id="image">
-          <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" 
-          @click="uploadCharacter(content.characterImage)">
+          <!-- <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" 
+          @click="uploadCharacter(content.characterImage)"> -->
         </div>
       </div>
     </div>
@@ -35,7 +34,7 @@
           backgroundImage: null,
           characterImage : null
         },
-        selectedMenu: null,
+        selectedMenu: 'character',
         notUploadImageList : false,
         nextId : 0,
         imageList : {},
@@ -86,11 +85,13 @@
             }
                 active = true;
                 document.body.style.cursor = 'grabbing';
+                e.target.style.opacity = '0.5';
             }
 
             function dragEnd(e) {
                 let imageId = e.target.dataset.ids;
                 toolMenu.imageList[imageId].image.style.zIndex = "1";
+                e.target.style.opacity = '1';
                 active = false;
             }
 
@@ -128,13 +129,17 @@
             this.content.backgroundImage = res.data;
             sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
             const uploadImage = document.createElement('img');
-            const imageList = document.querySelector('.menu .imageList');
-            console.log(this.content.backgroundImage);
-            uploadImage.src = `/img/${this.content.backgroundImage}`;
-            console.log(uploadImage.src);
+            const imageList = document.querySelector('.menu .image_list');
+            uploadImage.src = "/images/" + this.content.backgroundImage;
             uploadImage.id = "item"
             uploadImage.draggable = "true"
             uploadImage.dataset.id = 'i3';
+            uploadImage.height="100";
+            uploadImage.addEventListener("dragstart", (e) => {
+                const x = e.offsetX;
+                const y = e.offsetY;
+                e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
+            });
             imageList.appendChild(uploadImage);
           } else if (menu === 'character') {
             this.content.characterImage = res.data;
@@ -159,7 +164,7 @@
       },
       //기존이미지에 이벤트 리스너 추가
       haveImageEvent() {
-        document.querySelectorAll(".menu .imageList #item").forEach((element) => {
+        document.querySelectorAll(".menu .image_list #item").forEach((element) => {
             element.addEventListener("dragstart", (e) => {
                 const x = e.offsetX;
                 const y = e.offsetY;
@@ -184,7 +189,7 @@
             if (x != undefined && y != undefined && data != undefined) {
               let newDiv = document.createElement('div');
               newDiv.id = "test";
-              let newElement = document.querySelector(`.menu .imageList #item[data-id=${data}]`);
+              let newElement = document.querySelector(`.menu .image_list #item[data-id=${data}]`);
               let cloneNewElement = newElement.cloneNode();
               cloneNewElement.style.position = "absolute";
               cloneNewElement.style.left = (rX - x) + "px";
@@ -193,7 +198,6 @@
               cloneNewElement.setAttribute("draggable", "false");
               let imageId = nextId++;
               cloneNewElement.dataset.ids = imageId;
-              newDiv.appendChild(cloneNewElement);
               let newImage = {
                 pageNo : this.selectedPageNo,
                 image : cloneNewElement,
@@ -202,6 +206,11 @@
               this.xOffsetId[imageId] = 0;
               this.yOffsetId[imageId] = 0;
               this.$emit('imageList', this.imageList);
+              if(this.selectedMenu==='background') {
+                cloneNewElement.style.width = 950 + 'px';
+                cloneNewElement.style.height = 450 + 'px';  
+              }
+              newDiv.appendChild(cloneNewElement);
               document.querySelector('.selected_page .dragImage .object').appendChild(newDiv);
             }
         });

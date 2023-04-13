@@ -52,7 +52,6 @@
                 }
 
                 for (const [id, image] of Object.entries(this.imageList)) {
-                    console.log(Object.entries(this.imageList));
                     if (image.pageNo === this.selectedPageNo) {
                     const imageElement = image.image;
                     objectElement.appendChild(imageElement);

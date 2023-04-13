@@ -1,8 +1,9 @@
 <template>
     <div>
+        헤더
         <h2>저장하기</h2>
         <input type="text" v-model="contentName" disabled/>
-        <button type="submit" @click.prevent="saveToSessionStorage">저장</button>
+        <button @click.prevent="saveToSessionStorage">저장</button>
     </div>
 </template>
 
@@ -19,7 +20,7 @@ export default {
     methods: {
         saveToSessionStorage() {
             sessionStorage.setItem("projectTitle", this.contentName);
-            this.$router.push("/11");
+            this.$router.push("/my");
         },
     },
 };

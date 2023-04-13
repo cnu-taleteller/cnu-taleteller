@@ -1,11 +1,11 @@
-<template>
-  <div class="left_side_bar">
+<template>page-all
+  <div class="left-side-bar">
     <h3>페이지</h3>
-    <div class="page_all">
+    <div class="page-all">
       <!-- in test -->
-      <draggable v-model="items" :options="{animation:300, handle:'.page_body'}" class="page_list">
+      <draggable v-model="items" :options="{animation:300, handle:'.page-body'}" class="page-list">
         <li v-for="item, index in items" :key="index" class="one_page">
-          <div class="page_body" @click="clickPage(index)"></div>
+          <div class="page-body" @click="clickPage(index)"></div>
           <label>
             {{ item.no }}
           </label>
@@ -91,29 +91,27 @@ export default {
 }
 </script>
 <style>
-.left_side_bar {
+.left-side-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin: 10px;
-  width: 200px;
   height: 620px;
-  /* height: 90vh; */
   border: 1px solid gray;
 }
 
-.page_all {
-  width: 200px;
+.page-all {
+  width: 90%;
   height: 500px;
   /* height: 80vh; */
   overflow-y: scroll;
 }
-.page_all::-webkit-scrollbar {
+.page-all::-webkit-scrollbar {
   display: none;
 }
 
-.one_page {
+.one-page {
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -121,13 +119,13 @@ export default {
   margin-bottom: 10px;
 }
 
-.page_body {
-  width: 150px;
-  height: 150px;
+.page-body {
+  width: 80%;
+  height: 100px;
   border: 1px solid gray;
 }
 
-.page_list {
+.page-list {
   list-style: none;
 }
 

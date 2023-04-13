@@ -1,13 +1,13 @@
     <template>
-        <div class="selected_page">
-            <div class="dragImage">
+        <div class="selected-page">
+            <div class="drag-image">
                 <h3>{{ selectedPageNo }}</h3>
                 <div class="object" ref="pageObject">
                     
                 </div>
             </div>
-            <div class="selected_page2" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
-                <img class="character_image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
+            <div class="selected-page2" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
+                <img class="character-image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
             </div>
         </div>
     </template>
@@ -63,9 +63,9 @@
 
 </script>
 <style scoped>
-.selected_page{
+.selected-page{
     margin: 10px;
-    width: 950px;;
+    width: 80%;
     height: 450px;
     display: flex;
     align-items: center;
@@ -75,21 +75,20 @@
     position: relative;
     border: 1px solid gray;
 }
-.selected_page2{
+.selected-page2{
     margin: 10px;
-    width: 950px;
+    width: 80%;
     height: 450px;
-    /* height: 60vh; */
     border: 1px solid gray;
 }
-.character_image{
+.character-image{
     width: 150px;
     text-align: center;
 }
 
-.dragImage {
+.drag-image {
     margin: 10px;
-    width: 950px;
+    width: 100%;
     height: 450px;
     position: absolute;
 }

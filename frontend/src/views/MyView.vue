@@ -4,27 +4,27 @@
         <h3>헤더</h3>
     </div>
     <div class="mypage_munu_content">
-    <div class='left'>
-        <ul>
-          <li v-for='list in linklist'>
-          <router-link
-            style=text-decoration:none;color:black;
-            :to='list.link' >{{ list.content }}
-          </router-link>
-          </li>
-        </ul>
-    </div>
-    <div class="mypage_content">
-    <div class="search_sort">
-      <input type="text" class="mysearch">
-      <input type="submit" value="검색" class="mysearchbtn">
-      <select class="mysort">
-        <option>최신순</option>
-        <option>추천순</option>
-        <option>결제순</option>        
-      </select>
-    </div>
-    <div class="mymain"> 
+      <div class='left'>
+          <ul>
+            <li v-for='list in linklist'>
+            <router-link
+              style=text-decoration:none;color:black;
+              :to='list.link' >{{ list.content }}
+            </router-link>
+            </li>
+          </ul>
+      </div>
+      <div class="mypage_content">
+      <div class="search_sort">
+        <input type="text" class="mysearch">
+        <input type="submit" value="검색" class="mysearchbtn">
+        <select class="mysort">
+          <option>최신순</option>
+          <option>추천순</option>
+          <option>결제순</option>        
+        </select>
+      </div>
+      <div class="mymain"> 
         <div class="thumbnail">
             <table>
                 <thead>

@@ -12,7 +12,7 @@
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
           <input type="file" @change="setImage('background')" accept="image/*" id="image">
-          <!-- <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" 
+          <!-- <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100"
           @click="uploadBackgorund(content.backgroundImage)"> -->
         </div>
         <div v-else-if="selectedMenu == 'character'">
@@ -21,7 +21,6 @@
           @click="uploadCharacter(content.characterImage)"> -->
         </div>
       </div>
-    </div>
     </div>
   </template>
   <script>

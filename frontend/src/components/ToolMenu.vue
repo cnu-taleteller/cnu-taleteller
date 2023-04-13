@@ -5,15 +5,21 @@
         <button @click="setSelectedMenu('character')">캐릭터</button>
         {{ selectedMenu }}
       </div>
-      <div v-if="selectedMenu == 'background'">
-        <input type="file" @change="setImage('background')" accept="image/*" id="image">
-        <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" 
-        @click="uploadBackgorund(content.backgroundImage)">
+      <div class="imageList">
+        <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
+        <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
       </div>
-      <div v-else-if="selectedMenu == 'character'">
-        <input type="file" @change="setImage('character')" accept="image/*" id="image">
-        <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" 
-        @click="uploadCharacter(content.characterImage)">
+      <div class="uploadImage">
+        <div v-if="selectedMenu == 'background'">
+          <input type="file" @change="setImage('background')" accept="image/*" id="image">
+          <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100" 
+          @click="uploadBackgorund(content.backgroundImage)">
+        </div>
+        <div v-else-if="selectedMenu == 'character'">
+          <input type="file" @change="setImage('character')" accept="image/*" id="image">
+          <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" 
+          @click="uploadCharacter(content.characterImage)">
+        </div>
       </div>
     </div>
   </template>
@@ -28,21 +34,83 @@
           backgroundImage: null,
           characterImage : null
         },
-        selectedMenu: null
+        selectedMenu: null,
+        notUploadImageList : false,
+        nextId : 0,
+        imageList : {},
+        xOffsetId : {},
+        yOffsetId : {},
+        nextId : 0,
       }
     },
     props : {
         selectedPageNo : Number,
     },
     mounted() {
-      this.selectedMenu = sessionStorage.getItem('selectedMenu');
-      this.pageNo = this.selectedPageNo;
-      if(sessionStorage.getItem(this.pageNo) == null ){
-        this.content.backgroundImage = null;
-        this.content.characterImage = null;
-      } else {
-        this.content = JSON.parse(sessionStorage.getItem(this.selectedPageNo));
-      }
+      if(!this.notUploadImageList) {
+        this.haveImageEvent();
+        this.notUploadImageList = true;
+      };
+      
+      const toolSelectedPageDrag = document.querySelector('.selected_page');
+      const container = document.querySelector('.selected_page .dragImage .object');
+      
+      let toolMenu = this;
+      let active = false;
+      let currentX;
+      let currentY;
+      let initialX;
+      let initialY;
+      let xOffset = 0;
+      let yOffset = 0;
+      let currentImage = null;
+      
+      this.imageEventDragOver(toolSelectedPageDrag);
+      this.imageEventDrop(toolSelectedPageDrag);
+      
+      container.addEventListener("mousedown", dragStart, {capture:false});
+      container.addEventListener("mouseup", dragEnd, {capture:false});
+      container.addEventListener("mousemove", drag, {capture:false});
+
+      function dragStart(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                currentImage = e.target;
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - toolMenu.xOffsetId[e.target.dataset.ids];
+                initialY = e.clientY - toolMenu.yOffsetId[e.target.dataset.ids];
+            }
+                active = true;
+                document.body.style.cursor = 'grabbing';
+            }
+
+            function dragEnd(e) {
+                let imageId = e.target.dataset.ids;
+                toolMenu.imageList[imageId].image.style.zIndex = "1";
+                active = false;
+            }
+
+            function drag(e) {
+                if (active && currentImage === e.target) {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    toolMenu.xOffsetId[e.target.dataset.ids] = currentX;
+                    toolMenu.yOffsetId[e.target.dataset.ids] = currentY;
+                    let imageId = e.target.dataset.ids;
+                    setTranslate(currentX, currentY, toolMenu.imageList[imageId].image);
+                }else if(currentImage !== e.target){
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+
+            function setTranslate(xPos, yPos, el) {
+                el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+                el.style.zIndex = "10";
+            }
     },
     methods: {
       async setImage(menu) {
@@ -70,16 +138,65 @@
       uploadCharacter(image) {
         this.content.characterImage = image;
         sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-        // location.reload();
+        
       },
       uploadBackgorund(image) {
         this.content.backgroundImage = image;
         sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-        // location.reload();
+        
       },
       setSelectedMenu(menu) {
         this.selectedMenu = menu;
         sessionStorage.setItem('selectedMenu', menu);
+      },
+      //기존이미지에 이벤트 리스너 추가
+      haveImageEvent() {
+        document.querySelectorAll(".menu .imageList #item").forEach((element) => {
+            element.addEventListener("dragstart", (e) => {
+                const x = e.offsetX;
+                const y = e.offsetY;
+                e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
+            });
+        });
+      },
+      imageEventDragOver(element) {
+        element.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+      },
+      imageEventDrop(element) {
+        let nextId = this.nextId;
+        element.addEventListener("drop", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            let rX = e.pageX - document.querySelector('.selected_page').offsetLeft;
+            let rY = e.pageY - document.querySelector('.selected_page').offsetTop;
+            let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
+            if (x != undefined && y != undefined && data != undefined) {
+              let newDiv = document.createElement('div');
+              newDiv.id = "test";
+              let newElement = document.querySelector(`.menu .imageList #item[data-id=${data}]`);
+              let cloneNewElement = newElement.cloneNode();
+              cloneNewElement.style.position = "absolute";
+              cloneNewElement.style.left = (rX - x) + "px";
+              cloneNewElement.style.top = (rY - y) + "px";
+              cloneNewElement.style.zIndex = 1;
+              cloneNewElement.setAttribute("draggable", "false");
+              let imageId = nextId++;
+              cloneNewElement.dataset.ids = imageId;
+              newDiv.appendChild(cloneNewElement);
+              let newImage = {
+                pageNo : this.selectedPageNo,
+                image : cloneNewElement,
+              };
+              this.imageList[imageId] = newImage;
+              this.xOffsetId[imageId] = 0;
+              this.yOffsetId[imageId] = 0;
+              this.$emit('imageList', this.imageList);
+              document.querySelector('.selected_page .dragImage .object').appendChild(newDiv);
+            }
+        });
       },
     },
   }

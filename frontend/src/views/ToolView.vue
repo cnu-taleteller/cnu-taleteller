@@ -5,13 +5,12 @@
       <ToolPageList @selectedPage="handle"></ToolPageList>
       <div class="tool_right">
         <div class="tool_right_top">
-          <ToolSelectedPage :selectedPageNo="this.selectPageNo"></ToolSelectedPage>
+          <ToolSelectedPage :selectedPageNo="Number(this.selectPageNo)" :imageList="this.imageList"></ToolSelectedPage>
           <ToolLayer></ToolLayer>
         </div>
-        <ToolMenu :selectedPageNo="this.selectPageNo"></ToolMenu>
+        <ToolMenu :selectedPageNo="Number(this.selectPageNo)" @imageList="setImageList"></ToolMenu>
       </div>
     </div>
-
   </div>
 </template>
 <script>
@@ -25,6 +24,12 @@ export default {
   data() {
     return {
       selectPageNo : 0,
+      imageList : {},
+    }
+  },
+  mounted() {
+    if(sessionStorage.getItem('recentlyClickPageNo') != null) {
+      this.selectPageNo = sessionStorage.getItem('recentlyClickPageNo');
     }
   },
   components: {
@@ -38,7 +43,10 @@ export default {
     handle(selectedPage) {
       this.selectPageNo = selectedPage;
     },
-  }
+    setImageList(imageList) {
+      this.imageList = imageList;
+    },
+  },
 }
 
 </script>

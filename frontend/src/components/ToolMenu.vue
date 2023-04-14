@@ -6,19 +6,19 @@
         {{ selectedMenu }}
       </div>
       <div class="image-list">
-          <img src="@/assets/pngwing.com.png" id="item" draggable="true" data-id="i1">
-          <img src="@/assets/pngwing2.com.png" id="item" draggable="true" data-id="i2">
+        <div class="image-list-char" v-show="selectedMenu == 'character'" v-for="item, index in charList">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId" :style="{ height : item.height}">
+        </div>
+        <div class="image-list-back" v-show="selectedMenu == 'background'" v-for="item, index in backList">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId" :style="{ height : item.height}">
+        </div>
       </div>
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
           <input type="file" @change="setImage('background')" accept="image/*" id="image">
-          <!-- <img v-if="content.backgroundImage" :src="require(`@/assets/${content.backgroundImage}`)" height="100"
-          @click="uploadBackgorund(content.backgroundImage)"> -->
         </div>
         <div v-else-if="selectedMenu == 'character'">
           <input type="file" @change="setImage('character')" accept="image/*" id="image">
-          <!-- <img v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)" height="100" 
-          @click="uploadCharacter(content.characterImage)"> -->
         </div>
       </div>
     </div>
@@ -34,13 +34,37 @@
           backgroundImage: null,
           characterImage : null
         },
+        charList: [
+          {
+            src : '/images/pngwing.com.png',
+            id : 'item',
+            draggable : "true",
+            dataId : 'i1',
+            height : "100",
+          },
+          {
+            src : '/images/pngwing2.com.png',
+            id : 'item',
+            draggable : "true",
+            dataId : 'i2',
+            height : "100px",
+          }],
+        backList: [
+          {
+            src : '/images/field.png',
+            id : 'item',
+            draggable : 'true',
+            dataId : 'i3',
+            height : '100px',
+          }],
         selectedMenu: 'character',
         notUploadImageList : false,
         nextId : 0,
         imageList : {},
         xOffsetId : {},
         yOffsetId : {},
-        nextId : 0,
+        uploadId : 0,
+        isUpload : false,
       }
     },
     props : {
@@ -52,7 +76,7 @@
         this.notUploadImageList = true;
       };
       
-      const toolSelectedPageDrag = document.querySelector('.selected-page');
+      const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
       const container = document.querySelector('.selected-page .drag-image .object');
       
       let toolMenu = this;
@@ -114,6 +138,20 @@
                 el.style.zIndex = "10";
             }
     },
+    updated() {
+      if(this.isUpload) {
+        const uploadImage = document.querySelector(`.menu .image-list #item[data-id=upload${this.uploadId}]`);
+        if(uploadImage !== null) {
+          uploadImage.addEventListener('dragstart', e => {
+            const x = e.offsetX;
+            const y = e.offsetY;
+            e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
+        });
+      }
+      this.uploadId++;
+      }
+      this.isUpload = false;
+    },
     methods: {
       async setImage(menu) {
         try {
@@ -126,24 +164,29 @@
             }
           });
           if (menu === 'background') {
+            this.isUpload = true;
             this.content.backgroundImage = res.data;
             sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
-            const uploadImage = document.createElement('img');
-            const imageList = document.querySelector('.menu .image-list');
-            uploadImage.src = "/images/" + this.content.backgroundImage;
-            uploadImage.id = "item"
-            uploadImage.draggable = "true"
-            uploadImage.dataset.id = 'i3';
-            uploadImage.height="100";
-            uploadImage.addEventListener("dragstart", (e) => {
-                const x = e.offsetX;
-                const y = e.offsetY;
-                e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
+            this.src = "/images/" + this.content.backgroundImage;
+            this.backList.push({
+              src : this.src,
+              id : 'item',
+              draggable : "true",
+              dataId : 'upload' + this.uploadId,
+              height : "1000",
             });
-            imageList.appendChild(uploadImage);
           } else if (menu === 'character') {
+            this.isUpload = true;
             this.content.characterImage = res.data;
             sessionStorage.setItem('characterImage', this.content.characterImage);
+            this.src = "/images/" + this.content.characterImage;
+            this.charList.push({
+              src : this.src,
+              id : 'item',
+              draggable : "true",
+              dataId : 'upload' + this.uploadId,
+              height : "100",
+            });
           }
           console.log("전송 성공");
         } catch (e) {

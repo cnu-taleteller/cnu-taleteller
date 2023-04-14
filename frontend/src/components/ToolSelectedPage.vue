@@ -1,13 +1,10 @@
     <template>
         <div class="selected-page">
+            <h3>{{ selectedPageNo }}</h3>
             <div class="drag-image">
-                <h3>{{ selectedPageNo }}</h3>
                 <div class="object" ref="pageObject">
                     
                 </div>
-            </div>
-            <div class="selected-page2" v-if="content.backgroundImage" :style="{ 'background-image': `url(${require('@/assets/' + content.backgroundImage)})`, 'background-size': 'cover', 'background-repeat': 'no-repeat' }">
-                <img class="character-image" v-if="content.characterImage" :src="require(`@/assets/${content.characterImage}`)">
             </div>
         </div>
     </template>
@@ -39,22 +36,19 @@
         },
         methods: {
             updateContent() {    
-                if (sessionStorage.getItem(this.selectedPageNo) == null) {
-                    this.content.backgroundImage = null;
-                    this.content.characterImage = null;
-                } else {
+                if (sessionStorage.getItem(this.selectedPageNo) != null) {
                     this.content = JSON.parse(sessionStorage.getItem(this.selectedPageNo));
                 }
                 const objectElement = this.$refs.pageObject;
-                //모든 자식요소 삭제
+                
                 while (objectElement.firstChild) {
                     objectElement.removeChild(objectElement.firstChild);
                 }
 
                 for (const [id, image] of Object.entries(this.imageList)) {
                     if (image.pageNo === this.selectedPageNo) {
-                    const imageElement = image.image;
-                    objectElement.appendChild(imageElement);
+                        const imageElement = image.image;
+                        objectElement.appendChild(imageElement);
                     }
                 }
             },

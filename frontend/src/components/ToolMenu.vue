@@ -119,7 +119,7 @@
           let frm = new FormData();
           let imageFile = document.getElementById("image");
           frm.append("image", imageFile.files[0]);
-          const res = await axios.post(`/api/users/image?menu=${menu}`, frm, {
+          const res = await axios.post(`/api/tool/image?menu=${menu}`, frm, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }

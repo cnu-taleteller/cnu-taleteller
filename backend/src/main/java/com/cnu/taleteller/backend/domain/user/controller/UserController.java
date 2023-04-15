@@ -1,9 +1,9 @@
-package com.cnu.taleteller.backend.controller;
+package com.cnu.taleteller.backend.domain.user.controller;
 
 
-import com.cnu.taleteller.backend.domain.User;
-import com.cnu.taleteller.backend.dto.UserResponseDto;
-import com.cnu.taleteller.backend.service.UserService;
+import com.cnu.taleteller.backend.domain.user.domain.User;
+import com.cnu.taleteller.backend.domain.user.dto.UserResponseDto;
+import com.cnu.taleteller.backend.domain.user.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

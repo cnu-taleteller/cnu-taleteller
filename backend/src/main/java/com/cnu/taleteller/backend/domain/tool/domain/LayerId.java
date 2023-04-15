@@ -1,4 +1,4 @@
-package com.cnu.taleteller.backend.tool.domain;
+package com.cnu.taleteller.backend.domain.tool.domain;
 
 import lombok.*;
 

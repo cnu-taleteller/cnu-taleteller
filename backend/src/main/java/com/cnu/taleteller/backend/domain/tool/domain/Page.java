@@ -1,6 +1,6 @@
-package com.cnu.taleteller.backend.tool.domain;
+package com.cnu.taleteller.backend.domain.tool.domain;
 
-import com.cnu.taleteller.backend.tool.domain.Book;
+import com.cnu.taleteller.backend.domain.book.domain.Book;
 import lombok.*;
 
 import javax.persistence.*;

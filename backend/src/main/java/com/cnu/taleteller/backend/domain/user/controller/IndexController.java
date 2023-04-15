@@ -1,4 +1,4 @@
-package com.cnu.taleteller.backend.controller;
+package com.cnu.taleteller.backend.domain.user.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

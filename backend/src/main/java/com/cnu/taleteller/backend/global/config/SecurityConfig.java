@@ -1,4 +1,4 @@
-package com.cnu.taleteller.backend.config;
+package com.cnu.taleteller.backend.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

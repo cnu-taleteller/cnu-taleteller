@@ -18,28 +18,28 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long book_id;
+    private Long bookId;
 
     @Column(length = 100)
-    private String book_name;
+    private String bookName;
 
-    private Timestamp book_regdate;
+    private Timestamp bookRegdate;
 
     @Column(length = 10)
-    private String book_size;
+    private String bookSize;
 
     @Column(columnDefinition = "TEXT")
-    private String book_description;
+    private String bookDescription;
 
     @Column(length = 15)
-    private String book_status;
+    private String bookStatus;
 
     @Column(length = 15)
-    private String book_category;
+    private String bookCategory;
 
-    private int book_recommend;
+    private int bookRecommend;
 
     @Column(length = 1)
-    private String book_public;
+    private String bookPublic;
 
 }

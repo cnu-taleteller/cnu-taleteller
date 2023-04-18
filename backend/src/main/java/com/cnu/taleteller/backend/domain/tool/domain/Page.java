@@ -15,27 +15,27 @@ public class Page {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long page_id;
+    private Long pageId;
 
-    private int page_sequence;
+    private int pageSequence;
 
     @Column(length = 1)
-    private String page_status;
+    private String pageStatus;
 
-    private int caption_size;
+    private int captionSize;
 
     @Column(columnDefinition = "TEXT")
-    private String caption_content;
+    private String captionContent;
 
     @Column(length = 2)
-    private String caption_location;
+    private String captionLocation;
 
     @Column(length = 100)
-    private String caption_color;
+    private String captionColor;
 
     private String thumbnail;
 
     @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book_id;
+    @JoinColumn(name = "bookId")
+    private Book bookId;
 }

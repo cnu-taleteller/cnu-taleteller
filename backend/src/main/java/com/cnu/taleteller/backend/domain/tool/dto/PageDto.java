@@ -10,35 +10,35 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PageDto {
 
-    private Long page_id;
+    private Long pageId;
 
-    private int page_sequence;
+    private int pageSequence;
 
-    private String page_status;
+    private String pageStatus;
 
-    private int caption_size;
+    private int captionSize;
 
-    private String caption_content;
+    private String captionContent;
 
-    private String caption_location;
+    private String captionLocation;
 
-    private String caption_color;
+    private String captionColor;
 
     private String thumbnail;
 
-    private Long book_id;
+    private Long bookId;
 
     public Page toEntity() {
         return Page.builder()
-                .page_id(this.page_id)
-                .page_sequence(this.page_sequence)
-                .page_status(this.page_status)
-                .caption_size(this.caption_size)
-                .caption_content(this.caption_content)
-                .caption_location(this.caption_location)
-                .caption_color(this.caption_color)
+                .pageId(this.pageId)
+                .pageSequence(this.pageSequence)
+                .pageStatus(this.pageStatus)
+                .captionSize(this.captionSize)
+                .captionContent(this.captionContent)
+                .captionLocation(this.captionLocation)
+                .captionColor(this.captionColor)
                 .thumbnail(this.thumbnail)
-                .book_id(Book.builder().book_id(this.book_id).build())
+                .bookId(Book.builder().bookId(this.bookId).build())
                 .build();
     }
 }

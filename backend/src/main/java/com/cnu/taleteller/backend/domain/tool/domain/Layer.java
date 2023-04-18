@@ -17,30 +17,30 @@ public class Layer {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long layer_id;
+    private Long layerId;
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "page_id")
-    private Page page_id;
+    @JoinColumn(name = "pageId")
+    private Page pageId;
 
-    private int layer_x;
+    private int layerX;
 
-    private int layer_y;
+    private int layerY;
 
-    private int layer_x_size;
+    private int layerXSize;
 
-    private int layer_y_size;
+    private int layerYSize;
 
     @Column(length = 101)
-    private String file_name;
+    private String fileName;
 
     @Column(length = 10)
-    private String file_size;
+    private String fileSize;
 
     @Column(length = 100)
-    private String file_location;
+    private String fileLocation;
 
     @Column(length = 100)
-    private String file_origin_name;
+    private String fileOriginName;
 }

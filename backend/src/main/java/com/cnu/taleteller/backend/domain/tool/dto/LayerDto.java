@@ -11,38 +11,38 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LayerDto {
 
-    private Long layer_id;
+    private Long layerId;
 
-    private Long page_id;
+    private Long pageId;
 
-    private int layer_x;
+    private int layerX;
 
-    private int layer_y;
+    private int layerY;
 
-    private int layer_x_size;
+    private int layerXSize;
 
-    private int layer_y_size;
+    private int layerYSize;
 
-    private String file_name;
+    private String fileName;
 
-    private String file_size;
+    private String fileSize;
 
-    private String file_location;
+    private String fileLocation;
 
-    private String file_origin_name;
+    private String fileOriginName;
 
     public Layer toEntity() {
         return Layer.builder()
-                .layer_id(this.layer_id)
-                .page_id(Page.builder().page_id(this.page_id).build())
-                .layer_x(this.layer_x)
-                .layer_y(this.layer_y)
-                .layer_x_size(this.layer_x_size)
-                .layer_y_size(this.layer_y_size)
-                .file_name(this.file_name)
-                .file_size(this.file_size)
-                .file_location(this.file_location)
-                .file_origin_name(this.file_origin_name)
+                .layerId(this.layerId)
+                .pageId(Page.builder().pageId(this.pageId).build())
+                .layerX(this.layerX)
+                .layerY(this.layerY)
+                .layerXSize(this.layerXSize)
+                .layerYSize(this.layerYSize)
+                .fileName(this.fileName)
+                .fileSize(this.fileSize)
+                .fileLocation(this.fileLocation)
+                .fileOriginName(this.fileOriginName)
                 .build();
     }
 

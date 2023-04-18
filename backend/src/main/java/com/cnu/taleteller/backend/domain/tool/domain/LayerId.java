@@ -11,6 +11,6 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class LayerId implements Serializable {
 
-    private Long layer_id;
-    private Long page_id;
+    private Long layerId;
+    private Long pageId;
 }

@@ -17,7 +17,7 @@ public class Page {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long pageId;
 
-    private int pageSequence;
+    private int pageNumber;
 
     @Column(length = 1)
     private String pageStatus;

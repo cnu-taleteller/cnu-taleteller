@@ -24,12 +24,16 @@ public class Layer {
     @JoinColumn(name = "pageId")
     private Page pageId;
 
+    @Column(name = "layer_x")
     private int layerX;
 
+    @Column(name = "layer_y")
     private int layerY;
 
+    @Column(name = "layer_x_size")
     private int layerXSize;
 
+    @Column(name = "layer_y_size")
     private int layerYSize;
 
     @Column(length = 101)
@@ -39,8 +43,8 @@ public class Layer {
     private String fileSize;
 
     @Column(length = 100)
-    private String fileLocation;
-
-    @Column(length = 100)
     private String fileOriginName;
+
+    private int layerNumber;
+
 }

@@ -74,16 +74,16 @@ export default {
 }
 .tool-content {
   height: 80%;
-  width: 80%;
+  width: 90%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .tool-right{
-  width: 80%;
+  width: 75%;
 }
 .tool-left{
-  width: 20%;
+  width: 15%;
   height: 100%;
 }
 .tool-right-top {

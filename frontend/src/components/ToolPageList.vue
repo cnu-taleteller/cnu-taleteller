@@ -2,17 +2,16 @@
   <div class="left-side-bar">
     <h3>페이지</h3>
     <div class="page-all">
-      <!-- in test -->
-      <draggable v-model="items" :options="{animation:300, handle:'.page-body'}" class="page-list">
-        <li v-for="item, index in items" :key="index" class="one_page">
+      <draggable @change="saveSession()" v-model="pageArr" :options="{ animation: 300, handle: '.page-body' }" class="page-list">
+        <li v-for="page, index in pageArr" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
-            {{ item.no }}
+            {{ page.pageNo }}
           </label>
         </li>
       </draggable>
     </div>
-    <button @click="insertItem()">페이지 추가</button>
+    <button @click="addPage()">페이지 추가</button>
   </div>
 </template>
 
@@ -26,68 +25,55 @@ export default {
   name: 'App',
   data() {
     return {
-      firstItem: [],
-      items: [],
+      book_id: null,
+      pageArr: [],
       currentPageNo: 1,
     }
   },
+  created() {
+    this.book_id = sessionStorage.getItem('book_id');
+    this.pageArr.push({
+      pageNo: 1,
+      pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
+    })
+  },
   methods: {
-    defalutReset() {
-      this.currentPageNo = items.length - 1;
+    addPage(){
+      let newNo = 1;
+      if (this.pageArr.concat().length > 0) {
+        newNo = Math.max.apply(null, this.pageArr.concat().map(
+          function (page) { 
+            return page.pageNo; 
+          })) + 1;
+      }
+
+      this.pageArr.push({
+        pageNo: newNo,
+        pageStatus: 1, 
+      })
+      this.saveSession();
     },
     clickPage(index) {
       this.currentPageNo = index;
-      this.$emit('selectedPage', this.items[index].no);
-      sessionStorage.setItem('recentlyClickPageNo', this.items[index].no);
+      this.$emit('selectedPage', this.pageArr[index].pageNo);
+      console.log(this.pageArr[this.currentPageNo]);
     },
-    checkMove(evt) {
-      console.log('draggedContext', evt.draggedContext);
-      console.log('relatedContext', evt.relatedContext);
-      return (evt.draggedContext.element.name !== 'first');
-    },
-    insertItem() {
-      let currnet = this.currentPageNo;
-      var self = this;
-      var newNo = 1;
-      if (self.items.concat().length > 0) {
-        newNo = Math.max.apply(null, self.items.concat().map(function (item) { return item.no; })) + 1;
-      }
-
-      this.items.splice(
-        currnet + 1,
-        0,
-        {
-          no: newNo,
-          name: 'list' + newNo,
-        }
-      );
-      //배열을 세션에 담아서 추가 할 때마다 세션저장
-      sessionStorage.setItem('pageNumber', JSON.stringify(this.items));
-      this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
-      this.currentPageNo += 1;
-    },
-    deleteItem(item, index) {
-      this.items.splice(index, 1);
-    },
+    saveSession(){
+      sessionStorage.setItem(this.book_id, JSON.stringify(this.pageArr));
+    }
+    // deletePage(item, index) {
+    //   this.items.splice(index, 1);
+    // },
   },
   //페이지를 세션 저장해서 불러오기 2023 04 11 일단 기존 방식사용
-  mounted() {
-    if(JSON.parse(sessionStorage.getItem('pageNumber'))==null) {
-      this.items = [];
-    }else {
-      this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
-    };
-  }
-  // created() {
-  //     axios.get('/static/list.json').then(response => {
-  //       this.firstItem = response.data.clickPageList[0];
-  //       let cnt = 0;
-  //       for(let i=1; i<response.data.clickPageList.length; i++) {
-  //         this.items[cnt] = response.data.clickPageList[i];
-  //         cnt++;
-  //       }
-  //     });
-  //   }
+  // mounted() {
+  //   if (JSON.parse(sessionStorage.getItem('pageNumber')) == null) {
+  //     this.items = [];
+  //   } else {
+  //     this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
+  //   };
+  // }
+
 }
 </script>
 <style>
@@ -107,6 +93,7 @@ export default {
   /* height: 80vh; */
   overflow-y: scroll;
 }
+
 .page-all::-webkit-scrollbar {
   display: none;
 }
@@ -120,13 +107,12 @@ export default {
 }
 
 .page-body {
-  width: 80%;
-  height: 100px;
+  /* width: 80%; */
+  height: 120px;
   border: 1px solid gray;
 }
 
 .page-list {
   list-style: none;
 }
-
 </style>

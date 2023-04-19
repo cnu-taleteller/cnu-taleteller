@@ -12,7 +12,7 @@ public class PageDto {
 
     private Long pageId;
 
-    private int pageSequence;
+    private int pageNumber;
 
     private String pageStatus;
 
@@ -31,7 +31,7 @@ public class PageDto {
     public Page toEntity() {
         return Page.builder()
                 .pageId(this.pageId)
-                .pageSequence(this.pageSequence)
+                .pageNumber(this.pageNumber)
                 .pageStatus(this.pageStatus)
                 .captionSize(this.captionSize)
                 .captionContent(this.captionContent)

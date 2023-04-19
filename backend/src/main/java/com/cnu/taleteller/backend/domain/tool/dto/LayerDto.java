@@ -27,9 +27,9 @@ public class LayerDto {
 
     private String fileSize;
 
-    private String fileLocation;
-
     private String fileOriginName;
+
+    private int layerNumber;
 
     public Layer toEntity() {
         return Layer.builder()
@@ -41,8 +41,8 @@ public class LayerDto {
                 .layerYSize(this.layerYSize)
                 .fileName(this.fileName)
                 .fileSize(this.fileSize)
-                .fileLocation(this.fileLocation)
                 .fileOriginName(this.fileOriginName)
+                .layerNumber(this.layerNumber)
                 .build();
     }
 

@@ -1,13 +1,13 @@
 <template>
   <div class="left-side-bar">
     <h3>페이지</h3>
+    <button @click="test">데이터확인</button>
     <div class="page-all">
-      <!-- in test -->
-      <draggable v-model="items" :options="{animation:300, handle:'.page-body'}" class="page-list">
-        <li v-for="item, index in items" :key="index" class="one_page">
+      <draggable v-model="bookId" :options="{animation:300, handle:'.page-body'}" class="page-list">
+        <li v-for="item, index in bookId" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
-            {{ item.no }}
+            {{ item.pageNumber || 0 }}
           </label>
         </li>
       </draggable>
@@ -26,8 +26,28 @@ export default {
   name: 'App',
   data() {
     return {
-      firstItem: [],
-      items: [],
+      // firstItem: [],
+      bookId: [
+        {
+          pageNumber : 1,
+          imageList : [
+            {
+              src : '/images/field.png',
+              id : 'item',
+              objId : '0',
+              menu: 'background',
+              draggable : "true", 
+              style : {
+                left : "0px",
+                top : "0px",
+                position : "absolute",
+                width: '1200px',
+                height: '800px',
+              },
+            },
+          ]
+        }
+      ],
       currentPageNo: 1,
     }
   },
@@ -37,8 +57,7 @@ export default {
     },
     clickPage(index) {
       this.currentPageNo = index;
-      this.$emit('selectedPage', this.items[index].no);
-      sessionStorage.setItem('recentlyClickPageNo', this.items[index].no);
+      this.$emit('bookIdList', this.bookId[index]);
     },
     checkMove(evt) {
       console.log('draggedContext', evt.draggedContext);
@@ -49,45 +68,29 @@ export default {
       let currnet = this.currentPageNo;
       var self = this;
       var newNo = 1;
-      if (self.items.concat().length > 0) {
-        newNo = Math.max.apply(null, self.items.concat().map(function (item) { return item.no; })) + 1;
+      if (self.bookId.concat().length > 0) {
+        newNo = Math.max.apply(null, self.bookId.concat().map(function (item) { return item.pageNumber; })) + 1;
       }
-
-      this.items.splice(
+      this.bookId.splice(
         currnet + 1,
         0,
         {
-          no: newNo,
-          name: 'list' + newNo,
+          pageNumber: newNo,
+          imageList : [],
         }
       );
-      //배열을 세션에 담아서 추가 할 때마다 세션저장
-      sessionStorage.setItem('pageNumber', JSON.stringify(this.items));
-      this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
       this.currentPageNo += 1;
     },
     deleteItem(item, index) {
       this.items.splice(index, 1);
     },
+    test() {
+      console.log(this.bookId);
+    }
   },
-  //페이지를 세션 저장해서 불러오기 2023 04 11 일단 기존 방식사용
   mounted() {
-    if(JSON.parse(sessionStorage.getItem('pageNumber'))==null) {
-      this.items = [];
-    }else {
-      this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
-    };
+    
   }
-  // created() {
-  //     axios.get('/static/list.json').then(response => {
-  //       this.firstItem = response.data.clickPageList[0];
-  //       let cnt = 0;
-  //       for(let i=1; i<response.data.clickPageList.length; i++) {
-  //         this.items[cnt] = response.data.clickPageList[i];
-  //         cnt++;
-  //       }
-  //     });
-  //   }
 }
 </script>
 <style>

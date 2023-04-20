@@ -5,15 +5,15 @@
     </div>
     <div class="tool-content">
       <div class="tool-left">
-      <ToolPageList @selectedPage="handle"></ToolPageList>
+      <ToolPageList @bookIdList="handle"></ToolPageList>
     </div>
       <div class="tool-right">
         <div class="tool-right-top">
-          <ToolSelectedPage :selectedPageNo="Number(this.selectPageNo)" :imageList="this.imageList"></ToolSelectedPage>
+          <ToolSelectedPage :bookIdList="this.bookIdList" :imageIndex="this.imageIndex"></ToolSelectedPage>
           <ToolLayer></ToolLayer>
         </div>
         <div class="tool-right-bottom">
-        <ToolMenu :selectedPageNo="Number(this.selectPageNo)" @imageList="setImageList"></ToolMenu>
+        <ToolMenu :bookIdList="this.bookIdList" @imageIndex="handle2"></ToolMenu>
       </div>
       </div>
     </div>
@@ -29,8 +29,8 @@ import toolMenu from '@/components/ToolMenu.vue';
 export default {
   data() {
     return {
-      selectPageNo : 0,
-      imageList : {},
+      bookIdList : {},
+      imageIndex : 0,
     }
   },
   mounted() {
@@ -46,11 +46,11 @@ export default {
     ToolMenu: toolMenu
   },
   methods : {
-    handle(selectedPage) {
-      this.selectPageNo = selectedPage;
+    handle(bookIdList) {
+      this.bookIdList = bookIdList;
     },
-    setImageList(imageList) {
-      this.imageList = imageList;
+    handle2(imageIndex) {
+      this.imageIndex = imageIndex;
     },
   },
 }

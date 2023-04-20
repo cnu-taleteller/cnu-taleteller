@@ -6,11 +6,11 @@
         {{ selectedMenu }}
       </div>
       <div class="image-list">
-        <div class="image-list-char" v-show="selectedMenu == 'character'" v-for="item, index in charList">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId" :style="{ height : item.height}">
+        <div class="image-list-char" v-show="selectedMenu == 'character'">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId" :style="{ height : item.height}" v-for="item, index in charList">
         </div>
-        <div class="image-list-back" v-show="selectedMenu == 'background'" v-for="item, index in backList">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId" :style="{ height : item.height}">
+        <div class="image-list-back" v-show="selectedMenu == 'background'">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId" :style="{ height : item.height}" v-for="item, index in backList">
         </div>
       </div>
       <div class="uploadImage">
@@ -28,12 +28,7 @@
   export default {
     data() {
       return {
-        image: null,
         pageNo: 0,
-        content: {
-          backgroundImage: null,
-          characterImage : null
-        },
         charList: [
           {
             src : '/images/pngwing.com.png',
@@ -47,7 +42,7 @@
             id : 'item',
             draggable : "true",
             dataId : 'i2',
-            height : "100px",
+            height : "100",   
           }],
         backList: [
           {
@@ -58,85 +53,20 @@
             height : '100px',
           }],
         selectedMenu: 'character',
-        notUploadImageList : false,
-        nextId : 0,
-        imageList : {},
-        xOffsetId : {},
-        yOffsetId : {},
+        nextId : 1,
         uploadId : 0,
         isUpload : false,
+        imageIndex : 0,
       }
     },
     props : {
-        selectedPageNo : Number,
+        bookIdList : Object,
     },
     mounted() {
-      if(!this.notUploadImageList) {
-        this.haveImageEvent();
-        this.notUploadImageList = true;
-      };
-      
       const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
-      const container = document.querySelector('.selected-page .drag-image .object');
-      
-      let toolMenu = this;
-      let active = false;
-      let currentX;
-      let currentY;
-      let initialX;
-      let initialY;
-      let xOffset = 0;
-      let yOffset = 0;
-      let currentImage = null;
-      
+      this.haveImageEvent();
       this.imageEventDragOver(toolSelectedPageDrag);
       this.imageEventDrop(toolSelectedPageDrag);
-      
-      container.addEventListener("mousedown", dragStart, {capture:false});
-      container.addEventListener("mouseup", dragEnd, {capture:false});
-      container.addEventListener("mousemove", drag, {capture:false});
-
-      function dragStart(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                currentImage = e.target;
-            if (e.type === "touchstart") {
-                initialX = e.touches[0].clientX - xOffset;
-                initialY = e.touches[0].clientY - yOffset;
-            } else {
-                initialX = e.clientX - toolMenu.xOffsetId[e.target.dataset.ids];
-                initialY = e.clientY - toolMenu.yOffsetId[e.target.dataset.ids];
-            }
-                active = true;
-                document.body.style.cursor = 'grabbing';
-                e.target.style.opacity = '0.5';
-            }
-
-            function dragEnd(e) {
-                let imageId = e.target.dataset.ids;
-                toolMenu.imageList[imageId].image.style.zIndex = "1";
-                e.target.style.opacity = '1';
-                active = false;
-            }
-
-            function drag(e) {
-                if (active && currentImage === e.target) {
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                    toolMenu.xOffsetId[e.target.dataset.ids] = currentX;
-                    toolMenu.yOffsetId[e.target.dataset.ids] = currentY;
-                    let imageId = e.target.dataset.ids;
-                    setTranslate(currentX, currentY, toolMenu.imageList[imageId].image);
-                }else if(currentImage !== e.target){
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }
-
-            function setTranslate(xPos, yPos, el) {
-                el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
-                el.style.zIndex = "10";
-            }
     },
     updated() {
       if(this.isUpload) {
@@ -146,8 +76,8 @@
             const x = e.offsetX;
             const y = e.offsetY;
             e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
-        });
-      }
+          });
+        }
       this.uploadId++;
       }
       this.isUpload = false;
@@ -163,23 +93,18 @@
               'Content-Type': 'multipart/form-data'
             }
           });
+          this.isUpload = true;
           if (menu === 'background') {
-            this.isUpload = true;
-            this.content.backgroundImage = res.data;
-            sessionStorage.setItem('backgroundImage', this.content.backgroundImage);
-            this.src = "/images/" + this.content.backgroundImage;
+            this.src = "/images/" + res.data;
             this.backList.push({
               src : this.src,
               id : 'item',
               draggable : "true",
               dataId : 'upload' + this.uploadId,
-              height : "1000",
+              height : "100",
             });
           } else if (menu === 'character') {
-            this.isUpload = true;
-            this.content.characterImage = res.data;
-            sessionStorage.setItem('characterImage', this.content.characterImage);
-            this.src = "/images/" + this.content.characterImage;
+            this.src = "/images/" + res.data;
             this.charList.push({
               src : this.src,
               id : 'item',
@@ -193,19 +118,9 @@
           console.log(e);
         }
       },
-      uploadCharacter(image) {
-        this.content.characterImage = image;
-        sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-      },
-      uploadBackgorund(image) {
-        this.content.backgroundImage = image;
-        sessionStorage.setItem(this.selectedPageNo, JSON.stringify(this.content));
-      },
       setSelectedMenu(menu) {
         this.selectedMenu = menu;
-        sessionStorage.setItem('selectedMenu', menu);
       },
-      //기존이미지에 이벤트 리스너 추가
       haveImageEvent() {
         document.querySelectorAll(".menu .image-list #item").forEach((element) => {
             element.addEventListener("dragstart", (e) => {
@@ -224,38 +139,52 @@
       imageEventDrop(element) {
         let nextId = this.nextId;
         element.addEventListener("drop", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            let rX = e.pageX - document.querySelector('.selected-page').offsetLeft;
-            let rY = e.pageY - document.querySelector('.selected-page').offsetTop;
-            let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
-            if (x != undefined && y != undefined && data != undefined) {
-              let newDiv = document.createElement('div');
-              newDiv.id = "test";
-              let newElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
-              let cloneNewElement = newElement.cloneNode();
-              cloneNewElement.style.position = "absolute";
-              cloneNewElement.style.left = (rX - x) + "px";
-              cloneNewElement.style.top = (rY - y) + "px";
-              cloneNewElement.style.zIndex = 1;
-              cloneNewElement.setAttribute("draggable", "false");
-              let imageId = nextId++;
-              cloneNewElement.dataset.ids = imageId;
-              let newImage = {
-                pageNo : this.selectedPageNo,
-                image : cloneNewElement,
-              };
-              this.imageList[imageId] = newImage;
-              this.xOffsetId[imageId] = 0;
-              this.yOffsetId[imageId] = 0;
-              this.$emit('imageList', this.imageList);
-              if(this.selectedMenu==='background') {
-                cloneNewElement.style.width = 1200 + 'px';
-                cloneNewElement.style.height = 450 + 'px';  
-              }
-              newDiv.appendChild(cloneNewElement);
-              document.querySelector('.selected-page .drag-image .object').appendChild(newDiv);
-            }
+          e.preventDefault();
+          e.stopPropagation();
+          let rX = e.pageX - document.querySelector('.selected-page').offsetLeft;
+          let rY = e.pageY - document.querySelector('.selected-page').offsetTop;
+          let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
+          let newElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
+          let cloneNewElement = newElement.cloneNode();
+          cloneNewElement.setAttribute("draggable", "false");
+          // 기본적으로 0,1,2 를 오브젝트 아이디로 줌 각각을 구별하기 위해
+          let imageId = nextId++;
+          cloneNewElement.dataset.objId = imageId;
+          if(this.selectedMenu == 'background') {
+            const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
+            const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
+            const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
+            cloneNewElement.style.left = "0px";
+            cloneNewElement.style.top = "0px";
+            cloneNewElement.style.width = dragImageWidth;
+            cloneNewElement.style.height = dragImageHeight;
+            cloneNewElement.style.position = "absolute";
+            cloneNewElement.style.zIndex = 1;
+          }else {
+            cloneNewElement.style.left = (rX - x) + "px";
+            cloneNewElement.style.top = (rY - y) + "px";
+            cloneNewElement.style.position = "absolute";
+            cloneNewElement.style.width = cloneNewElement.width;
+            cloneNewElement.style.height = cloneNewElement.height;
+            cloneNewElement.style.zIndex = 1;
+          }
+          let newImage = {
+            src : cloneNewElement.src,
+            id : 'item',
+            objId : String(imageId),
+            menu: this.selectedMenu,
+            style : {
+              left : cloneNewElement.style.left,
+              top : cloneNewElement.style.top,
+              position : cloneNewElement.style.position,
+              width : cloneNewElement.style.width,
+              height : cloneNewElement.style.height,
+            },
+          };
+          //만약 레이어위치 변경 해야하면 변경할 수 도 있는 부분(2023-04-20)
+          this.imageIndex = this.bookIdList.imageList.length;
+          this.bookIdList.imageList[this.imageIndex] = newImage;
+          document.querySelector('.selected-page .drag-image .object').appendChild(cloneNewElement);
         });
       },
     },

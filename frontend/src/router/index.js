@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/HomeView.vue'
 import ToolView from '../views/ToolView.vue'
 import ToolSubmitView from '../views/ToolSubmitView.vue'
 import MyPageView from '../views/MyView.vue'
@@ -9,11 +9,11 @@ import ToolScenarioView from '../views/ToolScenarioView.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'home',
-  //   component: HomeView
-  // },
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
+  },
   {
     path: '/tool',
     name: 'tool',

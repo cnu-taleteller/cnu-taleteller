@@ -7,7 +7,7 @@
         </h5>
         </div>
         <div class="header-menu">
-        <button @click="setScenario()">시나리오</button>
+        <!-- <button @click="setScenario()">시나리오</button> -->
         <button>임시저장</button>
         <button><router-link :to="{ name: 'ToolSubmit', params: { contentName: contentName } }">제출</router-link></button>
         </div>
@@ -28,13 +28,13 @@ export default {
                     this.contentName = inputValue;
                 }
             },
-            setScenario(){
-                const popupWidth = 1000;
-                const popupHeight = 600;
-                const popupX = (window.screen.width / 2) - (popupWidth / 2);
-                const popupY= (window.screen.height / 2) - (popupHeight / 2);
-                this.pop = window.open("/toolScenario", "open_component", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
-            }
+            // setScenario(){
+            //     const popupWidth = 1000;
+            //     const popupHeight = 600;
+            //     const popupX = (window.screen.width / 2) - (popupWidth / 2);
+            //     const popupY= (window.screen.height / 2) - (popupHeight / 2);
+            //     this.pop = window.open("/toolScenario", "open_component", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
+            // }
         },
 }
 </script>

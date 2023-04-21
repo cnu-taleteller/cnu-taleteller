@@ -34,7 +34,7 @@ public class LayerDto {
     public Layer toEntity() {
         return Layer.builder()
                 .layerId(this.layerId)
-                .pageId(Page.builder().pageId(this.pageId).build())
+                .page(Page.builder().pageId(this.pageId).build())
                 .layerX(this.layerX)
                 .layerY(this.layerY)
                 .layerXSize(this.layerXSize)

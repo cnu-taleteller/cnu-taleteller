@@ -20,7 +20,7 @@ export default {
     methods: {
         saveToSessionStorage() {
             sessionStorage.setItem("projectTitle", this.contentName);
-            this.$router.push("/my");
+            this.$router.push("/mypage/workmanage");
         },
     },
 };

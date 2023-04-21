@@ -29,6 +29,7 @@
     data() {
       return {
         pageNo: 0,
+        //리스트 변경 해야함.
         charList: [
           {
             src : '/images/pngwing.com.png',
@@ -60,27 +61,16 @@
       }
     },
     props : {
-        bookIdList : Object,
+      currentPageList : Object,
     },
     mounted() {
       const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
-      this.haveImageEvent();
+      this.existingImageEventDragStart();
       this.imageEventDragOver(toolSelectedPageDrag);
       this.imageEventDrop(toolSelectedPageDrag);
     },
     updated() {
-      if(this.isUpload) {
-        const uploadImage = document.querySelector(`.menu .image-list #item[data-id=upload${this.uploadId}]`);
-        if(uploadImage !== null) {
-          uploadImage.addEventListener('dragstart', e => {
-            const x = e.offsetX;
-            const y = e.offsetY;
-            e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
-          });
-        }
-      this.uploadId++;
-      }
-      this.isUpload = false;
+      this.addImageEventDragstart();
     },
     methods: {
       async setImage(menu) {
@@ -121,7 +111,8 @@
       setSelectedMenu(menu) {
         this.selectedMenu = menu;
       },
-      haveImageEvent() {
+      //기존에 있는 이미지에 dragStart 이벤트를 줌
+      existingImageEventDragStart() {
         document.querySelectorAll(".menu .image-list #item").forEach((element) => {
             element.addEventListener("dragstart", (e) => {
                 const x = e.offsetX;
@@ -129,6 +120,20 @@
                 e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
             });
         });
+      },
+      addImageEventDragstart() {
+        if(this.isUpload) {
+        const uploadImage = document.querySelector(`.menu .image-list #item[data-id=upload${this.uploadId}]`);
+        if(uploadImage !== null) {
+          uploadImage.addEventListener('dragstart', e => {
+            const x = e.offsetX;
+            const y = e.offsetY;
+            e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
+          });
+        }
+        this.uploadId++;
+        }
+        this.isUpload = false;
       },
       imageEventDragOver(element) {
         element.addEventListener("dragover", (e) => {
@@ -144,47 +149,47 @@
           let rX = e.pageX - document.querySelector('.selected-page').offsetLeft;
           let rY = e.pageY - document.querySelector('.selected-page').offsetTop;
           let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
-          let newElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
-          let cloneNewElement = newElement.cloneNode();
-          cloneNewElement.setAttribute("draggable", "false");
-          // 기본적으로 0,1,2 를 오브젝트 아이디로 줌 각각을 구별하기 위해
+          let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
+          let cloneImageElement = imageElement.cloneNode();
+          cloneImageElement.setAttribute("draggable", "false");
+          // 기본적으로 0,1,2 를 오브젝트 아이디로 줌 각각을 구별하기 위해 고유 id 를 주거나해야할듯??
           let imageId = nextId++;
-          cloneNewElement.dataset.objId = imageId;
+          cloneImageElement.dataset.objId = imageId;
           if(this.selectedMenu == 'background') {
             const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
             const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
             const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
-            cloneNewElement.style.left = "0px";
-            cloneNewElement.style.top = "0px";
-            cloneNewElement.style.width = dragImageWidth;
-            cloneNewElement.style.height = dragImageHeight;
-            cloneNewElement.style.position = "absolute";
-            cloneNewElement.style.zIndex = 1;
+            cloneImageElement.style.left = "0px";
+            cloneImageElement.style.top = "0px";
+            cloneImageElement.style.width = dragImageWidth;
+            cloneImageElement.style.height = dragImageHeight;
+            cloneImageElement.style.position = "absolute";
+            cloneImageElement.style.zIndex = 1;
           }else {
-            cloneNewElement.style.left = (rX - x) + "px";
-            cloneNewElement.style.top = (rY - y) + "px";
-            cloneNewElement.style.position = "absolute";
-            cloneNewElement.style.width = cloneNewElement.width;
-            cloneNewElement.style.height = cloneNewElement.height;
-            cloneNewElement.style.zIndex = 1;
+            cloneImageElement.style.left = (rX - x) + "px";
+            cloneImageElement.style.top = (rY - y) + "px";
+            cloneImageElement.style.position = "absolute";
+            cloneImageElement.style.width = cloneImageElement.width;
+            cloneImageElement.style.height = cloneImageElement.height;
+            cloneImageElement.style.zIndex = 1;
           }
           let newImage = {
-            src : cloneNewElement.src,
+            src : cloneImageElement.src,
             id : 'item',
             objId : String(imageId),
             menu: this.selectedMenu,
             style : {
-              left : cloneNewElement.style.left,
-              top : cloneNewElement.style.top,
-              position : cloneNewElement.style.position,
-              width : cloneNewElement.style.width,
-              height : cloneNewElement.style.height,
+              left : cloneImageElement.style.left,
+              top : cloneImageElement.style.top,
+              position : cloneImageElement.style.position,
+              width : cloneImageElement.style.width,
+              height : cloneImageElement.style.height,
             },
           };
           //만약 레이어위치 변경 해야하면 변경할 수 도 있는 부분(2023-04-20)
-          this.imageIndex = this.bookIdList.imageList.length;
-          this.bookIdList.imageList[this.imageIndex] = newImage;
-          document.querySelector('.selected-page .drag-image .object').appendChild(cloneNewElement);
+          this.imageIndex = this.currentPageList.imageList.length;
+          this.currentPageList.imageList[this.imageIndex] = newImage;
+          document.querySelector('.selected-page .drag-image .object').appendChild(cloneImageElement);
         });
       },
     },

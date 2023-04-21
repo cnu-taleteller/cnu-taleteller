@@ -1,18 +1,17 @@
 <template>
   <div class="left-side-bar">
     <h3>페이지</h3>
-    <button @click="test">데이터확인</button>
     <div class="page-all">
-      <draggable v-model="bookId" :options="{animation:300, handle:'.page-body'}" class="page-list">
-        <li v-for="item, index in bookId" :key="index" class="one_page">
+      <draggable @change="saveSession()" v-model="pageArr" :options="{ animation: 300, handle: '.page-body' }" class="page-list">
+        <li v-for="page, index in pageArr" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
-            {{ item.pageNumber || 0 }}
+            {{ page.pageNo }}
           </label>
         </li>
       </draggable>
     </div>
-    <button @click="insertItem()">페이지 추가</button>
+    <button @click="addPage()">페이지 추가</button>
   </div>
 </template>
 
@@ -26,10 +25,11 @@ export default {
   name: 'App',
   data() {
     return {
-      // firstItem: [],
-      bookId: [
-        {
-          pageNumber : 1,
+      book_id: null,
+      pageArr: [
+          {
+          pageNo : 1,
+          pageStatus: 1,
           imageList : [
             {
               src : '/images/field.png',
@@ -57,25 +57,21 @@ export default {
     },
     clickPage(index) {
       this.currentPageNo = index;
-      this.$emit('bookIdList', this.bookId[index]);
+      this.$emit('currentPageList', this.pageArr[index]);
     },
-    checkMove(evt) {
-      console.log('draggedContext', evt.draggedContext);
-      console.log('relatedContext', evt.relatedContext);
-      return (evt.draggedContext.element.name !== 'first');
-    },
-    insertItem() {
+    addPage() {
       let currnet = this.currentPageNo;
       var self = this;
       var newNo = 1;
-      if (self.bookId.concat().length > 0) {
-        newNo = Math.max.apply(null, self.bookId.concat().map(function (item) { return item.pageNumber; })) + 1;
+      if (self.pageArr.concat().length > 0) {
+        newNo = Math.max.apply(null, self.pageArr.concat().map(function (item) { return item.pageNo; })) + 1;
       }
-      this.bookId.splice(
+      this.pageArr.splice(
         currnet + 1,
         0,
         {
-          pageNumber: newNo,
+          pageNo: newNo,
+          pageStatus: 1,
           imageList : [],
         }
       );
@@ -84,13 +80,10 @@ export default {
     deleteItem(item, index) {
       this.items.splice(index, 1);
     },
-    test() {
-      console.log(this.bookId);
-    }
+    saveSession(){
+      sessionStorage.setItem(this.book_id, JSON.stringify(this.pageArr));
+    },
   },
-  mounted() {
-    
-  }
 }
 </script>
 <style>

@@ -1,9 +1,9 @@
     <template>
         <div class="selected-page">
-            <h3>{{ bookIdList.pageNumber }}</h3>
+            <h3>{{ currentPageList.pageNo }}</h3>
             <div class="drag-image">
                 <div class="object" ref="pageObject">
-                    
+    
                 </div>
             </div>
         </div>
@@ -11,7 +11,7 @@
     <script>
     export default {
         props : {
-            bookIdList : Object,
+            currentPageList : Object,
             imageIndex : Number,
         },
         data(){
@@ -20,20 +20,20 @@
         },
         mounted() {
             const dragArea = document.querySelector('.selected-page');
-            const container = document.querySelector('.selected-page .drag-image .object');
+            const objArea = document.querySelector('.selected-page .drag-image .object');
             let toolMenu = this;
             let active = false;
             let currentX;
             let currentY;
             let currentXOffset;
             let currentYOffset;
-            let initialX;
-            let initialY;
+            let moveX;
+            let moveY;
             let currentObjId = null;
 
-            container.addEventListener("mousedown", dragStart, {capture:false});
-            container.addEventListener("mouseup", dragEnd, {capture:false});
-            container.addEventListener("mousemove", drag, {capture:false});
+            objArea.addEventListener("mousedown", dragStart, {capture:false});
+            objArea.addEventListener("mouseup", dragEnd, {capture:false});
+            objArea.addEventListener("mousemove", drag, {capture:false});
             
             function dragStart(e) {
                 e.stopPropagation();
@@ -43,7 +43,6 @@
                 currentY = e.pageY - dragArea.offsetTop;
                 currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
                 currentYOffset = e.pageY - dragArea.offsetTop - e.offsetY;
-                console.log(currentYOffset);
                 document.body.style.cursor = 'grabbing';
                 e.target.style.opacity = '0.5';
                 active = true;
@@ -53,27 +52,27 @@
                 e.preventDefault();
                 e.stopPropagation();
                 if (active && currentObjId === e.target.dataset.objId) {
-                    initialX = e.pageX - dragArea.offsetLeft;
-                    initialY = e.pageY - dragArea.offsetTop;
-                    setTranslate(initialX - currentX, initialY - currentY, e.target);
+                    moveX = e.pageX - dragArea.offsetLeft;
+                    moveY = e.pageY - dragArea.offsetTop;
+                    setLocation(moveX - currentX, moveY - currentY, e.target);
                 }else if(currentObjId !== e.target.dataset.objId){
                     e.preventDefault();
                     e.stopPropagation();
                 }
             };
 
-            function setTranslate(xPos, yPos, el) {
-                el.style.left = currentXOffset + xPos + "px";
-                el.style.top = currentYOffset + yPos + "px";
-                el.style.zIndex = "10";
+            function setLocation(xMove, yMove, element) {
+                element.style.left = currentXOffset + xMove+ "px";
+                element.style.top = currentYOffset + yMove + "px";
+                element.style.zIndex = "10";
             };
 
             function dragEnd(e) {
                 e.target.style.zIndex = "1";
                 e.target.style.opacity = '1';
                 let targetObj = e.target.dataset.objId;
-                console.log(typeof(targetObj));
-                let result = toolMenu.bookIdList.imageList.find(el => el.objId === targetObj);
+                //객체에도 변한 위치를 적용시킴
+                let result = toolMenu.currentPageList.imageList.find(el => el.objId === targetObj);
                 result.style.left = e.target.style.left;
                 result.style.top = e.target.style.top;
                 document.body.style.cursor = '';
@@ -81,7 +80,7 @@
             };
         },
         watch: {
-            bookIdList() {
+            currentPageList() {
                 this.updateContent();
             },
         },
@@ -91,8 +90,8 @@
                 while (objectElement.firstChild) {
                     objectElement.removeChild(objectElement.firstChild);
                 }
-                if(this.bookIdList.imageList != null) {
-                    for (const [index, image] of Object.entries(this.bookIdList.imageList)) {
+                if(this.currentPageList.imageList != null) {
+                    for (const [index, image] of Object.entries(this.currentPageList.imageList)) {
                         const imageEle = document.createElement('img');
                         imageEle.src = image.src;
                         imageEle.id = image.id;

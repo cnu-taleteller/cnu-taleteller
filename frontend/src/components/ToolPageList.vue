@@ -26,7 +26,28 @@ export default {
   data() {
     return {
       book_id: null,
-      pageArr: [],
+      pageArr: [
+          {
+          pageNo : 1,
+          pageStatus: 1,
+          imageList : [
+            {
+              src : '/images/field.png',
+              id : 'item',
+              objId : '0',
+              menu: 'background',
+              draggable : "true", 
+              style : {
+                left : "0px",
+                top : "0px",
+                position : "absolute",
+                width: '1200px',
+                height: '800px',
+              },
+            },
+          ]
+        }
+      ],
       currentPageNo: 1,
     }
   },
@@ -38,19 +59,30 @@ export default {
     })
   },
   methods: {
-    addPage(){
-      let newNo = 1;
-      if (this.pageArr.concat().length > 0) {
-        newNo = Math.max.apply(null, this.pageArr.concat().map(
-          function (page) { 
-            return page.pageNo; 
-          })) + 1;
+    defalutReset() {
+      this.currentPageNo = items.length - 1;
+    },
+    clickPage(index) {
+      this.currentPageNo = index;
+      this.$emit('currentPageList', this.pageArr[index]);
+    },
+    addPage() {
+      let currnet = this.currentPageNo;
+      var self = this;
+      var newNo = 1;
+      if (self.pageArr.concat().length > 0) {
+        newNo = Math.max.apply(null, self.pageArr.concat().map(function (item) { return item.pageNo; })) + 1;
       }
-
-      this.pageArr.push({
-        pageNo: newNo,
-        pageStatus: 1, 
-      })
+      this.pageArr.splice(
+        currnet + 1,
+        0,
+        {
+          pageNo: newNo,
+          pageStatus: 1,
+          imageList : [],
+        }
+      );
+      this.currentPageNo += 1;
       this.saveSession();
     },
     clickPage(index) {
@@ -65,15 +97,6 @@ export default {
     //   this.items.splice(index, 1);
     // },
   },
-  //페이지를 세션 저장해서 불러오기 2023 04 11 일단 기존 방식사용
-  // mounted() {
-  //   if (JSON.parse(sessionStorage.getItem('pageNumber')) == null) {
-  //     this.items = [];
-  //   } else {
-  //     this.items = JSON.parse(sessionStorage.getItem('pageNumber'));
-  //   };
-  // }
-
 }
 </script>
 <style>

@@ -76,6 +76,7 @@ export default {
         }
       );
       this.currentPageNo += 1;
+      this.saveSession();
     },
     deleteItem(item, index) {
       this.items.splice(index, 1);

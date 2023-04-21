@@ -38,7 +38,7 @@ public class PageDto {
                 .captionLocation(this.captionLocation)
                 .captionColor(this.captionColor)
                 .thumbnail(this.thumbnail)
-                .bookId(Book.builder().bookId(this.bookId).build())
+                .book(Book.builder().bookId(this.bookId).build())
                 .build();
     }
 }

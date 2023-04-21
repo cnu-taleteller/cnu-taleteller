@@ -28,6 +28,6 @@ public class Scenario {
 
     @ManyToOne
     @JoinColumn(name = "bookId")
-    private Book bookId;
+    private Book book;
 
 }

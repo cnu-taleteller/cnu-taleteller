@@ -51,6 +51,13 @@ export default {
       currentPageNo: 1,
     }
   },
+  created() {
+    this.book_id = sessionStorage.getItem('book_id');
+    this.pageArr.push({
+      pageNo: 1,
+      pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
+    })
+  },
   methods: {
     defalutReset() {
       this.currentPageNo = items.length - 1;
@@ -78,12 +85,17 @@ export default {
       this.currentPageNo += 1;
       this.saveSession();
     },
-    deleteItem(item, index) {
-      this.items.splice(index, 1);
+    clickPage(index) {
+      this.currentPageNo = index;
+      this.$emit('selectedPage', this.pageArr[index].pageNo);
+      console.log(this.pageArr[this.currentPageNo]);
     },
     saveSession(){
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageArr));
-    },
+    }
+    // deletePage(item, index) {
+    //   this.items.splice(index, 1);
+    // },
   },
 }
 </script>
@@ -104,6 +116,7 @@ export default {
   /* height: 80vh; */
   overflow-y: scroll;
 }
+
 .page-all::-webkit-scrollbar {
   display: none;
 }
@@ -117,13 +130,12 @@ export default {
 }
 
 .page-body {
-  width: 80%;
-  height: 100px;
+  /* width: 80%; */
+  height: 120px;
   border: 1px solid gray;
 }
 
 .page-list {
   list-style: none;
 }
-
 </style>

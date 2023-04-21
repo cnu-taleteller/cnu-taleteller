@@ -207,7 +207,7 @@
     text-align: left;
   }
 
-  .imageList{
+  .image-list{
     display: flex;
     align-items: center;
     justify-content: center;

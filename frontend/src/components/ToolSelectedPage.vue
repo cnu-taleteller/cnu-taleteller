@@ -3,7 +3,7 @@
             <h3>{{ currentPageList.pageNo }}</h3>
             <div class="drag-image">
                 <div class="object" ref="pageObject">
-    
+                
                 </div>
             </div>
         </div>
@@ -122,13 +122,7 @@
     overflow: hidden;
     touch-action: none;
     position: relative;
-    border: 1px solid gray;
-}
-.selected-page2{
-    margin: 10px;
-    width: 80%;
-    height: 450px;
-    border: 1px solid gray;
+    
 }
 .character-image{
     width: 150px;
@@ -140,6 +134,7 @@
     width: 100%;
     height: 450px;
     position: absolute;
+    border: 1px solid gray;
 }
 .object {
     position: absolute;

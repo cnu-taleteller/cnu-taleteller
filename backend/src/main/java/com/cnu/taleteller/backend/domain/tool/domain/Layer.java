@@ -22,7 +22,7 @@ public class Layer {
     @Id
     @ManyToOne
     @JoinColumn(name = "pageId")
-    private Page page;
+    private Page pageId;
 
     @Column(name = "layer_x")
     private int layerX;

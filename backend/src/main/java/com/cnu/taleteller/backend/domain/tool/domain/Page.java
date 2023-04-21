@@ -37,5 +37,5 @@ public class Page {
 
     @ManyToOne
     @JoinColumn(name = "bookId")
-    private Book book;
+    private Book bookId;
 }

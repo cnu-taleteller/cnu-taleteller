@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import ToolView from '../views/ToolView.vue'
 import ToolSubmitView from '../views/ToolSubmitView.vue'
 import MyPageView from '../views/MyView.vue'
+import ToolScenarioView from '../views/ToolScenarioView.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +23,11 @@ const routes = [
     path: "/toolSubmit",
     name: "ToolSubmit",
     component: ToolSubmitView
+  },
+  {
+    path: "/toolScenario",
+    name: "ToolScenario",
+    component: ToolScenarioView
   },
    {
     path: '/mypage',

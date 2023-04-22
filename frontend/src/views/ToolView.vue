@@ -1,8 +1,11 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-    <ToolHeader></ToolHeader>
+      <ToolHeader></ToolHeader>
     </div>
+    <!-- <div class="tool-contnet">
+      <ToolScenario></ToolScenario>
+    </div> -->
     <div class="tool-content">
       <div class="tool-left">
       <ToolPageList @currentPageList="handlePageList"></ToolPageList>
@@ -15,6 +18,11 @@
         <div class="tool-right-bottom">
         <ToolMenu :currentPageList="this.currentPageList" @imageIndex="handleImageIndex"></ToolMenu>
       </div>
+      <div class="tool-center">
+        <ToolSelectedPage :selectedPageNo="Number(this.selectPageNo)" :imageList="this.imageList"></ToolSelectedPage>
+      </div>
+      <div class="tool-right">
+        <ToolMenu :selectedPageNo="Number(this.selectPageNo)" @imageList="setImageList"></ToolMenu>
       </div>
     </div>
   </div>
@@ -25,6 +33,7 @@ import toolPageList from '@/components/ToolPageList.vue';
 import toolSelectedPage from '@/components/ToolSelectedPage.vue';
 import toolLayer from '@/components/ToolLayer.vue';
 import toolMenu from '@/components/ToolMenu.vue';
+import toolScenario from '@/components/ToolScenario.vue';
 
 export default {
   data() {
@@ -34,7 +43,7 @@ export default {
     }
   },
   mounted() {
-    if(sessionStorage.getItem('recentlyClickPageNo') != null) {
+    if (sessionStorage.getItem('recentlyClickPageNo') != null) {
       this.selectPageNo = sessionStorage.getItem('recentlyClickPageNo');
     }
   },
@@ -43,7 +52,8 @@ export default {
     ToolPageList: toolPageList,
     ToolSelectedPage: toolSelectedPage,
     ToolLayer: toolLayer,
-    ToolMenu: toolMenu
+    ToolMenu: toolMenu,
+    ToolScenario : toolScenario
   },
   methods : {
     handlePageList(currentPageList) {
@@ -65,32 +75,34 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.tool-header{
-  height: 20%;
-  width: 90%;
+
+.tool-header {
+  height: 10%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .tool-content {
-  height: 80%;
-  width: 90%;
+  height: 90%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.tool-right{
-  width: 75%;
-}
-.tool-left{
-  width: 15%;
+
+.tool-left {
   height: 100%;
+  width: 15%;
 }
-.tool-right-top {
-  display: flex;
-  height: 70%;
+
+.tool-center {
+  height: 100%;
+  width: 60%;
 }
-.tool-right-bottom{
-  height: 30%;
-}
-</style>
+
+.tool-right {
+  height: 100%;
+  width: 25%;
+}</style>

@@ -198,8 +198,7 @@
   <style scoped>
   .menu {
     margin: 10px;
-    /* width: 1200px; */
-    height: 150px;
+    height: 80vh;
     border: 1px solid gray;
   }
   

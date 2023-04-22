@@ -11,8 +11,6 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Table(name = "scenarios")
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class Scenario {
 
@@ -29,5 +27,14 @@ public class Scenario {
     @ManyToOne
     @JoinColumn(name = "bookId")
     private Book bookId;
+
+    @Builder
+    public Scenario(Long scenarioId, String scenarioContent, String scenarioType, Book bookId) {
+        this.scenarioId = scenarioId;
+        this.scenarioContent = scenarioContent;
+        this.scenarioType = scenarioType;
+        this.bookId = bookId;
+    }
+
 
 }

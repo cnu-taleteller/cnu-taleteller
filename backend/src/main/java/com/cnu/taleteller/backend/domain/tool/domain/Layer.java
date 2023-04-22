@@ -8,9 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @Table(name = "layers")
-@AllArgsConstructor
 @NoArgsConstructor
 @IdClass(LayerId.class)
 public class Layer {
@@ -47,4 +45,17 @@ public class Layer {
 
     private int layerNumber;
 
+    @Builder
+    public Layer(Long layerId, Page pageId, int layerX, int layerY, int layerXSize, int layerYSize, String fileName, String fileSize, String fileOriginName, int layerNumber) {
+        this.layerId = layerId;
+        this.pageId = pageId;
+        this.layerX = layerX;
+        this.layerY = layerY;
+        this.layerXSize = layerXSize;
+        this.layerYSize = layerYSize;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.fileOriginName = fileOriginName;
+        this.layerNumber = layerNumber;
+    }
 }

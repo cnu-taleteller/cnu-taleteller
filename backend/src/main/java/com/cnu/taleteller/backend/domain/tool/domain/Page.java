@@ -8,8 +8,6 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Table(name = "pages")
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class Page {
 
@@ -38,4 +36,17 @@ public class Page {
     @ManyToOne
     @JoinColumn(name = "bookId")
     private Book bookId;
+
+    @Builder
+    public Page(Long pageId, int pageNumber, String pageStatus, int captionSize, String captionContent, String captionLocation, String captionColor, String thumbnail, Book bookId) {
+        this.pageId = pageId;
+        this.pageNumber = pageNumber;
+        this.pageStatus = pageStatus;
+        this.captionSize = captionSize;
+        this.captionContent = captionContent;
+        this.captionLocation = captionLocation;
+        this.captionColor = captionColor;
+        this.thumbnail = thumbnail;
+        this.bookId = bookId;
+    }
 }

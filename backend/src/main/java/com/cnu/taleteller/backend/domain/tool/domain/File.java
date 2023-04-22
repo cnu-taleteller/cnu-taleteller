@@ -9,9 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @Table(name = "files")
-@AllArgsConstructor
 @NoArgsConstructor
 public class File {
 
@@ -24,4 +22,11 @@ public class File {
 
     @Column(length = 10)
     private String fileSize;
+
+    @Builder
+    public File(Long fileId, String fileName, String fileSize) {
+        this.fileId = fileId;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+    }
 }

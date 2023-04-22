@@ -7,7 +7,7 @@
         </h5>
         </div>
         <div class="header-menu">
-        <button @click="setScenario()">시나리오</button>
+        <!-- <button @click="setScenario()">시나리오</button> -->
         <button>임시저장</button>
         <button><router-link :to="{ name: 'ToolSubmit', params: { contentName: contentName } }">제출</router-link></button>
         </div>
@@ -28,34 +28,32 @@ export default {
                     this.contentName = inputValue;
                 }
             },
-            setScenario(){
-                const popupWidth = 1000;
-                const popupHeight = 600;
-                const popupX = (window.screen.width / 2) - (popupWidth / 2);
-                const popupY= (window.screen.height / 2) - (popupHeight / 2);
-                this.pop = window.open("/toolScenario", "open_component", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
-            }
+            // setScenario(){
+            //     const popupWidth = 1000;
+            //     const popupHeight = 600;
+            //     const popupX = (window.screen.width / 2) - (popupWidth / 2);
+            //     const popupY= (window.screen.height / 2) - (popupHeight / 2);
+            //     this.pop = window.open("/toolScenario", "open_component", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
+            // }
         },
 }
 </script>
 <style scoped>
 .header{
-    width: 90%;
-    /* margin-top: 10px; */
-    padding: 0.5%;
-    border-bottom: 1px solid gray;
+    width: 100%;
+    border: 1px solid gray;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .header-title {
-    width: 30%;
+    width: 20%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 .header-menu{
-    width: 70%;
+    width: 80%;
     display: flex;
     justify-content: flex-end;
     align-items: center;

@@ -1,10 +1,12 @@
     <template>
-        <div class="selected-page">
+        <div class="page-form">
+            <div class="selected-page" >
             <div class="drag-image">
                 <h3>{{ selectedPageNo }}</h3>
                 <div class="object" ref="pageObject">
                 </div>
             </div>
+        </div>
         </div>
     </template>
     <script>
@@ -56,10 +58,9 @@
 
 </script>
 <style scoped>
-.selected-page{
-    margin: 10px;
-    width: 80%;
-    height: 450px;
+.page-form{
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,17 +69,20 @@
     position: relative;
     
 }
+.selected-page {
+    width: 100%;
+    height: 60vh;
+    border: 1px solid gray;
+}
 .character-image{
     width: 150px;
     text-align: center;
 }
 
 .drag-image {
-    margin: 10px;
     width: 100%;
-    height: 450px;
+    height: 60vh;
     position: absolute;
-    border: 1px solid gray;
 }
 
 .object {

@@ -83,13 +83,13 @@ export default {
   align-items: center;
   justify-content: center;
   margin: 10px;
-  height: 620px;
+  height: 100%;
   border: 1px solid gray;
 }
 
 .page-all {
   width: 90%;
-  height: 500px;
+  height: 70vh;
   /* height: 80vh; */
   overflow-y: scroll;
 }

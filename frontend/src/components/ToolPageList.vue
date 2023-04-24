@@ -53,10 +53,10 @@ export default {
   },
   created() {
     this.book_id = sessionStorage.getItem('book_id');
-    this.pageArr.push({
-      pageNo: 1,
-      pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-    })
+    // this.pageArr.push({
+    //   pageNo: 1,
+    //   pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
+    // })
   },
   methods: {
     defalutReset() {
@@ -84,11 +84,6 @@ export default {
       );
       this.currentPageNo += 1;
       this.saveSession();
-    },
-    clickPage(index) {
-      this.currentPageNo = index;
-      this.$emit('selectedPage', this.pageArr[index].pageNo);
-      console.log(this.pageArr[this.currentPageNo]);
     },
     saveSession(){
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageArr));

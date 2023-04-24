@@ -8,21 +8,13 @@
     </div> -->
     <div class="tool-content">
       <div class="tool-left">
-      <ToolPageList @currentPageList="handlePageList"></ToolPageList>
-    </div>
-      <div class="tool-right">
-        <div class="tool-right-top">
-          <ToolSelectedPage :currentPageList="this.currentPageList" :imageIndex="this.imageIndex"></ToolSelectedPage>
-          <ToolLayer></ToolLayer>
-        </div>
-        <div class="tool-right-bottom">
-        <ToolMenu :currentPageList="this.currentPageList" @imageIndex="handleImageIndex"></ToolMenu>
+        <ToolPageList @currentPageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-        <ToolSelectedPage :selectedPageNo="Number(this.selectPageNo)" :imageList="this.imageList"></ToolSelectedPage>
+        <ToolSelectedPage :currentPageList="this.currentPageList" :imageIndex="this.imageIndex"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu :selectedPageNo="Number(this.selectPageNo)" @imageList="setImageList"></ToolMenu>
+        <ToolMenu :currentPageList="this.currentPageList" @imageIndex="handleImageIndex"></ToolMenu>
       </div>
     </div>
   </div>
@@ -43,7 +35,7 @@ export default {
     }
   },
   mounted() {
-    if (sessionStorage.getItem('recentlyClickPageNo') != null) {
+    if(sessionStorage.getItem('recentlyClickPageNo') != null) {
       this.selectPageNo = sessionStorage.getItem('recentlyClickPageNo');
     }
   },
@@ -53,7 +45,7 @@ export default {
     ToolSelectedPage: toolSelectedPage,
     ToolLayer: toolLayer,
     ToolMenu: toolMenu,
-    ToolScenario : toolScenario
+    ToolScenario: toolScenario
   },
   methods : {
     handlePageList(currentPageList) {
@@ -64,6 +56,7 @@ export default {
     },
   },
 }
+
 
 </script>
 <style scoped>

@@ -2,8 +2,9 @@
   <div class="left-side-bar">
     <h3>페이지</h3>
     <div class="page-all">
-      <draggable @change="saveSession()" v-model="pageArr" :options="{ animation: 300, handle: '.page-body' }" class="page-list">
-        <li v-for="page, index in pageArr" :key="index" class="one_page">
+      <draggable @change="saveSession()" v-model="pageList" :options="{ animation: 300, handle: '.page-body' }"
+        class="page-list">
+        <li v-for="page, index in pageList" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
             {{ page.pageNo }}
@@ -25,24 +26,34 @@ export default {
   name: 'App',
   data() {
     return {
-      book_id: null,
-      pageArr: [
-          {
-          pageNo : 1,
-          pageStatus: 1,
-          imageList : [
+      book_id: null, // 작품 번호
+      pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 page_id
+        {
+          page_number: 1, // 페이지 순서 번호
+          page_status: 1, // 페이지 있으면 1, 삭제하면 0
+
+          // 자막 관련
+          caption: {
+            size: 10,
+            content: null,
+            location: null,
+          },
+          thumbnail: null,
+
+          // 페이지 안에 있는 파일들(레이어)
+          layerList: [
             {
-              src : '/images/field.png',
-              id : 'item',
-              objId : '0',
+              id: 'item',
+              layer_id: '0',
+              file_id: '/images/field.png',
               menu: 'background',
-              draggable : "true", 
-              style : {
-                left : "0px",
-                top : "0px",
-                position : "absolute",
-                width: '1200px',
-                height: '800px',
+              draggable: 'true',
+              style: {
+                width: '1200px', // 가로사이즈
+                height: '800px', // 세로사이즈
+                left: "0px", // x 좌표
+                top: "0px", // y 좌표
+                position: "absolute",
               },
             },
           ]
@@ -53,9 +64,9 @@ export default {
   },
   created() {
     this.book_id = sessionStorage.getItem('book_id');
-    // this.pageArr.push({
+    // this.pageList.push({
     //   pageNo: 1,
-    //   pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
+    //   pageStatus: 1, 
     // })
   },
   methods: {
@@ -64,29 +75,29 @@ export default {
     },
     clickPage(index) {
       this.currentPageNo = index;
-      this.$emit('currentPageList', this.pageArr[index]);
+      this.$emit('currentPageList', this.pageList[index]);
     },
     addPage() {
       let currnet = this.currentPageNo;
       var self = this;
       var newNo = 1;
-      if (self.pageArr.concat().length > 0) {
-        newNo = Math.max.apply(null, self.pageArr.concat().map(function (item) { return item.pageNo; })) + 1;
+      if (self.pageList.concat().length > 0) {
+        newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageNo; })) + 1;
       }
-      this.pageArr.splice(
+      this.pageList.splice(
         currnet + 1,
         0,
         {
           pageNo: newNo,
           pageStatus: 1,
-          imageList : [],
+          imageList: [],
         }
       );
       this.currentPageNo += 1;
       this.saveSession();
     },
-    saveSession(){
-      sessionStorage.setItem(this.book_id, JSON.stringify(this.pageArr));
+    saveSession() {
+      sessionStorage.setItem(this.book_id, JSON.stringify(this.pageList));
     }
     // deletePage(item, index) {
     //   this.items.splice(index, 1);

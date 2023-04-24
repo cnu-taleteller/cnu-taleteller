@@ -1,38 +1,48 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from "vue";
+import Vuex from "vuex";
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
-       // 배열 인덱스+1 = page_id
-      pageArr: [{
-        page_number: null,
+    book_id: null, // 작품 번호
+    pageList: [
+      // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 page_id
+      {
+        page_number: 1, // 페이지 순서 번호
         page_status: 1, // 페이지 있으면 1, 삭제하면 0
-        caption_color: null,
-        caption_content: null,
-        caption_location: null,
-        caption_size: null,
-        thumbnail: null,
-    }],
 
-    // 배열 인덱스+1 = layer_id
-    layerArr: [{
-      layer_order: null,
-      file_name: null,
-      file_origin_name: null,
-      file_size: null,
-      layer_x: null,
-      layer_y: null,
-      layer_x_size: null,
-      layer_y_size: null,
-    }]
+        // 자막 관련
+        caption: {
+          size: 10,
+          content: null,
+          location: null,
+        },
+        thumbnail: null,
+
+        // 페이지 안에 있는 파일들(레이어)
+        layerList: [
+          {
+            id: "item",
+            layer_id: "0",
+            file_id: "/images/field.png",
+            menu: "background",
+            draggable: "true",
+            style: {
+              width: "1200px", // 가로사이즈
+              height: "800px", // 세로사이즈
+              left: "0px", // x 좌표
+              top: "0px", // y 좌표
+              position: "absolute",
+            },
+          },
+        ],
+      },
+    ],
+    currentPageNo: 1,
   },
 
   mutations: {
-    setPageArr(state, payload) {
-     
-    }
-  }
+    setPageArr(state, payload) {},
+  },
 });
-

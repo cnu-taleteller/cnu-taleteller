@@ -154,7 +154,7 @@
           cloneImageElement.setAttribute("draggable", "false");
           // 기본적으로 0,1,2 를 오브젝트 아이디로 줌 각각을 구별하기 위해 고유 id 를 주거나해야할듯??
           let imageId = nextId++;
-          cloneImageElement.dataset.objId = imageId;
+          cloneImageElement.dataset.layer_id = imageId;
           if(this.selectedMenu == 'background') {
             const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
             const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
@@ -176,7 +176,7 @@
           let newImage = {
             src : cloneImageElement.src,
             id : 'item',
-            objId : String(imageId),
+            layer_id : String(imageId),
             menu: this.selectedMenu,
             style : {
               left : cloneImageElement.style.left,

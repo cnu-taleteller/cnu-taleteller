@@ -1,5 +1,6 @@
 package com.cnu.taleteller.backend.domain.tool.dto;
 
+import com.cnu.taleteller.backend.domain.tool.domain.File;
 import com.cnu.taleteller.backend.domain.tool.domain.Layer;
 import com.cnu.taleteller.backend.domain.tool.domain.Page;
 import lombok.Getter;
@@ -13,7 +14,7 @@ public class LayerDto {
 
     private Long layerId;
 
-    private Long pageId;
+    private Long pageIdx;
 
     private int layerX;
 
@@ -31,10 +32,12 @@ public class LayerDto {
 
     private int layerNumber;
 
+    private Long fileId;
+
     public Layer toEntity() {
         return Layer.builder()
                 .layerId(this.layerId)
-                .pageId(Page.builder().pageId(this.pageId).build())
+                .pageIdx(Page.builder().pageIdx(this.pageIdx).build())
                 .layerX(this.layerX)
                 .layerY(this.layerY)
                 .layerXSize(this.layerXSize)
@@ -43,6 +46,7 @@ public class LayerDto {
                 .fileSize(this.fileSize)
                 .fileOriginName(this.fileOriginName)
                 .layerNumber(this.layerNumber)
+                .fileId(File.builder().fileId(this.fileId).build())
                 .build();
     }
 

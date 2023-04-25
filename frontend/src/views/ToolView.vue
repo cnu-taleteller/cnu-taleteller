@@ -30,14 +30,13 @@ import toolScenario from '@/components/ToolScenario.vue';
 export default {
   data() {
     return {
-      currentPageList : {},
-      imageIndex : 0,
-      book_id: null, // 작품 번호
-      pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 page_id
+      currentPageList: {},
+      imageIndex: 0,
+      bookId: null, // 작품 번호
+      pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
         {
-          page_number: 1, // 페이지 순서 번호
-          page_status: 1, // 페이지 있으면 1, 삭제하면 0
-
+          pageId: 1, // 작품마다 페이지 고유한 번호 
+          pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
           // 자막 관련
           caption: {
             size: 10,
@@ -45,13 +44,12 @@ export default {
             location: null,
           },
           thumbnail: null,
-
           // 페이지 안에 있는 파일들(레이어)
           layerList: [
             {
               id: 'item',
-              layer_id: '0',
-              file_id: '/images/field.png',
+              layerId: '0',
+              fileId: '',
               menu: 'background',
               draggable: 'true',
               style: {
@@ -68,7 +66,7 @@ export default {
     }
   },
   mounted() {
-    if(sessionStorage.getItem('recentlyClickPageNo') != null) {
+    if (sessionStorage.getItem('recentlyClickPageNo') != null) {
       this.selectPageNo = sessionStorage.getItem('recentlyClickPageNo');
     }
   },
@@ -80,7 +78,7 @@ export default {
     ToolMenu: toolMenu,
     ToolScenario: toolScenario
   },
-  methods : {
+  methods: {
     handlePageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
@@ -131,4 +129,5 @@ export default {
 .tool-right {
   height: 100%;
   width: 25%;
-}</style>
+}
+</style>

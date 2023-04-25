@@ -7,7 +7,7 @@
         <li v-for="page, index in pageList" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
-            {{ page.page_number }}
+            {{ page.pageId }}
           </label>
         </li>
       </draggable>
@@ -26,7 +26,7 @@ export default {
   name: 'App',
   data() {
     return {
-      bookId: null, // 작품 번호
+      book_id: null, // 작품 번호
       pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
           {
           pageId : 1, // 작품마다 페이지 고유한 번호 
@@ -80,7 +80,7 @@ export default {
       var self = this;
       var newNo = 1;
       if (self.pageList.concat().length > 0) {
-        newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.page_number; })) + 1;
+        newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageId; })) + 1;
       }
       this.pageList.splice(
         currnet + 1,
@@ -92,7 +92,7 @@ export default {
             location: null,
           },
           thumbnail: null,
-          page_number: newNo,
+          pageId: newNo,
           pageStatus: 1,
           layerList: [],
         }

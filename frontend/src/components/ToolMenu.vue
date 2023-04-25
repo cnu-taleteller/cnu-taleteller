@@ -91,7 +91,7 @@
               id : 'item',
               draggable : "true",
               dataId : 'upload' + this.uploadId,
-              height : "100",
+              height : "100px",
             });
           } else if (menu === 'character') {
             this.src = "/images/" + res.data;
@@ -100,7 +100,7 @@
               id : 'item',
               draggable : "true",
               dataId : 'upload' + this.uploadId,
-              height : "100",
+              height : "100px",
             });
           }
           console.log("전송 성공");
@@ -174,9 +174,9 @@
             cloneImageElement.style.zIndex = 1;
           }
           let newImage = {
-            file_id : cloneImageElement.src,
+            fileId : cloneImageElement.src,
             id : 'item',
-            layer_id : String(imageId),
+            layerId : String(imageId),
             menu: this.selectedMenu,
             style : {
               left : cloneImageElement.style.left,

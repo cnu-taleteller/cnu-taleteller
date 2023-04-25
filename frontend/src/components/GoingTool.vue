@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">새로만들기</h1>
+    <h1><a href="/tool"><img src="@/assets/icon.png" class="icon">새로만들기</a></h1>
     <hr>
     <div class="column">
       <div class="column-icon">
@@ -31,12 +31,6 @@ export default {
   methods: {
     onClickNew() {
       this.$emit('change-testone', false);
-    },
-    // 새로 만드는 작품일 때, session에 toolState new 해줘야 시나리오 진입함
-    makeNewBook(){
-      sessionStorage.setItem('toolState', 'new');
-      sessionStorage.removeItem('scenario');
-      this.$router.push('/tool');
     }
   },
 }

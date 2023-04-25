@@ -7,7 +7,7 @@
         <li v-for="page, index in pageList" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
-            {{ page.pageNo }}
+            {{ page.page_number }}
           </label>
         </li>
       </draggable>
@@ -82,15 +82,21 @@ export default {
       var self = this;
       var newNo = 1;
       if (self.pageList.concat().length > 0) {
-        newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageNo; })) + 1;
+        newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.page_number; })) + 1;
       }
       this.pageList.splice(
         currnet + 1,
         0,
         {
-          pageNo: newNo,
+          caption: {
+            size: 10,
+            content: null,
+            location: null,
+          },
+          thumbnail: null,
+          page_number: newNo,
           pageStatus: 1,
-          imageList: [],
+          layerList: [],
         }
       );
       this.currentPageNo += 1;

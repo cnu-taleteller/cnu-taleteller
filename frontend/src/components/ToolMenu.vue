@@ -64,7 +64,7 @@
       currentPageList : Object,
     },
     mounted() {
-      const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
+      const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
       this.existingImageEventDragStart();
       this.imageEventDragOver(toolSelectedPageDrag);
       this.imageEventDrop(toolSelectedPageDrag);
@@ -146,8 +146,8 @@
         element.addEventListener("drop", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          let rX = e.pageX - document.querySelector('.selected-page').offsetLeft;
-          let rY = e.pageY - document.querySelector('.selected-page').offsetTop;
+          let rX = e.pageX - document.querySelector('.page-form').offsetLeft;
+          let rY = e.pageY - document.querySelector('.page-form').offsetTop;
           let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
           let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
           let cloneImageElement = imageElement.cloneNode();
@@ -156,7 +156,7 @@
           let imageId = nextId++;
           cloneImageElement.dataset.layer_id = imageId;
           if(this.selectedMenu == 'background') {
-            const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
+            const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
             const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
             const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
             cloneImageElement.style.left = "0px";
@@ -174,7 +174,7 @@
             cloneImageElement.style.zIndex = 1;
           }
           let newImage = {
-            src : cloneImageElement.src,
+            file_id : cloneImageElement.src,
             id : 'item',
             layer_id : String(imageId),
             menu: this.selectedMenu,
@@ -187,9 +187,9 @@
             },
           };
           //만약 레이어위치 변경 해야하면 변경할 수 도 있는 부분(2023-04-20)
-          this.imageIndex = this.currentPageList.imageList.length;
-          this.currentPageList.imageList[this.imageIndex] = newImage;
-          document.querySelector('.selected-page .drag-image .object').appendChild(cloneImageElement);
+          this.imageIndex = this.currentPageList.layerList.length;
+          this.currentPageList.layerList[this.imageIndex] = newImage;
+          document.querySelector('.page-form .selected-page .drag-image .object').appendChild(cloneImageElement);
         });
       },
     },

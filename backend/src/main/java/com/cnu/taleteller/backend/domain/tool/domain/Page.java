@@ -13,9 +13,11 @@ public class Page {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long pageId;
+    private Long pageIdx;
 
-    private int pageNumber;
+    private int pageId;
+
+    private int pageOrder;
 
     @Column(length = 1)
     private String pageStatus;
@@ -38,9 +40,10 @@ public class Page {
     private Book bookId;
 
     @Builder
-    public Page(Long pageId, int pageNumber, String pageStatus, int captionSize, String captionContent, String captionLocation, String captionColor, String thumbnail, Book bookId) {
+    public Page(Long pageIdx, int pageId, int pageOrder, String pageStatus, int captionSize, String captionContent, String captionLocation, String captionColor, String thumbnail, Book bookId) {
+        this.pageIdx = pageIdx;
         this.pageId = pageId;
-        this.pageNumber = pageNumber;
+        this.pageOrder = pageOrder;
         this.pageStatus = pageStatus;
         this.captionSize = captionSize;
         this.captionContent = captionContent;

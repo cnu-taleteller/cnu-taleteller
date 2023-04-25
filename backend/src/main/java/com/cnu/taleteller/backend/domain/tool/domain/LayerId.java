@@ -12,5 +12,5 @@ import java.io.Serializable;
 public class LayerId implements Serializable {
 
     private Long layerId;
-    private Long pageId;
+    private Long pageIdx;
 }

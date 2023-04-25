@@ -19,8 +19,8 @@ public class Layer {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "pageId")
-    private Page pageId;
+    @JoinColumn(name = "pageIdx")
+    private Page pageIdx;
 
     @Column(name = "layer_x")
     private int layerX;
@@ -45,10 +45,14 @@ public class Layer {
 
     private int layerNumber;
 
+    @OneToOne
+    @JoinColumn(name = "fileId")
+    private File fileId;
+
     @Builder
-    public Layer(Long layerId, Page pageId, int layerX, int layerY, int layerXSize, int layerYSize, String fileName, String fileSize, String fileOriginName, int layerNumber) {
+    public Layer(Long layerId, Page pageIdx, int layerX, int layerY, int layerXSize, int layerYSize, String fileName, String fileSize, String fileOriginName, int layerNumber, File fileId) {
         this.layerId = layerId;
-        this.pageId = pageId;
+        this.pageIdx = pageIdx;
         this.layerX = layerX;
         this.layerY = layerY;
         this.layerXSize = layerXSize;
@@ -57,5 +61,6 @@ public class Layer {
         this.fileSize = fileSize;
         this.fileOriginName = fileOriginName;
         this.layerNumber = layerNumber;
+        this.fileId = fileId;
     }
 }

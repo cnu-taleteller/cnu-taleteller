@@ -64,7 +64,7 @@
       currentPageList : Object,
     },
     mounted() {
-      const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
+      const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
       this.existingImageEventDragStart();
       this.imageEventDragOver(toolSelectedPageDrag);
       this.imageEventDrop(toolSelectedPageDrag);
@@ -91,7 +91,7 @@
               id : 'item',
               draggable : "true",
               dataId : 'upload' + this.uploadId,
-              height : "100",
+              height : "100px",
             });
           } else if (menu === 'character') {
             this.src = "/images/" + res.data;
@@ -100,7 +100,7 @@
               id : 'item',
               draggable : "true",
               dataId : 'upload' + this.uploadId,
-              height : "100",
+              height : "100px",
             });
           }
           console.log("전송 성공");
@@ -146,17 +146,17 @@
         element.addEventListener("drop", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          let rX = e.pageX - document.querySelector('.selected-page').offsetLeft;
-          let rY = e.pageY - document.querySelector('.selected-page').offsetTop;
+          let rX = e.pageX - document.querySelector('.page-form').offsetLeft;
+          let rY = e.pageY - document.querySelector('.page-form').offsetTop;
           let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
           let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
           let cloneImageElement = imageElement.cloneNode();
           cloneImageElement.setAttribute("draggable", "false");
           // 기본적으로 0,1,2 를 오브젝트 아이디로 줌 각각을 구별하기 위해 고유 id 를 주거나해야할듯??
           let imageId = nextId++;
-          cloneImageElement.dataset.objId = imageId;
+          cloneImageElement.dataset.layerId = imageId;
           if(this.selectedMenu == 'background') {
-            const toolSelectedPageDrag = document.querySelector('.selected-page .drag-image');
+            const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
             const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
             const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
             cloneImageElement.style.left = "0px";
@@ -174,9 +174,9 @@
             cloneImageElement.style.zIndex = 1;
           }
           let newImage = {
-            src : cloneImageElement.src,
+            fileId : cloneImageElement.src,
             id : 'item',
-            objId : String(imageId),
+            layerId : String(imageId),
             menu: this.selectedMenu,
             style : {
               left : cloneImageElement.style.left,
@@ -187,9 +187,9 @@
             },
           };
           //만약 레이어위치 변경 해야하면 변경할 수 도 있는 부분(2023-04-20)
-          this.imageIndex = this.currentPageList.imageList.length;
-          this.currentPageList.imageList[this.imageIndex] = newImage;
-          document.querySelector('.selected-page .drag-image .object').appendChild(cloneImageElement);
+          this.imageIndex = this.currentPageList.layerList.length;
+          this.currentPageList.layerList[this.imageIndex] = newImage;
+          document.querySelector('.page-form .selected-page .drag-image .object').appendChild(cloneImageElement);
         });
       },
     },

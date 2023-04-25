@@ -10,9 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PageDto {
 
-    private Long pageId;
+    private Long pageIdx;
 
-    private int pageNumber;
+    private int pageId;
+    private int pageOrder;
 
     private String pageStatus;
 
@@ -30,8 +31,9 @@ public class PageDto {
 
     public Page toEntity() {
         return Page.builder()
+                .pageIdx(this.pageIdx)
                 .pageId(this.pageId)
-                .pageNumber(this.pageNumber)
+                .pageOrder(this.pageOrder)
                 .pageStatus(this.pageStatus)
                 .captionSize(this.captionSize)
                 .captionContent(this.captionContent)

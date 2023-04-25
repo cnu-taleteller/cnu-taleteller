@@ -43,7 +43,7 @@ export default {
             {
               id : 'item',
               layerId : '0',
-              fileId : '', 
+              fileId : '/images/field.png', 
               menu: 'background', 
               draggable : 'true', 
               style : { 

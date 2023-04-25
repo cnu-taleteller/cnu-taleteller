@@ -64,7 +64,7 @@ export default {
     return {
       toolState: null,
       gpt: false, // gpt로 시나리오 받을건지.. 받을거면 true
-      API_KEY: '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',
+      API_KEY: '',
 
       // gpt로 받을 시나리오 키워드
       scenario: {

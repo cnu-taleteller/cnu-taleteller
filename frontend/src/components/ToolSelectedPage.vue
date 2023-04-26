@@ -3,17 +3,18 @@
     <div class='selected-page'>
       <div class='drag-image'>
         <div class='object' ref='pageObject'>
+          
         </div>
       </div>
     </div>
-    <!-- <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
+    <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
       <ul>
         <li><a @click="next(thisObjId)">앞으로</a></li>
         <li><a @click="back(thisObjId)">뒤로</a></li>
         <li><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
         <li><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
       </ul>
-    </div> -->
+    </div>
   </div>
 </template>
 <script>
@@ -50,13 +51,13 @@ export default {
       }
       const targetObj = e.target.dataset.layerId;
       toolMenu.thisObjId = targetObj;
-      // const popupMenu = document.querySelector("#popupMenu");
-      // popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
-      // popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
-      // popupMenu.style.display = "block";
+      const popupMenu = document.querySelector("#popupMenu");
+      popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
+      popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
+      popupMenu.style.display = "block";
     });
 
-    document.addEventListener("mousedown", function(e) {
+    document.addEventListener("click", function(e) {
       if (e.target !== objArea && e.target !== popupMenu) {
           popupMenu.style.display = "none";
       }
@@ -84,12 +85,12 @@ export default {
       e.stopPropagation();
       e.preventDefault();
       if (active && currentObjId === currentObj.dataset.layerId) {
+        currentObj.style.zIndex = '10'
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
         requestAnimationFrame(() => {
           currentObj.style.left = currentXOffset + (moveX - currentX) + 'px';
           currentObj.style.top = currentYOffset + (moveY - currentY) + 'px';
-          currentObj.style.zIndex = '10';
         });
       }
     };
@@ -140,8 +141,8 @@ export default {
       const elementDoc = document.querySelector(`.object #item[data-layer-id='${layerId}']`);
       //firstchild의 layerId가 background를 포함하고 있으면 밑의 방식 만약 없다면 .firstchild 로 변경 if eles 문
       let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+      const secondChild = objectDocument.children[1];
       if(objectDocument.firstChild.dataset.layerId.includes('background')) {
-        const secondChild = objectDocument.children[1];
         if(secondChild) {
           objectDocument.insertBefore(elementDoc, secondChild);
           // let indexOfSecondeElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === secondChild.dataset.layerId);
@@ -182,6 +183,9 @@ export default {
       const objectDocument = document.querySelector('.object');
       const elementDoc = document.querySelector(`.object #item[data-layer-id='${layerId}']`);
       const previusImage = elementDoc.previousElementSibling;
+      if(previusImage && previusImage.dataset.layerId.includes('background')) {
+        return;
+      }
       if (previusImage) {
         let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
         const item = this.currentPageList.layerList[indexOfElement];

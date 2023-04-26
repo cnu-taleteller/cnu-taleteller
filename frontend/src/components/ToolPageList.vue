@@ -2,7 +2,7 @@
   <div class="left-side-bar">
     <h3>페이지</h3>
     <div class="page-all">
-      <draggable @change="saveSession()" v-model="pageList" :options="{ animation: 300, handle: '.page-body' }"
+      <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list">
         <li v-for="page, index in pageList" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)"></div>
@@ -26,46 +26,32 @@ export default {
   name: 'App',
   data() {
     return {
-      book_id: null, // 작품 번호
-      pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
-          {
-          pageId : 1, // 작품마다 페이지 고유한 번호 
-          pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-          // 자막 관련
+      book_id: null,
+      pageList: [
+      {
+          pageId : 1,
+          pageStatus: 1,
           caption : {
             size: 10,
             content: null,
             location: null,
           },
           thumbnail: null,
-          // 페이지 안에 있는 파일들(레이어)
-          layerList : [
-            {
-              id : 'item',
-              layerId : '0',
-              fileId : '/images/field.png', 
-              menu: 'background', 
-              draggable : 'true', 
-              style : { 
-                width: '1200px', // 가로사이즈
-                height: '800px', // 세로사이즈
-                left : "0px", // x 좌표
-                top : "0px", // y 좌표
-                position : "absolute",
-              },
-            },
-          ]
+          layerList : []
         }
       ],
       currentPageNo: 1,
+      sortableOptions: {
+        animation: 300,
+        handle: '.page-body'
+      },
     }
   },
   created() {
     this.book_id = sessionStorage.getItem('book_id');
-    // this.pageList.push({
-    //   pageNo: 1,
-    //   pageStatus: 1, 
-    // })
+  },
+  mounted() {
+    this.$emit('currentPageList', this.pageList[0]);
   },
   methods: {
     defalutReset() {

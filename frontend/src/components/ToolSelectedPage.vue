@@ -1,22 +1,19 @@
 <template>
   <div class='page-form'>
-    <!-- 현재 이미지 보여주는 번호 때문에 살짝 밀림 -->
-    <h3>{{ currentPageList.pageId }}</h3>
     <div class='selected-page'>
       <div class='drag-image'>
         <div class='object' ref='pageObject'>
-          
         </div>
       </div>
     </div>
-    <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
+    <!-- <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
       <ul>
-        <li><a @click="">앞으로</a></li>
-        <li><a @click="">뒤로</a></li>
-        <li><a @click="">제일 앞으로</a></li>
-        <li><a @click="lastBack(thisObjId)">제일 뒤로</a></li>
+        <li><a @click="next(thisObjId)">앞으로</a></li>
+        <li><a @click="back(thisObjId)">뒤로</a></li>
+        <li><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
+        <li><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
       </ul>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
@@ -48,25 +45,29 @@ export default {
     objArea.addEventListener('mouseup', dragEnd);
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
+      if(e.target.dataset.layerId.includes('background')) {
+        return;
+      }
       const targetObj = e.target.dataset.layerId;
       toolMenu.thisObjId = targetObj;
-      const popupMenu = document.querySelector("#popupMenu");
-      popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
-      popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
-      popupMenu.style.display = "block";
+      // const popupMenu = document.querySelector("#popupMenu");
+      // popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
+      // popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
+      // popupMenu.style.display = "block";
     });
 
-    document.addEventListener("click", function(e) {
+    document.addEventListener("mousedown", function(e) {
       if (e.target !== objArea && e.target !== popupMenu) {
           popupMenu.style.display = "none";
       }
     });
 
+
     function dragStart(e) {
       if(e.button === 0) {
         e.stopPropagation();
         e.preventDefault();
-        currentObjId = e.target.dataset.objId;
+        currentObjId = e.target.dataset.layerId;
         currentX = e.pageX - dragArea.offsetLeft;
         currentY = e.pageY - dragArea.offsetTop;
         currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
@@ -82,7 +83,7 @@ export default {
     function drag(e) {
       e.stopPropagation();
       e.preventDefault();
-      if (active && currentObjId === currentObj.dataset.objId) {
+      if (active && currentObjId === currentObj.dataset.layerId) {
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
         requestAnimationFrame(() => {
@@ -92,7 +93,7 @@ export default {
         });
       }
     };
-    //온클릭 메서드 추가해서 각 이미지에 아이디 띄우기
+    
     function dragEnd(e) {
       e.target.style.zIndex = '1';
       e.target.style.opacity = '1';
@@ -104,6 +105,7 @@ export default {
       active = false;
       document.removeEventListener('mousemove', drag);
     };
+
   },
   watch: {
     currentPageList() {
@@ -133,14 +135,60 @@ export default {
         }
       }
     },
-    defaultContent() {
-
-    },
     lastBack(layerId) {
       const objectDocument = document.querySelector('.object');
-      const elementDoc = document.querySelector(`.object #item[data-layer-id=${layerId}]`);
-      console.log(elementDoc);
-      objectDocument.insertBefore(elementDoc, null);
+      const elementDoc = document.querySelector(`.object #item[data-layer-id='${layerId}']`);
+      //firstchild의 layerId가 background를 포함하고 있으면 밑의 방식 만약 없다면 .firstchild 로 변경 if eles 문
+      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+      if(objectDocument.firstChild.dataset.layerId.includes('background')) {
+        const secondChild = objectDocument.children[1];
+        if(secondChild) {
+          objectDocument.insertBefore(elementDoc, secondChild);
+          // let indexOfSecondeElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === secondChild.dataset.layerId);
+          const item = this.currentPageList.layerList[indexOfElement];
+          this.currentPageList.layerList.splice(indexOfElement, 1);
+          this.currentPageList.layerList.splice(1, 0, item);
+        }
+      } else {
+        const firstChild = objectDocument.firstChild;
+        objectDocument.insertBefore(elementDoc, firstChild);
+        const item = this.currentPageList.layerList[indexOfElement];
+        this.currentPageList.layerList.splice(indexOfElement, 1);
+        this.currentPageList.layerList.splice(0, 0, item);
+      }
+    },
+    frontmost(layerId) {
+      const objectDocument = document.querySelector('.object');
+      const elementDoc = document.querySelector(`.object #item[data-layer-id='${layerId}']`);
+      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+      const item = this.currentPageList.layerList[indexOfElement];
+      this.currentPageList.layerList.splice(indexOfElement, 1);
+      this.currentPageList.layerList.splice(this.currentPageList.layerList.length, 0, item);
+      objectDocument.appendChild(elementDoc);
+    },
+    next(layerId) {
+      const objectDocument = document.querySelector('.object');
+      const elementDoc = document.querySelector(`.object #item[data-layer-id='${layerId}']`);
+      const nextImage = elementDoc.nextElementSibling;
+      if(nextImage) {
+        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+        const item = this.currentPageList.layerList[indexOfElement];
+        this.currentPageList.layerList.splice(indexOfElement, 1);
+        this.currentPageList.layerList.splice(indexOfElement + 1, 0, item);
+        objectDocument.insertBefore(elementDoc, nextImage.nextElementSibling);
+      }
+    },
+    back(layerId) {
+      const objectDocument = document.querySelector('.object');
+      const elementDoc = document.querySelector(`.object #item[data-layer-id='${layerId}']`);
+      const previusImage = elementDoc.previousElementSibling;
+      if (previusImage) {
+        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+        const item = this.currentPageList.layerList[indexOfElement];
+        this.currentPageList.layerList.splice(indexOfElement, 1);
+        this.currentPageList.layerList.splice(indexOfElement - 1, 0, item);
+        objectDocument.insertBefore(elementDoc, elementDoc.previousElementSibling);
+      }
     }
   },
 }
@@ -156,13 +204,12 @@ export default {
     overflow: hidden;
     touch-action: none;
     position: relative;
+    border: 1px solid gray;
 }
 
 .selected-page {
   width: 100%;
   height: 450px;
-  /* height: 60vh; */
-  border: 1px solid gray;
 }
 
 .character-image {

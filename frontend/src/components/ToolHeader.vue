@@ -34,6 +34,8 @@ export default {
     },
     saveBook() {
       sessionStorage.removeItem('scenario');
+      sessionStorage.removeItem('scenarioKeyword');
+      sessionStorage.setItem('bookName',this.bookName);
       this.$router.push('/ToolSubmit');
     }
   },

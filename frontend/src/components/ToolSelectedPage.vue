@@ -6,14 +6,14 @@
         </div>
       </div>
     </div>
-    <!-- <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
+    <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
       <ul>
         <li><a @click="next(thisObjId)">앞으로</a></li>
         <li><a @click="back(thisObjId)">뒤로</a></li>
         <li><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
         <li><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
       </ul>
-    </div> -->
+    </div>
   </div>
 </template>
 <script>
@@ -50,10 +50,10 @@ export default {
       }
       const targetObj = e.target.dataset.layerId;
       toolMenu.thisObjId = targetObj;
-      // const popupMenu = document.querySelector("#popupMenu");
-      // popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
-      // popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
-      // popupMenu.style.display = "block";
+      const popupMenu = document.querySelector("#popupMenu");
+      popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
+      popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
+      popupMenu.style.display = "block";
     });
 
     document.addEventListener("mousedown", function(e) {

@@ -74,6 +74,7 @@
     },
     methods: {
       async setImage(menu) {
+        console.log(menu);
         try {
           let frm = new FormData();
           let imageFile = document.getElementById("image");
@@ -111,7 +112,6 @@
       setSelectedMenu(menu) {
         this.selectedMenu = menu;
       },
-      //기존에 있는 이미지에 dragStart 이벤트를 줌
       existingImageEventDragStart() {
         document.querySelectorAll(".menu .image-list #item").forEach((element) => {
             element.addEventListener("dragstart", (e) => {
@@ -143,6 +143,7 @@
       },
       imageEventDrop(element) {
         let nextId = this.nextId;
+        let layerListRemove;
         element.addEventListener("drop", (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -152,11 +153,10 @@
           let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
           let cloneImageElement = imageElement.cloneNode();
           cloneImageElement.setAttribute("draggable", "false");
-          // 기본적으로 0,1,2 를 오브젝트 아이디로 줌 각각을 구별하기 위해 고유 id 를 주거나해야할듯??
-          let imageId = nextId++;
+          let imageId = this.selectedMenu + nextId++;
           cloneImageElement.dataset.layerId = imageId;
           if(this.selectedMenu == 'background') {
-            const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
+            const toolSelectedPageDrag = document.querySelector('.page-form');
             const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
             const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
             cloneImageElement.style.left = "0px";
@@ -165,6 +165,29 @@
             cloneImageElement.style.height = dragImageHeight;
             cloneImageElement.style.position = "absolute";
             cloneImageElement.style.zIndex = 1;
+            let newImage = {
+              fileId : cloneImageElement.src,
+              id : 'item',
+              layerId : String(imageId),
+              menu: this.selectedMenu,
+              style : {
+                left : cloneImageElement.style.left,
+                top : cloneImageElement.style.top,
+                position : cloneImageElement.style.position,
+                width : cloneImageElement.style.width,
+                height : cloneImageElement.style.height,
+              },
+            };
+            let elementToRemove = Array.from(document.querySelectorAll('.object #item[data-layer-id]'))
+              .find(el => el.dataset.layerId.includes('background'));
+            if (elementToRemove) {
+              layerListRemove = elementToRemove.dataset.layerId;
+              this.currentPageList.layerList.splice(0, 1, newImage);
+              elementToRemove.parentNode.removeChild(elementToRemove);
+            } else {
+              this.currentPageList.layerList.unshift(newImage);
+            }
+            document.querySelector('.object').insertBefore(cloneImageElement, document.querySelector('.object').firstChild);
           }else {
             cloneImageElement.style.left = (rX - x) + "px";
             cloneImageElement.style.top = (rY - y) + "px";
@@ -172,24 +195,23 @@
             cloneImageElement.style.width = cloneImageElement.width;
             cloneImageElement.style.height = cloneImageElement.height;
             cloneImageElement.style.zIndex = 1;
+            let newImage = {
+              fileId : cloneImageElement.src,
+              id : 'item',
+              layerId : String(imageId),
+              menu: this.selectedMenu,
+              style : {
+                left : cloneImageElement.style.left,
+                top : cloneImageElement.style.top,
+                position : cloneImageElement.style.position,
+                width : cloneImageElement.style.width,
+                height : cloneImageElement.style.height,
+              },
+            };
+            document.querySelector('.object').appendChild(cloneImageElement);
+            this.imageIndex = this.currentPageList.layerList.length;
+            this.currentPageList.layerList[this.imageIndex] = newImage;
           }
-          let newImage = {
-            fileId : cloneImageElement.src,
-            id : 'item',
-            layerId : String(imageId),
-            menu: this.selectedMenu,
-            style : {
-              left : cloneImageElement.style.left,
-              top : cloneImageElement.style.top,
-              position : cloneImageElement.style.position,
-              width : cloneImageElement.style.width,
-              height : cloneImageElement.style.height,
-            },
-          };
-          //만약 레이어위치 변경 해야하면 변경할 수 도 있는 부분(2023-04-20)
-          this.imageIndex = this.currentPageList.layerList.length;
-          this.currentPageList.layerList[this.imageIndex] = newImage;
-          document.querySelector('.page-form .selected-page .drag-image .object').appendChild(cloneImageElement);
         });
       },
     },

@@ -1,30 +1,41 @@
 <template>
-    <div class="book-detail">
-        <div class="book-image">
-            <img src="@/assets/book.png" class="book-image">
+    <div class="book">
+        <div class="book-detail">
+            <div class="book-image">
+                <img src="@/assets/book.png" class="book-image">
+            </div>
+            <div class="book-info">
+                <h1>{{ book && book.bookName }}</h1>
+                <p>저자: 테스트</p>
+                <p>소개: {{ book && book.bookDescription }}</p>
+                <p>추천 수: {{ book && book.bookRecommend }}</p>
+            </div>
+            <div class="book-button">
+                <button @click="recommend">추천</button>
+                <button>즐겨찾기</button>
+                <button>감상</button>
+            </div>
         </div>
-        <div class="book-info">
-            <h1>{{ book && book.bookName }}</h1>
-            <p>저자: 테스트</p>
-            <p>소개: {{ book && book.bookDescription }}</p>
-            <p>추천 수: {{ book && book.bookRecommend }}</p>
-        </div>
-        <div class="book-button">
-            <button @click="recommend">추천</button>
-            <button>즐겨찾기</button>
-            <button>감상</button>
+        <div class="book-reply">
+            <reply :bookId="bookId" @created="writeReply" :replies="replies"/>
         </div>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import Reply from "../components/Reply.vue";
 
 export default {
+    components: {
+        Reply,
+    },
     data() {
         return {
             book: null,
-        };
+            bookId: this.$route.params.id,
+            replies: []
+        }
     },
     created() {
         const bookId = this.$route.params.id;
@@ -42,8 +53,8 @@ export default {
         recommend() {
             const bookId = this.$route.params.id;
 
-            axios.
-            post(`/api/book/detail/${bookId}/recommend`)
+            axios
+                .post(`/api/book/detail/${bookId}/recommend`)
                 .then(response => {
                     this.book = response.data;
                 })
@@ -51,6 +62,9 @@ export default {
                     console.log(error);
                 });
         },
+        writeReply(reply) {
+            this.replies.push(reply);
+        }
     },
 };
 </script>
@@ -108,5 +122,9 @@ export default {
 
 .book-button button:hover {
     background-color: steelblue;
+}
+
+.book-reply {
+    padding: 0 20%;
 }
 </style>

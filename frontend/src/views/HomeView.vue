@@ -19,7 +19,7 @@
 .tab button {
   background-color: white;
   border: 1px white;
-  font-size: 50px;
+  font-size: 30px;
   margin-right: 15%;
 }
 .tab button:last-child {

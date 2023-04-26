@@ -19,19 +19,19 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping("/search")
-    public ResponseEntity<List<Book>> search(@RequestParam String searchType, @RequestParam String keyword) {
+    public ResponseEntity<List<Book>> search(@RequestParam String searchType, @RequestParam String searchKeyword) {
 
         List<Book> searchResults;
 
         switch (searchType) {
 /*            case "name":
-                searchResults = bookService.searchByName(keyword);
+                searchResults = bookService.searchByName(searchKeyword);
                 break;*/
             case "title":
-                searchResults = bookService.searchByTitle(keyword);
+                searchResults = bookService.searchByTitle(searchKeyword);
                 break;
             case "content":
-                searchResults = bookService.searchByContent(keyword);
+                searchResults = bookService.searchByContent(searchKeyword);
                 break;
             default:
                 return ResponseEntity.badRequest().build();
@@ -50,12 +50,12 @@ public class BookController {
     }
 
     @PostMapping("/detail/{bookId}/recommend")
-    public ResponseEntity<Book> recommendBook(@PathVariable Long bookId) {
-        Book book = bookService.recommendBook(bookId);
-        if (book == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<BookDto> recommendBook(@PathVariable Long bookId, BookDto bookDto) {
+        BookDto recommendBook = bookService.recommendBook(bookId, bookDto);
+        if (recommendBook != null) {
+            return ResponseEntity.ok(recommendBook);
         }
-        return new ResponseEntity<>(book, HttpStatus.OK);
+        return ResponseEntity.notFound().build();
     }
 
 }

@@ -4,6 +4,8 @@ import HomeView from '../views/HomeView.vue'
 import ToolView from '../views/ToolView.vue'
 import ToolSubmitView from '../views/ToolSubmitView.vue'
 import MyPageView from '../views/MyView.vue'
+import SearchView from "../views/SearchView.vue";
+import BookDetailView from "../views/BookDetailView.vue";
 
 Vue.use(VueRouter)
 
@@ -28,6 +30,16 @@ const routes = [
     name: 'MyPage',
     component: MyPageView
   },
+  {
+    path: '/search',
+    name: 'Search',
+    component: SearchView
+  },
+  {
+    path: '/detail/:id',
+    name: 'BookDetail',
+    component: BookDetailView
+  }
 ]
 
 const router = new VueRouter({

@@ -52,5 +52,12 @@ public class Book {
         this.bookPublic = bookPublic;
     }
 
+    public void incrementRecommend() {
+       this.bookRecommend = bookRecommend + 1;
+        this.bookId = bookId;
+        this.bookName = bookName;
+        this.bookDescription = bookDescription;
+        // 로그인 기능 되면 사용자 이름도 추가
+    }
 
 }

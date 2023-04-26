@@ -14,10 +14,10 @@
         <h4>시나리오</h4>
         <p>키워드를 입력하세요.</p>
         <p>사건은 구체적이게 적을수록 좋습니다!</p>
-        <p>누가: <input type="text" class="scenario-input" v-model="scenario.who" placeholder="짱구가"></p>
-        <p>언제: <input type="text" class="scenario-input" v-model="scenario.when" placeholder="주말 아침에"></p>
-        <p>어디서: <input type="text" class="scenario-input" v-model="scenario.where" placeholder="숲에서"></p>
-        <p>사건: <textarea class="scenario-input" v-model="scenario.event"
+        <p>누가: <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가"></p>
+        <p>언제: <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에"></p>
+        <p>어디서: <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서"></p>
+        <p>사건: <textarea class="scenario-input" v-model="scenarioKeyword.event"
             placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></textarea></p>
         <button @click="setScenario()">시나리오 받아보기</button>
       </div>
@@ -44,8 +44,7 @@
         <ToolSelectedPage :currentPageList="this.currentPageList" :imageIndex="this.imageIndex"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu :currentPageList="this.currentPageList" :finalScenario="this.finalScenario" :gpt="this.gpt"
-          @imageIndex="handleImageIndex"></ToolMenu>
+        <ToolMenu :currentPageList="this.currentPageList" :finalScenario="this.finalScenario" :gpt="this.gpt" @imageIndex="handleImageIndex"></ToolMenu>
       </div>
     </div>
   </div>
@@ -64,10 +63,10 @@ export default {
     return {
       toolState: null,
       gpt: false, // gpt로 시나리오 받을건지.. 받을거면 true
-      API_KEY: '',
+      API_KEY: process.env.VUE_APP_API_KEY,
 
       // gpt로 받을 시나리오 키워드
-      scenario: {
+      scenarioKeyword: {
         who: null,
         when: null,
         where: null,
@@ -175,10 +174,10 @@ export default {
           "model": "gpt-3.5-turbo",
           "messages": [{
             "role": "user",
-            "content": `누가: ${this.scenario.who},
-                        언제: ${this.scenario.when}, 
-                        어디서: ${this.scenario.where},
-                        사건: ${this.scenario.event}
+            "content": `누가: ${this.scenarioKeyword.who},
+                        언제: ${this.scenarioKeyword.when}, 
+                        어디서: ${this.scenarioKeyword.where},
+                        사건: ${this.scenarioKeyword.event}
                         라는 내용을 가진 동화책을 '도입/전개/위기/결말' 로 나눠서 써줘.
                         내용을 나눌 때 형식은 
                         [도입] 내용

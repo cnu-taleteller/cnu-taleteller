@@ -37,9 +37,11 @@
              <div v-else>
               <p v-for="(story,index) in finalScenario" :key="index">
                 {{ setScenarioLabel(index) }} <br>
-                {{ story }}
+                <textarea v-model="finalScenario[index]" class="story-input" :disabled="isDisabled">{{ story }}</textarea>
               </p>
-              <button @click="editScenario()">수정</button>
+              <button @click="reScenario()">시나리오 다시 받기</button>
+              <button v-show="isDisabled" @click="editScenario('edit')">수정</button>
+              <button v-show="!isDisabled" @click="editScenario('save')">저장</button>
             </div>
           </div>
            
@@ -52,6 +54,7 @@
   export default {
     data() {
       return {
+        isDisabled: true, // 시나리오 textarea 비활성화
         pageNo: 0,
         //리스트 변경 해야함.
         charList: [
@@ -87,7 +90,8 @@
     props : {
       currentPageList : Object,
       finalScenario : Array,
-      gpt: Boolean
+      gpt: Boolean,
+      scenarioKeyword: Object
     },
     mounted() {
       const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
@@ -116,9 +120,19 @@
         }
       },
       // 시나리오 수정
-      editScenario(){
-
+      editScenario(arg){
+        this.isDisabled = !!!this.isDisabled;
+        this.resultScenario='[도입]'+this.finalScenario[0] + '[전개]'+this.finalScenario[1]+ '[위기]'+this.finalScenario[2] +'[결말]'+this.finalScenario[3];
+        if(arg==='save'){
+          sessionStorage.setItem('scenario', this.resultScenario);
+        }
       },
+
+      // 시나리오 다시 받기
+      reScenario(){
+    
+      },
+      
       async setImage(menu) {
         console.log(menu);
         try {
@@ -297,6 +311,17 @@
 .menu-btn.active {
   background-color: gray;
   color: white;
+}
+
+.story-input {
+  width: 90%;
+  height: 170px;
+  background-color: white;
+  resize: none;
+}
+.story-input:disabled {
+  color: black;
+  border: none;
 }
   </style>
   

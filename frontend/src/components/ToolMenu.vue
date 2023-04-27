@@ -177,26 +177,13 @@ export default {
         }
       )
         .then((res) => {
-          console.log(res.data.choices[0].message.content);
+          // console.log(res.data.choices[0].message.content);
           this.resultScenario = res.data.choices[0].message.content;
           sessionStorage.setItem('scenario', this.resultScenario);
-
-          // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
-          const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
-          sections.forEach((section, index) => {
-            const scenario = this.resultScenario;
-            const start = scenario.indexOf(section);
-            let end;
-
-            if (index < sections.length - 1) {
-              end = scenario.indexOf(sections[index + 1]);
-            } else {
-              end = scenario.length;
-            }
-            // 새로 받고 나서 데이터가 한줄만 뜨는 이유좀....
-            this.finalScenario = [];
-            this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
-          });
+          this.finalScenario = [];
+          this.setScenarioArr();
+          console.log(this.finalScenario);
+          
           this.gpt = false;
           this.isDisabled2 = false;
         })
@@ -209,7 +196,22 @@ export default {
           this.isReScenario = false;
         })
     },
+    setScenarioArr() {
+      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
+      const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
+      sections.forEach((section, index) => {
+        const scenario = this.resultScenario;
+        const start = scenario.indexOf(section);
+        let end;
 
+        if (index < sections.length - 1) {
+          end = scenario.indexOf(sections[index + 1]);
+        } else {
+          end = scenario.length;
+        }
+        this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
+      });
+    },
     async setImage(menu) {
       console.log(menu);
       try {

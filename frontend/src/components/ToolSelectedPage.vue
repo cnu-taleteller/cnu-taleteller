@@ -34,6 +34,7 @@ export default {
     const dragArea = this.$refs.pageForm;
     const objArea = this.$refs.pageObject;
     const imageArea = this.$refs.dragImage;
+    const popupMenu = document.querySelector("#popupMenu");
 
     let toolMenu = this;
     let active = false;
@@ -57,7 +58,6 @@ export default {
       }
       const targetObj = e.target.dataset.layerId;
       toolMenu.thisObjId = targetObj;
-      const popupMenu = document.querySelector("#popupMenu");
       popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
       popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
       popupMenu.style.display = "block";

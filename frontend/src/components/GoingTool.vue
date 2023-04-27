@@ -36,6 +36,8 @@ export default {
     makeNewBook(){
       sessionStorage.setItem('toolState', 'new');
       sessionStorage.removeItem('scenario');
+      sessionStorage.removeItem('bookName');
+      sessionStorage.removeItem("projectTitle");
       this.$router.push('/tool');
     }
   },

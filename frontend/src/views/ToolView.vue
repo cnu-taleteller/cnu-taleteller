@@ -4,35 +4,41 @@
       <ToolHeader></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
-    <div v-if="toolState === 'new'" class="tool-contnet">
+    <div v-if="toolState === 'new'" class="tool-content">
+      <div class="scenario-btn">
       <button @click="selectScenarioMenu('gpt')">시나리오 추천 받기</button>
       <button @click="selectScenarioMenu('write')">시나리오 직접 쓰기</button>
     </div>
+    </div>
     <!-- gpt가 쓰는 시나리오 -->
-    <div v-else-if="toolState === 'gpt'" class="tool-contnet">
+    <div v-else-if="toolState === 'gpt'" class="tool-content tool-scenario">
       <div class="scenario-form">
         <h4>시나리오</h4>
-        <p>키워드를 입력하세요.</p>
-        <p>사건은 구체적이게 적을수록 좋습니다!</p>
-        <p>누가: <input type="text" class="scenario-input" v-model="scenario.who" placeholder="짱구가"></p>
-        <p>언제: <input type="text" class="scenario-input" v-model="scenario.when" placeholder="주말 아침에"></p>
-        <p>어디서: <input type="text" class="scenario-input" v-model="scenario.where" placeholder="숲에서"></p>
-        <p>사건: <textarea class="scenario-input" v-model="scenario.event"
+        <p>키워드를 입력하세요.
+          <br>키워드는 변경 불가능하니 신중하게 적어주세요!
+          <br>사건은 구체적이게 적을수록 좋습니다!</p>
+        <p>누가: <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가"></p>
+        <p>언제: <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에"></p>
+        <p>어디서: <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서"></p>
+        <p>사건: <textarea class="scenario-input" v-model="scenarioKeyword.event"
             placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></textarea></p>
-        <button @click="setScenario()">시나리오 받아보기</button>
+        <button class="submit-btn" @click="setScenario()">시나리오 받아보기</button>
       </div>
+      <ToolScenarioExample></ToolScenarioExample>
     </div>
     <!-- 내가 쓰는 시나리오 -->
-    <div v-else-if="toolState === 'write'" class="tool-contnet">
+    <div v-else-if="toolState === 'write'" class="tool-content">
       <div class="scenario-form">
         <h4>시나리오</h4>
         <p>시나리오를 입력해주세요.</p>
-        <p>도입: <input type="text" class="scenario-input" v-model="write1"></p>
-        <p>전개: <input type="text" class="scenario-input" v-model="write2"></p>
-        <p>위기: <input type="text" class="scenario-input" v-model="write3"></p>
-        <p>결말: <input type="text" class="scenario-input" v-model="write4"></p>
-        <button @click="saveScenario()">시나리오 저장</button>
-        <button @click="goTool()">나중에 쓸게요</button>
+        <p class="center">도입: <textarea class="scenario-input" v-model="write1"></textarea></p>
+        <p class="center">전개: <textarea class="scenario-input" v-model="write2"></textarea></p>
+        <p class="center">위기: <textarea class="scenario-input" v-model="write3"></textarea></p>
+        <p class="center">결말: <textarea class="scenario-input" v-model="write4"></textarea></p>
+        <div>
+          <button @click="saveScenario()">시나리오 저장</button> 
+          <button @click="goTool()">나중에 쓸게요</button>
+        </div>
       </div>
     </div>
     <!-- 툴 -->
@@ -41,11 +47,10 @@
         <ToolPageList @currentPageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-        <ToolSelectedPage :currentPageList="this.currentPageList" :imageIndex="this.imageIndex"></ToolSelectedPage>
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu :currentPageList="this.currentPageList" :finalScenario="this.finalScenario" :gpt="this.gpt"
-          @imageIndex="handleImageIndex"></ToolMenu>
+        <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList" :finalScenario2="this.finalScenario" :gpt="this.gpt"></ToolMenu>
       </div>
     </div>
   </div>
@@ -58,16 +63,16 @@ import toolPageList from '@/components/ToolPageList.vue';
 import toolSelectedPage from '@/components/ToolSelectedPage.vue';
 import toolLayer from '@/components/ToolLayer.vue';
 import toolMenu from '@/components/ToolMenu.vue';
+import toolScenarioExample from '@/components/ToolScenarioExample.vue'
 
 export default {
   data() {
     return {
       toolState: null,
       gpt: false, // gpt로 시나리오 받을건지.. 받을거면 true
-      API_KEY: '',
 
       // gpt로 받을 시나리오 키워드
-      scenario: {
+      scenarioKeyword: {
         who: null,
         when: null,
         where: null,
@@ -81,9 +86,8 @@ export default {
       write2: null,
       write3: null,
       write4: null,
-
+      selectedMenu : '',
       currentPageList: {},
-      imageIndex: 0,
       bookId: null, // 작품 번호
       pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
           {
@@ -134,13 +138,14 @@ export default {
     ToolSelectedPage: toolSelectedPage,
     ToolLayer: toolLayer,
     ToolMenu: toolMenu,
+    ToolScenarioExample: toolScenarioExample
   },
   methods: {
     handlePageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
-    handleImageIndex(imageIndex) {
-      this.imageIndex = imageIndex;
+    handleSelectedMenu(selectedMenu) {
+      this.selectedMenu = selectedMenu;
     },
     selectScenarioMenu(arg) {
       this.toolState = arg;
@@ -162,11 +167,10 @@ export default {
     },
     goTool(){
       sessionStorage.removeItem('toolState');
-      this.$emit('finalScenario', this.finalScenario);
-      this.$emit('gpt', this.gpt);
       this.toolState = null;
     },
     setScenario() {
+       sessionStorage.setItem('scenarioKeyword', JSON.stringify(this.scenarioKeyword));
       this.gpt = true;
       this.goTool();
       console.log("axios 통신 요청");
@@ -175,10 +179,10 @@ export default {
           "model": "gpt-3.5-turbo",
           "messages": [{
             "role": "user",
-            "content": `누가: ${this.scenario.who},
-                        언제: ${this.scenario.when}, 
-                        어디서: ${this.scenario.where},
-                        사건: ${this.scenario.event}
+            "content": `누가: ${this.scenarioKeyword.who},
+                        언제: ${this.scenarioKeyword.when}, 
+                        어디서: ${this.scenarioKeyword.where},
+                        사건: ${this.scenarioKeyword.event}
                         라는 내용을 가진 동화책을 '도입/전개/위기/결말' 로 나눠서 써줘.
                         내용을 나눌 때 형식은 
                         [도입] 내용
@@ -191,7 +195,7 @@ export default {
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.API_KEY}`,
+            "Authorization": `Bearer ${process.env.VUE_APP_API_KEY}`,
           }
         }
       )
@@ -201,10 +205,10 @@ export default {
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
           this.gpt = false;
-          this.$emit('gpt', this.gpt);
-          this.$emit('finalScenario', this.finalScenario);
         })
         .catch((err) => {
+          this.gpt = false;
+          alert('서버 오류로 시나리오 요청에 실패하였습니다.');
           console.log(err);
         })
     },
@@ -230,6 +234,9 @@ export default {
 
 </script>
 <style scoped>
+textarea {
+  resize: none;
+}
 .tool {
   width: 100%;
   height: 100%;
@@ -274,17 +281,50 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+ .scenario-input {
+    width: 250px;
 }
 
-/* .scenario-input {
-    width: 40%;
-}
-
+/*
 .scenario-content {
     width: 60%;
 } */
 
+.tool-scenario{
+  display: flex;
+  flex-direction: row;
+  width: 90%;
+  margin-top: 30px;
+}
 .scenario-input {
+  width: 350px;
+}
+.submit-btn{
+  width: 50%;
+}
+.scenario-btn {
+  width: 50%;
+  display: flex;
+  justify-content: space-around;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+.scenario-btn > button{
   width: 250px;
+  height: 250px;
+  border: 1px solid grey; 
+}
+.scenario-btn > button:hover {
+  background-color: rgb(181, 181, 181);
+  border: none;
+}
+.center {
+  display: flex;
+  align-items: center;
 }
 </style>

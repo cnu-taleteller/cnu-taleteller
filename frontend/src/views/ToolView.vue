@@ -41,11 +41,10 @@
         <ToolPageList @currentPageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-        <ToolSelectedPage :currentPageList="this.currentPageList" :imageIndex="this.imageIndex"></ToolSelectedPage>
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu :currentPageList="this.currentPageList" :finalScenario="this.finalScenario" :gpt="this.gpt"
-          @imageIndex="handleImageIndex"></ToolMenu>
+        <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList" :finalScenario="this.finalScenario" :gpt="this.gpt"></ToolMenu>
       </div>
     </div>
   </div>
@@ -81,9 +80,8 @@ export default {
       write2: null,
       write3: null,
       write4: null,
-
+      selectedMenu : '',
       currentPageList: {},
-      imageIndex: 0,
       bookId: null, // 작품 번호
       pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
           {
@@ -139,8 +137,8 @@ export default {
     handlePageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
-    handleImageIndex(imageIndex) {
-      this.imageIndex = imageIndex;
+    handleSelectedMenu(selectedMenu) {
+      this.selectedMenu = selectedMenu;
     },
     selectScenarioMenu(arg) {
       this.toolState = arg;

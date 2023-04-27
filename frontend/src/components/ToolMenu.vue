@@ -111,6 +111,7 @@ export default {
   },
   mounted() {
     const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
+    this.$emit('selectedMenu', this.selectedMenu);
     this.existingImageEventDragStart();
     this.imageEventDragOver(toolSelectedPageDrag);
     this.imageEventDrop(toolSelectedPageDrag);
@@ -249,9 +250,10 @@ export default {
         console.log(e);
       }
     },
-    setSelectedMenu(menu) {
-      this.selectedMenu = menu;
-    },
+      setSelectedMenu(menu) {
+        this.selectedMenu = menu;
+        this.$emit('selectedMenu', this.selectedMenu);
+      },
     existingImageEventDragStart() {
       document.querySelectorAll(".menu .image-list #item").forEach((element) => {
         element.addEventListener("dragstart", (e) => {
@@ -272,87 +274,9 @@ export default {
           });
         }
         this.uploadId++;
-      }
-      this.isUpload = false;
-    },
-    imageEventDragOver(element) {
-      element.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    },
-    imageEventDrop(element) {
-      let nextId = this.nextId;
-      let layerListRemove;
-      element.addEventListener("drop", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        let rX = e.pageX - document.querySelector('.page-form').offsetLeft;
-        let rY = e.pageY - document.querySelector('.page-form').offsetTop;
-        let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
-        let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
-        let cloneImageElement = imageElement.cloneNode();
-        cloneImageElement.setAttribute("draggable", "false");
-        let imageId = this.selectedMenu + nextId++;
-        cloneImageElement.dataset.layerId = imageId;
-        if (this.selectedMenu == 'background') {
-          const toolSelectedPageDrag = document.querySelector('.page-form');
-          const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
-          const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
-          cloneImageElement.style.left = "0px";
-          cloneImageElement.style.top = "0px";
-          cloneImageElement.style.width = dragImageWidth;
-          cloneImageElement.style.height = dragImageHeight;
-          cloneImageElement.style.position = "absolute";
-          cloneImageElement.style.zIndex = 1;
-          let newImage = {
-            fileId: cloneImageElement.src,
-            id: 'item',
-            layerId: String(imageId),
-            menu: this.selectedMenu,
-            style: {
-              left: cloneImageElement.style.left,
-              top: cloneImageElement.style.top,
-              position: cloneImageElement.style.position,
-              width: cloneImageElement.style.width,
-              height: cloneImageElement.style.height,
-            },
-          };
-          let elementToRemove = Array.from(document.querySelectorAll('.object #item[data-layer-id]'))
-            .find(el => el.dataset.layerId.includes('background'));
-          if (elementToRemove) {
-            layerListRemove = elementToRemove.dataset.layerId;
-            this.currentPageList.layerList.splice(0, 1, newImage);
-            elementToRemove.parentNode.removeChild(elementToRemove);
-          } else {
-            this.currentPageList.layerList.unshift(newImage);
-          }
-          document.querySelector('.object').insertBefore(cloneImageElement, document.querySelector('.object').firstChild);
-        } else {
-          cloneImageElement.style.left = (rX - x) + "px";
-          cloneImageElement.style.top = (rY - y) + "px";
-          cloneImageElement.style.position = "absolute";
-          cloneImageElement.style.width = cloneImageElement.width;
-          cloneImageElement.style.height = cloneImageElement.height;
-          cloneImageElement.style.zIndex = 1;
-          let newImage = {
-            fileId: cloneImageElement.src,
-            id: 'item',
-            layerId: String(imageId),
-            menu: this.selectedMenu,
-            style: {
-              left: cloneImageElement.style.left,
-              top: cloneImageElement.style.top,
-              position: cloneImageElement.style.position,
-              width: cloneImageElement.style.width,
-              height: cloneImageElement.style.height,
-            },
-          };
-          document.querySelector('.object').appendChild(cloneImageElement);
-          this.imageIndex = this.currentPageList.layerList.length;
-          this.currentPageList.layerList[this.imageIndex] = newImage;
         }
-      });
+        this.isUpload = false;
+      },
     },
   },
 }

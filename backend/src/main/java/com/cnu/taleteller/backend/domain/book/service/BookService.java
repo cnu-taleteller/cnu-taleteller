@@ -36,13 +36,13 @@ public class BookService {
     }
 
     @Transactional
-    public Book recommendBook(Long bookId) {
+    public BookDto recommendBook(Long bookId, BookDto bookDto) {
         Book book = bookRepository.findById(bookId).orElse(null);
-        BookDto bookDto = new BookDto();
         if (book != null) {
-            bookDto.setBookRecommend(book.getBookRecommend() + 1);
+            book.incrementRecommend();
             bookRepository.save(book);
+            return BookDto.fromEntity(book);
         }
-        return book;
+        return null;
     }
 }

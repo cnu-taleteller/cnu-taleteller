@@ -44,4 +44,18 @@ public class BookDto {
                 .build();
     }
 
+    public static BookDto fromEntity(Book book) {
+        BookDto bookDto = new BookDto();
+        bookDto.setBookRecommend(book.getBookRecommend());
+
+        bookDto.setBookId(book.getBookId());
+        bookDto.setBookName(book.getBookName());
+        bookDto.setBookRegdate(book.getBookRegdate());
+        bookDto.setBookSize(book.getBookSize());
+        bookDto.setBookDescription(book.getBookDescription());
+        bookDto.setBookStatus(book.getBookStatus());
+        bookDto.setBookCategory(book.getBookCategory());
+        bookDto.setBookPublic(book.getBookPublic());
+        return bookDto;
+    }
 }

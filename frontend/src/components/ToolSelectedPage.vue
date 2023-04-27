@@ -8,11 +8,11 @@
       </div>
     </div>
     <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
-      <ul>
-        <li><a @click="next(thisObjId)">앞으로</a></li>
-        <li><a @click="back(thisObjId)">뒤로</a></li>
-        <li><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
-        <li><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
+      <ul class="file-order-form">
+        <li class="file-order"><a @click="next(thisObjId)">앞으로</a></li>
+        <li class="file-order"><a @click="back(thisObjId)">뒤로</a></li>
+        <li class="file-order"><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
+        <li class="file-order"><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
       </ul>
     </div>
   </div>
@@ -313,4 +313,14 @@ export default {
 
 .object {
   position: absolute;
-}</style>
+}
+.file-order-form{
+  list-style:none;
+  padding: 1px;
+  margin: 2px;
+}
+.file-order:hover {
+  background-color: gray;
+  color: white;
+}
+</style>

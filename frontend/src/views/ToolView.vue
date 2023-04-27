@@ -204,7 +204,6 @@ export default {
           this.resultScenario = res.data.choices[0].message.content;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
-          this.gpt = false;
         })
         .catch((err) => {
           this.gpt = false;

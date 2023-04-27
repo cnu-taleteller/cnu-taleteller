@@ -44,7 +44,8 @@ export default {
 <style scoped>
 .header {
   width: 100%;
-  border: 1px solid gray;
+  background-color: rgb(222, 222, 222);
+  /* border: 1px solid gray; */
   display: flex;
   align-items: center;
   justify-content: center;

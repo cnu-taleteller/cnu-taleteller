@@ -35,6 +35,7 @@ export default {
             size: 10,
             content: null,
             location: null,
+            isTextAreaVisible: false,
           },
           thumbnail: null,
           layerList : []
@@ -76,6 +77,7 @@ export default {
             size: 10,
             content: null,
             location: null,
+            isTextAreaVisible: false,
           },
           thumbnail: null,
           pageId: newNo,

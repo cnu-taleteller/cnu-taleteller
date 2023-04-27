@@ -1,12 +1,27 @@
 <template>
-  <div class='page-form' ref="pageForm">
-    <div class='selected-page'>
-      <div class='drag-image' ref="dragImage">
-        <div class='object' ref='pageObject'>
-          
+    <div>
+      <div class='main-selected-page'>
+        {{this.currentPageList.caption.content}}
+        {{this.currentPageList.caption.isTextAreaVisible}}
+        <button @click="showTextArea">자막 추가</button>
+        <select v-model="fontSize" @change="setFontSize">
+            <option>10</option>
+            <option>12</option>
+            <option>14</option>
+            <option>16</option>
+            <option>18</option>
+            <option>20</option>
+        </select>
+        <input type="color" v-model="fontColor" @change="setFontColor">
+      </div>
+      <div class='page-form' ref="pageForm">
+        <div class='selected-page'>
+          <div class='drag-image' ref="dragImage">
+            <div class='object' ref='pageObject'>
+
+            </div>
         </div>
       </div>
-    </div>
     <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
       <ul class="file-order-form">
         <li class="file-order"><a @click="next(thisObjId)">앞으로</a></li>
@@ -15,6 +30,8 @@
         <li class="file-order"><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
       </ul>
     </div>
+    </div>
+    <textarea v-if="this.currentPageList.caption.isTextAreaVisible" v-model="textareaValue"></textarea>
   </div>
 </template>
 <script>
@@ -28,9 +45,15 @@ export default {
       thisObjId : '',
       imageIndex : 0,
       nextId : 1,
+      textareaValue: this.currentPageList.caption.content,
+      isTextAreaVisible: this.currentPageList.caption.isTextAreaVisible,
+      fontSize: 12,
+      fontColor: "#000000",
     }
   },
   mounted() {
+    this.setFontSize();
+    this.setFontColor();
     const dragArea = this.$refs.pageForm;
     const objArea = this.$refs.pageObject;
     const imageArea = this.$refs.dragImage;
@@ -100,7 +123,7 @@ export default {
         });
       }
     };
-    
+
     function dragEnd(e) {
       e.target.style.zIndex = '1';
       e.target.style.opacity = '1';
@@ -117,8 +140,25 @@ export default {
     currentPageList() {
       this.updateContent();
     },
+      //자막 내용 보내기
+    textareaValue(newValue) {
+      this.$emit('textareaValueChanged', newValue);
+    },
   },
   methods: {
+      //자막 보이게 하는 변경 값
+    showTextArea() {
+      console.log(this.currentPageList);
+      this.$emit('change', true);
+    },
+    setFontSize(){
+      const textarea = document.querySelector('textarea');
+      textarea.style.fontSize=this.fontSize+"px";
+    },
+    setFontColor(){
+      const textarea = document.querySelector('textarea');
+      textarea.style.color=this.fontColor;
+    },
     updateContent() {
       const objectElement = this.$refs.pageObject;
       while (objectElement.firstChild) {
@@ -293,7 +333,16 @@ export default {
     position: relative;
     border: 1px solid gray;
 }
-
+.main-selected-page{
+    width: 100%;
+    /* height: 450px; */
+    border: 1px solid gray;
+}
+textarea{
+    position: relative;
+    top: -100px;
+    z-index: 100;
+}
 .selected-page {
   width: 100%;
   height: 450px;

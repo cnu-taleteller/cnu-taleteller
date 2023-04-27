@@ -110,11 +110,8 @@ export default {
     gpt: Boolean,
   },
   mounted() {
-    const toolSelectedPageDrag = document.querySelector('.page-form .selected-page .drag-image');
     this.$emit('selectedMenu', this.selectedMenu);
     this.existingImageEventDragStart();
-    this.imageEventDragOver(toolSelectedPageDrag);
-    this.imageEventDrop(toolSelectedPageDrag);
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
     this.finalScenario = this.finalScenario2;
   },
@@ -278,8 +275,7 @@ export default {
         this.isUpload = false;
       },
     },
-  },
-}
+  }
 </script>
 <style scoped>
 .menu {

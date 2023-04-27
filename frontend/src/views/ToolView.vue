@@ -169,8 +169,6 @@ export default {
     },
     goTool(){
       sessionStorage.removeItem('toolState');
-      this.$emit('finalScenario', this.finalScenario);
-      this.$emit('gpt', this.gpt);
       this.toolState = null;
     },
     setScenario() {
@@ -209,13 +207,9 @@ export default {
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
           this.gpt = false;
-          this.$emit('gpt', this.gpt);
-          this.$emit('finalScenario', this.finalScenario);
         })
         .catch((err) => {
           this.gpt = false;
-          this.$emit('finalScenario', this.finalScenario);
-          this.$emit('gpt', this.gpt);
           alert('서버 오류로 시나리오 요청에 실패하였습니다.');
           console.log(err);
         })

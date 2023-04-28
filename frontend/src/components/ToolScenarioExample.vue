@@ -19,7 +19,7 @@ export default {
     data(){
         return {
             example1: {
-                who: '짱구가',
+                who: '철수가',
                 when: '5살때',
                 where: '유치원 놀이터에서',
                 event: '친구들과 미끄럼틀을 타다가 외계인에게 납치되었지만 외계인과 친구가 되어 무사히 살아 돌아온 이야기',

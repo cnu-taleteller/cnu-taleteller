@@ -106,14 +106,14 @@ export default {
   },
   props: {
     currentPageList: Object,
-    finalScenario2: Array,
+    viewFinalScenario: Array,
     gpt: Boolean,
   },
   mounted() {
     this.$emit('selectedMenu', this.selectedMenu);
     this.existingImageEventDragStart();
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
-    this.finalScenario = this.finalScenario2;
+    this.finalScenario = this.viewFinalScenario;
   },
   updated() {
     this.addImageEventDragstart();
@@ -181,6 +181,7 @@ export default {
           this.finalScenario = [];
           this.setScenarioArr();
           console.log(this.finalScenario);
+          this.$emit('finalScenario',this.finalScenario);
           
           this.gpt = false;
           this.isDisabled2 = false;

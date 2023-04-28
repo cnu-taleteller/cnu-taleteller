@@ -48,7 +48,7 @@
       </div>
       <div class="tool-center">
           <!--emit데이터 받아오기 위해서 변수 추가를 하였습니다 -->
-          <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged" :currentPageList="this.currentPageList" :imageIndex="this.imageIndex"></ToolSelectedPage>
+          <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged" :currentPageList="this.currentPageList" ></ToolSelectedPage>
       </div>
       <div class="tool-right">
         <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList" :finalScenario2="this.finalScenario" :gpt="this.gpt"></ToolMenu>
@@ -88,7 +88,8 @@ export default {
       write3: null,
       write4: null,
       selectedMenu : '',
-        //currentPageList를 보낼 때 기본 값을 설정을 안하니 1페이지 생성시에 caption부분이 안나오는 오류가 있어서 우선 기본값을 넣어서 해결했습니다.
+
+      // 현재 선택한 페이지
       currentPageList: {
           pageId : 1, // 작품마다 페이지 고유한 번호
           pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
@@ -119,37 +120,6 @@ export default {
           ]
       },
       bookId: null, // 작품 번호
-      pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
-          {
-          pageId : 1, // 작품마다 페이지 고유한 번호 
-          pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-          // 자막 관련
-          caption : {
-            size: 10,
-            content: null,
-            location: null,
-            isTextAreaVisible: false,
-          },
-          thumbnail: null,
-          // 페이지 안에 있는 파일들(레이어)
-          layerList : [
-            {
-              id : 'item',
-              layerId : '0',
-              fileId : '/images/field.png', 
-              menu: 'background', 
-              draggable : 'true', 
-              style : { 
-                width: '1200px', // 가로사이즈
-                height: '800px', // 세로사이즈
-                left : "0px", // x 좌표
-                top : "0px", // y 좌표
-                position : "absolute",
-              },
-            },
-          ]
-        }
-      ],
     }
   },
   created() {

@@ -1,36 +1,43 @@
 <template>
-    <div>
-      <div class='main-selected-page'>
-        {{this.currentPageList.caption.content}}
-        {{this.currentPageList.caption.isTextAreaVisible}}
-        <button @click="showTextArea">자막 추가</button>
-        <select v-model="fontSize" @change="setFontSize">
-            <option>10</option>
-            <option>12</option>
-            <option>14</option>
-            <option>16</option>
-            <option>18</option>
-            <option>20</option>
-        </select>
-        <input type="color" v-model="fontColor" @change="setFontColor">
-      </div>
-      <div class='page-form' ref="pageForm">
-        <div class='selected-page'>
-          <div class='drag-image' ref="dragImage">
-            <div class='object' ref='pageObject'>
+  <div>
+    <!-- 자막 메뉴 영역 -->
+    <div class='caption-menu-form'>
+      {{ this.currentPageList.caption.content }}
+      {{ this.currentPageList.caption.isTextAreaVisible }}
+      <button @click="showTextArea">자막 추가</button>
+      <select v-model="fontSize" @change="setFontSize">
+        <option>10</option>
+        <option>12</option>
+        <option>14</option>
+        <option>16</option>
+        <option>18</option>
+        <option>20</option>
+      </select>
+      <input type="color" v-model="fontColor" @change="setFontColor">
+    </div>
 
-            </div>
+    <!-- 이미지 영역 -->
+    <div class='page-form' ref="pageForm">
+      <div class='selected-page'>
+        <div class='drag-image' ref="dragImage">
+          <div class='object' ref='pageObject'>
+          </div>
         </div>
       </div>
-    <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
-      <ul class="file-order-form">
-        <li class="file-order"><a @click="next(thisObjId)">앞으로</a></li>
-        <li class="file-order"><a @click="back(thisObjId)">뒤로</a></li>
-        <li class="file-order"><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
-        <li class="file-order"><a @click="lastBack(thisObjId) ">제일 뒤로</a></li>
-      </ul>
+
+      <!-- 이미지 우클릭 영역 -->
+      <div id="popupMenu"
+        style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
+        <ul class="file-order-form">
+          <li class="file-order"><a @click="next(thisObjId)">앞으로</a></li>
+          <li class="file-order"><a @click="back(thisObjId)">뒤로</a></li>
+          <li class="file-order"><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
+          <li class="file-order"><a @click="lastBack(thisObjId)">제일 뒤로</a></li>
+        </ul>
+      </div>
     </div>
-    </div>
+
+    <!-- 자막 영역 -->
     <textarea v-if="this.currentPageList.caption.isTextAreaVisible" v-model="textareaValue"></textarea>
   </div>
 </template>
@@ -42,18 +49,18 @@ export default {
   },
   data() {
     return {
-      thisObjId : '',
-      imageIndex : 0,
-      nextId : 1,
-      textareaValue: this.currentPageList.caption.content,
-      isTextAreaVisible: this.currentPageList.caption.isTextAreaVisible,
+      thisObjId: '',
+      imageIndex: 0,
+      nextId: 1,
+      textareaValue: '',
+      isTextAreaVisible: null,
       fontSize: 12,
       fontColor: "#000000",
     }
   },
   mounted() {
-    this.setFontSize();
-    this.setFontColor();
+    // this.setFontSize();
+    // this.setFontColor();
     const dragArea = this.$refs.pageForm;
     const objArea = this.$refs.pageObject;
     const imageArea = this.$refs.dragImage;
@@ -76,7 +83,7 @@ export default {
     objArea.addEventListener('mouseup', dragEnd);
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      if(e.target.dataset.layerId.includes('background')) {
+      if (e.target.dataset.layerId.includes('background')) {
         return;
       }
       const targetObj = e.target.dataset.layerId;
@@ -86,9 +93,9 @@ export default {
       popupMenu.style.display = "block";
     });
 
-    document.addEventListener("click", function(e) {
+    document.addEventListener("click", function (e) {
       if (e.target !== objArea && e.target !== popupMenu) {
-          popupMenu.style.display = "none";
+        popupMenu.style.display = "none";
       }
     });
 
@@ -140,24 +147,24 @@ export default {
     currentPageList() {
       this.updateContent();
     },
-      //자막 내용 보내기
+    //자막 내용 보내기
     textareaValue(newValue) {
       this.$emit('textareaValueChanged', newValue);
     },
   },
   methods: {
-      //자막 보이게 하는 변경 값
+    //자막 보이게 하는 변경 값
     showTextArea() {
       console.log(this.currentPageList);
       this.$emit('change', true);
     },
-    setFontSize(){
+    setFontSize() {
       const textarea = document.querySelector('textarea');
-      textarea.style.fontSize=this.fontSize+"px";
+      textarea.style.fontSize = this.fontSize + "px";
     },
-    setFontColor(){
+    setFontColor() {
       const textarea = document.querySelector('textarea');
-      textarea.style.color=this.fontColor;
+      textarea.style.color = this.fontColor;
     },
     updateContent() {
       const objectElement = this.$refs.pageObject;
@@ -216,7 +223,7 @@ export default {
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#item[data-layer-id='${layerId}']`);
       const nextImage = elementDoc.nextElementSibling;
-      if(nextImage) {
+      if (nextImage) {
         let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
         const item = this.currentPageList.layerList[indexOfElement];
         this.currentPageList.layerList.splice(indexOfElement, 1);
@@ -228,7 +235,7 @@ export default {
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#item[data-layer-id='${layerId}']`);
       const previusImage = elementDoc.previousElementSibling;
-      if(previusImage && previusImage.dataset.layerId.includes('background')) {
+      if (previusImage && previusImage.dataset.layerId.includes('background')) {
         return;
       }
       if (previusImage) {
@@ -240,109 +247,112 @@ export default {
       }
     },
     imageEventDragOver(element) {
-        element.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
+      element.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
     },
     imageEventDrop(element) {
-        let nextId = this.nextId;
-        let toolSelectedPageDrag = document.querySelector('.page-form');
-        element.addEventListener("drop", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          let rX = e.pageX - toolSelectedPageDrag.offsetLeft;
-          let rY = e.pageY - toolSelectedPageDrag.offsetTop;
-          let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
-          let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
-          let cloneImageElement = imageElement.cloneNode();
-          let imageId = this.selectedMenu + nextId++;
-          cloneImageElement.setAttribute("draggable", "false");
-          cloneImageElement.dataset.layerId = imageId;
-          if(this.selectedMenu == 'background') {
-            const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
-            const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
-            cloneImageElement.style.left = "0px";
-            cloneImageElement.style.top = "0px";
-            cloneImageElement.style.width = dragImageWidth;
-            cloneImageElement.style.height = dragImageHeight;
-            cloneImageElement.style.position = "absolute";
-            cloneImageElement.style.zIndex = 1;
-            let newImage = {
-              fileId : cloneImageElement.src,
-              id : 'item',
-              layerId : String(imageId),
-              menu: this.selectedMenu,
-              style : {
-                left : cloneImageElement.style.left,
-                top : cloneImageElement.style.top,
-                position : cloneImageElement.style.position,
-                width : cloneImageElement.style.width,
-                height : cloneImageElement.style.height,
-              },
-            };
-            let elementToRemove = Array.from(document.querySelectorAll('.object #item[data-layer-id]'))
-              .find(el => el.dataset.layerId.includes('background'));
-            if (elementToRemove) {
-              layerListRemove = elementToRemove.dataset.layerId;
-              this.currentPageList.layerList.splice(0, 1, newImage);
-              elementToRemove.parentNode.removeChild(elementToRemove);
-            } else {
-              this.currentPageList.layerList.unshift(newImage);
-            }
-            document.querySelector('.object').insertBefore(cloneImageElement, document.querySelector('.object').firstChild);
-          }else {
-            cloneImageElement.style.left = (rX - x) + "px";
-            cloneImageElement.style.top = (rY - y) + "px";
-            cloneImageElement.style.position = "absolute";
-            cloneImageElement.style.width = cloneImageElement.width;
-            cloneImageElement.style.height = cloneImageElement.height;
-            cloneImageElement.style.zIndex = 1;
-            let newImage = {
-              fileId : cloneImageElement.src,
-              id : 'item',
-              layerId : String(imageId),
-              menu: this.selectedMenu,
-              style : {
-                left : cloneImageElement.style.left,
-                top : cloneImageElement.style.top,
-                position : cloneImageElement.style.position,
-                width : cloneImageElement.style.width,
-                height : cloneImageElement.style.height,
-              },
-            };
-            document.querySelector('.object').appendChild(cloneImageElement);
-            this.imageIndex = this.currentPageList.layerList.length;
-            this.currentPageList.layerList[this.imageIndex] = newImage;
+      let nextId = this.nextId;
+      let toolSelectedPageDrag = document.querySelector('.page-form');
+      element.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        let rX = e.pageX - toolSelectedPageDrag.offsetLeft;
+        let rY = e.pageY - toolSelectedPageDrag.offsetTop;
+        let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
+        let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
+        let cloneImageElement = imageElement.cloneNode();
+        let imageId = this.selectedMenu + nextId++;
+        cloneImageElement.setAttribute("draggable", "false");
+        cloneImageElement.dataset.layerId = imageId;
+        if (this.selectedMenu == 'background') {
+          const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
+          const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
+          cloneImageElement.style.left = "0px";
+          cloneImageElement.style.top = "0px";
+          cloneImageElement.style.width = dragImageWidth;
+          cloneImageElement.style.height = dragImageHeight;
+          cloneImageElement.style.position = "absolute";
+          cloneImageElement.style.zIndex = 1;
+          let newImage = {
+            fileId: cloneImageElement.src,
+            id: 'item',
+            layerId: String(imageId),
+            menu: this.selectedMenu,
+            style: {
+              left: cloneImageElement.style.left,
+              top: cloneImageElement.style.top,
+              position: cloneImageElement.style.position,
+              width: cloneImageElement.style.width,
+              height: cloneImageElement.style.height,
+            },
+          };
+          let elementToRemove = Array.from(document.querySelectorAll('.object #item[data-layer-id]'))
+            .find(el => el.dataset.layerId.includes('background'));
+          if (elementToRemove) {
+            layerListRemove = elementToRemove.dataset.layerId;
+            this.currentPageList.layerList.splice(0, 1, newImage);
+            elementToRemove.parentNode.removeChild(elementToRemove);
+          } else {
+            this.currentPageList.layerList.unshift(newImage);
           }
-        });
-      },
+          document.querySelector('.object').insertBefore(cloneImageElement, document.querySelector('.object').firstChild);
+        } else {
+          cloneImageElement.style.left = (rX - x) + "px";
+          cloneImageElement.style.top = (rY - y) + "px";
+          cloneImageElement.style.position = "absolute";
+          cloneImageElement.style.width = cloneImageElement.width;
+          cloneImageElement.style.height = cloneImageElement.height;
+          cloneImageElement.style.zIndex = 1;
+          let newImage = {
+            fileId: cloneImageElement.src,
+            id: 'item',
+            layerId: String(imageId),
+            menu: this.selectedMenu,
+            style: {
+              left: cloneImageElement.style.left,
+              top: cloneImageElement.style.top,
+              position: cloneImageElement.style.position,
+              width: cloneImageElement.style.width,
+              height: cloneImageElement.style.height,
+            },
+          };
+          document.querySelector('.object').appendChild(cloneImageElement);
+          this.imageIndex = this.currentPageList.layerList.length;
+          this.currentPageList.layerList[this.imageIndex] = newImage;
+        }
+      });
+    },
   },
 }
 
 </script>
 <style scoped>
 .page-form {
-    width: 100%;
-    height: 450px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    touch-action: none;
-    position: relative;
-    border: 1px solid gray;
+  width: 100%;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  position: relative;
+  border: 1px solid gray;
 }
-.main-selected-page{
-    width: 100%;
-    /* height: 450px; */
-    border: 1px solid gray;
+
+.caption-menu-form {
+  width: 100%;
+  /* height: 450px; */
+  border: 1px solid gray;
 }
-textarea{
-    position: relative;
-    top: -100px;
-    z-index: 100;
+
+textarea {
+  position: relative;
+  top: -100px;
+  z-index: 100;
 }
+
 .selected-page {
   width: 100%;
   height: 450px;
@@ -363,13 +373,14 @@ textarea{
 .object {
   position: absolute;
 }
-.file-order-form{
-  list-style:none;
+
+.file-order-form {
+  list-style: none;
   padding: 1px;
   margin: 2px;
 }
+
 .file-order:hover {
   background-color: gray;
   color: white;
-}
-</style>
+}</style>

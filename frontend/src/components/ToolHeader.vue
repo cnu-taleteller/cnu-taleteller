@@ -9,19 +9,25 @@
       <img  class="header-btn" @click="editBookName()" src="@/assets/check.png">
   </div>
     <div class="header-menu">
-      <button>임시저장</button>
+      <button @click="tempSave()">임시저장</button>
       <button @click="saveBook()">제출</button>
     </div>
   </div>
 </template>
 <script>
-export default {
+import axios from 'axios';
+
+export default{
   data() {
     return {
       bookName: "동화책 이름",
       pop: null,
       edit: false,
     };
+  },
+  props: {
+    viewFinalScenario: Array,
+    scenarioKeyword: Object
   },
   created() {
     if (sessionStorage.getItem('bookName')) {
@@ -32,7 +38,11 @@ export default {
     editBookName() {
       this.edit = !!!this.edit;
     },
+    tempSave(){
+      console.log(this.viewFinalScenario);
+    },
     saveBook() {
+      // this.tempSave();
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('scenarioKeyword');
       sessionStorage.setItem('bookName',this.bookName);
@@ -44,7 +54,8 @@ export default {
 <style scoped>
 .header {
   width: 100%;
-  border: 1px solid gray;
+  background-color: rgb(222, 222, 222);
+  /* border: 1px solid gray; */
   display: flex;
   align-items: center;
   justify-content: center;

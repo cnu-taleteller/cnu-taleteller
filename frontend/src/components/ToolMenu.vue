@@ -36,7 +36,7 @@
           <!-- 내가 적은 시나리오 없을 때 -->
           <div v-else-if="gpt == false && (!finalScenario || finalScenario.length === 0)">
             <p>입력된 시나리오가 없습니다.<br>시나리오를 입력해주세요.</p>
-            <button>추가</button>
+            <button @click="addScenario()">추가</button>
           </div>
           <!-- 시나리오 있을 때 -->
           <div v-else>
@@ -50,7 +50,7 @@
               {{ setScenarioLabel(index) }} <br>
               <textarea v-model="finalScenario[index]" class="story-input" :disabled="isDisabled">{{ story }}</textarea>
             </p>
-            <button :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
+            <button v-show="gpt" :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
             <button v-show="isDisabled" :disabled="isDisabled2" @click="editScenario('edit')">수정</button>
             <button v-show="!isDisabled" @click="editScenario('save')">저장</button>
           </div>
@@ -106,14 +106,14 @@ export default {
   },
   props: {
     currentPageList: Object,
-    finalScenario2: Array,
+    viewFinalScenario: Array,
     gpt: Boolean,
   },
   mounted() {
     this.$emit('selectedMenu', this.selectedMenu);
     this.existingImageEventDragStart();
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
-    this.finalScenario = this.finalScenario2;
+    this.finalScenario = this.viewFinalScenario;
   },
   updated() {
     this.addImageEventDragstart();
@@ -134,6 +134,15 @@ export default {
           return '';
       }
     },
+    // 시나리오 직접 작성
+    addScenario(){
+      for(let i=0; i<4; i++){
+        this.finalScenario.push('');
+      }
+      this.editScenario('edit');
+      
+    },
+
     // 시나리오 수정
     editScenario(arg) {
       this.isDisabled = !!!this.isDisabled;
@@ -181,12 +190,11 @@ export default {
           this.finalScenario = [];
           this.setScenarioArr();
           console.log(this.finalScenario);
+          this.$emit('finalScenario',this.finalScenario);
           
-          this.gpt = false;
           this.isDisabled2 = false;
         })
         .catch((err) => {
-          this.gpt = false;
           alert('서버 오류로 시나리오 요청에 실패하였습니다.');
           console.log(err);
         })
@@ -216,7 +224,7 @@ export default {
         let frm = new FormData();
         let imageFile = document.getElementById("image");
         frm.append("image", imageFile.files[0]);
-        const res = await axios.post(`/api/users/image?menu=${menu}`, frm, {
+        const res = await axios.post(`/api/tool/image?menu=${menu}`, frm, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

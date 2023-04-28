@@ -4,7 +4,7 @@
     <div class="page-all">
       <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list">
-        <li v-for="page, index in pageList" :key="index" class="one_page">
+        <li v-for="page, index in pageList" :key="index" class="one-page">
           <div class="page-body" @click="clickPage(index)"></div>
           <label>
             {{ page.pageId }}
@@ -120,6 +120,7 @@ export default {
 }
 
 .one-page {
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -128,7 +129,7 @@ export default {
 }
 
 .page-body {
-  /* width: 80%; */
+  width: 90%;
   height: 120px;
   border: 1px solid gray;
 }

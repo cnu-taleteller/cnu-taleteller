@@ -49,7 +49,8 @@
         <ToolPageList @currentPageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"></ToolSelectedPage>
+          <!--emit데이터 받아오기 위해서 변수 추가를 하였습니다 -->
+          <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged" :currentPageList="this.currentPageList" ></ToolSelectedPage>
       </div>
       <div class="tool-right">
         <ToolMenu @selectedMenu="handleSelectedMenu"  :currentPageList="this.currentPageList"
@@ -89,44 +90,40 @@ export default {
       write2: null,
       write3: null,
       write4: null,
-      selectedMenu: '',
-      currentPageList: {},
-
-      bookId: null, // 작품 번호
       
-      // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 page_order
-      pageList: [ 
-        {
-          pageId: 1, // 각 작품마다 페이지 고유 번호
+      selectedMenu : '',
+
+      // 현재 선택한 페이지
+      currentPageList: {
+          pageId : 1, // 작품마다 페이지 고유한 번호
           pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
           // 자막 관련
-          caption: {
-            size: 10,
-            content: null,
-            location: null,
+          caption : {
+              size: 10,
+              content: null,
+              location: null,
+              isTextAreaVisible: false,
           },
           thumbnail: null,
           // 페이지 안에 있는 파일들(레이어)
-          layerList: [
-            {
-              id: 'item',
-              layerId: '0',
-              fileId: '',
-              menu: 'background',
-              draggable: 'true',
-              style: {
-                width: '1200px', // 가로사이즈
-                height: '800px', // 세로사이즈
-                left: "0px", // x 좌표
-                top: "0px", // y 좌표
-                position: "absolute",
+          layerList : [
+              {
+                  id : 'item',
+                  layerId : '0',
+                  fileId : '/images/field.png',
+                  menu: 'background',
+                  draggable : 'true',
+                  style : {
+                      width: '1200px', // 가로사이즈
+                      height: '800px', // 세로사이즈
+                      left : "0px", // x 좌표
+                      top : "0px", // y 좌표
+                      position : "absolute",
+                  },
               },
-            },
           ]
-        }
-      ],
-
-
+      },
+      bookId: null, // 작품 번호
     }
   },
   created() {
@@ -149,6 +146,12 @@ export default {
     ToolScenarioExample: toolScenarioExample
   },
   methods: {
+    textareaValueChanged(newValue){
+      this.currentPageList.caption.content=newValue;
+    },
+    change(){
+      this.currentPageList.caption.isTextAreaVisible=true;
+    },
     handlePageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
@@ -212,7 +215,6 @@ export default {
           this.resultScenario = res.data.choices[0].message.content;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
-          this.gpt = false;
         })
         .catch((err) => {
           this.gpt = false;

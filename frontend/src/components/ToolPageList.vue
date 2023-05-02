@@ -6,6 +6,7 @@
         class="page-list">
         <li v-for="page, index in pageList" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)">
+            <!-- 썸네일 부분 -->
             <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:120px; height: 120px">
           </div>
           <label>
@@ -29,8 +30,9 @@ export default {
   data() {
     return {
       book_id: null,
+      //현재 사용중인 데이터
       pageList: [
-      {
+        {
           pageId : 1,
           pageStatus: 1,
           caption : {
@@ -43,26 +45,25 @@ export default {
         }
       ],
       currentPageNo: 1,
-      sortableOptions: {
-        animation: 300,
-        handle: '.page-body'
-      },
     }
   },
   created() {
     this.book_id = sessionStorage.getItem('book_id');
   },
   mounted() {
+    //기본적으로 DOM에 내용이 만들어지면 배열의 첫번째 요소를 보냄 들어오면 1번 페이지를 보여주기 위해서
     this.$emit('currentPageList', this.pageList[0]);
   },
   methods: {
     defalutReset() {
       this.currentPageNo = items.length - 1;
     },
+    //페이지 변경 시 그 페이지의 내용들을 보냄
     clickPage(index) {
       this.currentPageNo = index;
       this.$emit('currentPageList', this.pageList[index]);
     },
+    //페이지 추가부분
     addPage() {
       let currnet = this.currentPageNo;
       var self = this;

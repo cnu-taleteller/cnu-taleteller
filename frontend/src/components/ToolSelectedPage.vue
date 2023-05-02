@@ -19,6 +19,7 @@
 import html2canvas from 'html2canvas';
 
 export default {
+  //props로 toolView에서 보낸 데이터를 받음
   props: {
     currentPageList: Object,
     selectedMenu: String,
@@ -28,7 +29,7 @@ export default {
       thisObjId : '',
       imageIndex : 0,
       nextId : 1,
-      objArea2 : this.$refs.pageObject,
+      data : null,
     }
   },
   mounted() {
@@ -52,29 +53,34 @@ export default {
     this.imageEventDragOver(imageArea);
     objArea.addEventListener('mousedown', dragStart);
     objArea.addEventListener('mouseup', dragEnd);
+    
+    //오른쪽 마우스 클릭
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      if(e.target.dataset.layerId.includes('background')) {
+      if(e.target.id.includes('background')) {
         return;
       }
-      const targetObj = e.target.dataset.layerId;
+      const targetObj = e.target.id;
+      toolMenu.data = targetObj
       toolMenu.thisObjId = targetObj;
       popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
       popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
       popupMenu.style.display = "block";
     });
 
+    //그림 드래그 부분 제외 버튼 클릭 시 메뉴 안보이게
     document.addEventListener("click", function(e) {
       if (e.target !== objArea && e.target !== popupMenu) {
           popupMenu.style.display = "none";
       }
     });
 
+    //드래그 시작부분(selected page)
     function dragStart(e) {
       if (e.button === 0) {
         e.stopPropagation();
         e.preventDefault();
-        currentObjId = e.target.dataset.layerId;
+        currentObjId = e.target.id;
         currentX = e.pageX - dragArea.offsetLeft;
         currentY = e.pageY - dragArea.offsetTop;
         currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
@@ -87,10 +93,11 @@ export default {
       }
     };
 
+    //드래그 (selected page)
     function drag(e) {
       e.stopPropagation();
       e.preventDefault();
-      if (active && currentObjId === currentObj.dataset.layerId) {
+      if (active && currentObjId === currentObj.id) {
         currentObj.style.zIndex = '10'
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
@@ -101,11 +108,12 @@ export default {
       }
     };
     
+    //드래그 끝내는 부분 (selected page)
     function dragEnd(e) {
       e.target.style.zIndex = '1';
       e.target.style.opacity = '1';
-      let targetObj = e.target.dataset.layerId;
-      let result = toolMenu.currentPageList.layerList.find(el => el.layerId === targetObj);
+      let targetObj = e.target.id;
+      let result = toolMenu.currentPageList.layerList.find(el => el.id === targetObj);
       result.style.left = e.target.style.left;
       result.style.top = e.target.style.top;
       document.body.style.cursor = '';
@@ -118,6 +126,7 @@ export default {
     };
   },
   watch: {
+    //currentPageList => pageList[현재 선택한 페이지 인덱스] 가 변경이 일어나면 실행이 되는 부분
     currentPageList() {
       this.updateContent();
     },
@@ -125,16 +134,19 @@ export default {
   methods: {
     updateContent() {
       const objectElement = this.$refs.pageObject;
+
+      //object div 안의 내용을 초기화
       while (objectElement.firstChild) {
         objectElement.removeChild(objectElement.firstChild);
       }
+
+      //currentPageList를 기반으로 이미지를 새롭게 그림
       if (this.currentPageList.layerList != null) {
         const fragment = document.createDocumentFragment();
         for (const [index, image] of Object.entries(this.currentPageList.layerList)) {
           const imageEle = document.createElement('img');
           imageEle.src = image.fileId;
           imageEle.id = image.id;
-          imageEle.dataset.layerId = image.layerId;
           imageEle.style.left = image.style.left;
           imageEle.style.top = image.style.top;
           imageEle.style.position = image.style.position;
@@ -147,12 +159,13 @@ export default {
         objectElement.appendChild(fragment);
       }
     },
-    lastBack(layerId) {
+    //이미지를 가장 뒤로 보내는 메소드
+    lastBack(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#item[data-layer-id='${layerId}']`);
-      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+      const elementDoc = objectElement.querySelector(`#${this.data}`);
+      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
       const secondChild = objectElement.children[1];
-      if (objectElement.firstChild.dataset.layerId.includes('background')) {
+      if (objectElement.firstChild.id.includes('background')) {
         if (secondChild) {
           objectElement.insertBefore(elementDoc, secondChild);
           const item = this.currentPageList.layerList[indexOfElement];
@@ -172,10 +185,11 @@ export default {
         this.currentPageList.thumbnail = dataUrl;
       });
     },
-    frontmost(layerId) {
+    //이미지를 가장 앞으로 보내는 메소드
+    frontmost(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#item[data-layer-id='${layerId}']`);
-      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+      const elementDoc = objectElement.querySelector(`#${this.data}`);
+      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
       const item = this.currentPageList.layerList[indexOfElement];
       this.currentPageList.layerList.splice(indexOfElement, 1);
       this.currentPageList.layerList.splice(this.currentPageList.layerList.length, 0, item);
@@ -186,12 +200,13 @@ export default {
         this.currentPageList.thumbnail = dataUrl;
       });
     },
-    next(layerId) {
+    //이미지를 앞으로 보내는 메소드
+    next(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#item[data-layer-id='${layerId}']`);
+      const elementDoc = objectElement.querySelector(`#${this.data}`);
       const nextImage = elementDoc.nextElementSibling;
       if(nextImage) {
-        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
         const item = this.currentPageList.layerList[indexOfElement];
         this.currentPageList.layerList.splice(indexOfElement, 1);
         this.currentPageList.layerList.splice(indexOfElement + 1, 0, item);
@@ -203,15 +218,16 @@ export default {
         });
       }
     },
-    back(layerId) {
+    //이미지를 뒤로 보내는 메소드
+    back(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#item[data-layer-id='${layerId}']`);
+      const elementDoc = objectElement.querySelector(`#${this.data}`);
       const previusImage = elementDoc.previousElementSibling;
-      if(previusImage && previusImage.dataset.layerId.includes('background')) {
+      if(previusImage && previusImage.id.includes('background')) {
         return;
       }
       if (previusImage) {
-        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.layerId === layerId);
+        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
         const item = this.currentPageList.layerList[indexOfElement];
         this.currentPageList.layerList.splice(indexOfElement, 1);
         this.currentPageList.layerList.splice(indexOfElement - 1, 0, item);
@@ -223,16 +239,17 @@ export default {
         });
       }
     },
+    //toolmenu 부분의 dragover
     imageEventDragOver(element) {
         element.addEventListener("dragover", (e) => {
             e.preventDefault();
             e.stopPropagation();
         });
     },
+    //toolmenu 에서 selectedPage 로 드롭하는 부분
     imageEventDrop(element) {
         let nextId = this.nextId;
         let toolSelectedPageDrag = this.$refs.pageForm;
-
         element.addEventListener("drop", (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -242,11 +259,10 @@ export default {
           if(data == null || x == null || y == null) {
             return;
           }
-          let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
+          let imageElement = document.querySelector(`.menu .image-list #item #${data}`);
           let cloneImageElement = imageElement.cloneNode();
-          let imageId = this.selectedMenu + nextId++;
           cloneImageElement.setAttribute("draggable", "false");
-          cloneImageElement.dataset.layerId = imageId;
+          cloneImageElement.id = this.selectedMenu + nextId++;
           if(this.selectedMenu == 'background') {
             const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
             const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
@@ -258,8 +274,7 @@ export default {
             cloneImageElement.style.zIndex = 1;
             let newImage = {
               fileId : cloneImageElement.src,
-              id : 'item',
-              layerId : String(imageId),
+              id : cloneImageElement.id,
               menu: this.selectedMenu,
               style : {
                 left : cloneImageElement.style.left,
@@ -269,8 +284,9 @@ export default {
                 height : cloneImageElement.style.height,
               },
             };
-            let elementToRemove = Array.from(document.querySelectorAll('.object #item[data-layer-id]'))
-              .find(el => el.dataset.layerId.includes('background'));
+            let elementToRemove = Array.from(document.querySelectorAll(`.object img`))
+              .find(el => el.id.includes('background'));
+              console.log(elementToRemove);
             if (elementToRemove) {
               this.currentPageList.layerList.splice(0, 1, newImage);
               elementToRemove.parentNode.removeChild(elementToRemove);
@@ -282,13 +298,12 @@ export default {
             cloneImageElement.style.left = (rX - x) + "px";
             cloneImageElement.style.top = (rY - y) + "px";
             cloneImageElement.style.position = "absolute";
-            cloneImageElement.style.width = cloneImageElement.width;
-            cloneImageElement.style.height = cloneImageElement.height;
+            cloneImageElement.style.width = "100px";
+            cloneImageElement.style.height = "100px";
             cloneImageElement.style.zIndex = 1;
             let newImage = {
               fileId : cloneImageElement.src,
-              id : 'item',
-              layerId : String(imageId),
+              id : cloneImageElement.id,
               menu: this.selectedMenu,
               style : {
                 left : cloneImageElement.style.left,
@@ -301,6 +316,7 @@ export default {
             document.querySelector('.object').appendChild(cloneImageElement);
             this.imageIndex = this.currentPageList.layerList.length;
             this.currentPageList.layerList[this.imageIndex] = newImage;
+            console.log(this.currentPageList);
           }
           const imageArea = this.$refs.dragImage;
           html2canvas(imageArea).then(canvas => {

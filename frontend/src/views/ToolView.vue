@@ -44,9 +44,11 @@
     <!-- 툴 -->
     <div v-else class="tool-content">
       <div class="tool-left">
+        <!-- currentPageList 에 handlePageList 메서드로 툴 페이지리스트 컴포넌트에서 $emit으로 받은 pageList(index) 를 넣음 -->
         <ToolPageList @currentPageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
+        <!-- toolSelectedPage에 값을 전달해줌 -->
         <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"></ToolSelectedPage>
       </div>
       <div class="tool-right">
@@ -87,38 +89,8 @@ export default {
       write3: null,
       write4: null,
       selectedMenu : '',
-      currentPageList: {},
+      currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
       bookId: null, // 작품 번호
-      pageList: [ // 작품안에 있는 페이지 여러 개 배열로 - 인덱스가 order
-          {
-          pageId : 1, // 작품마다 페이지 고유한 번호 
-          pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-          // 자막 관련
-          caption : {
-            size: 10,
-            content: null,
-            location: null,
-          },
-          thumbnail: null,
-          // 페이지 안에 있는 파일들(레이어)
-          layerList : [
-            {
-              id : 'item',
-              layerId : '0',
-              fileId : '/images/field.png', 
-              menu: 'background', 
-              draggable : 'true', 
-              style : { 
-                width: '1200px', // 가로사이즈
-                height: '800px', // 세로사이즈
-                left : "0px", // x 좌표
-                top : "0px", // y 좌표
-                position : "absolute",
-              },
-            },
-          ]
-        }
-      ],
     }
   },
   created() {
@@ -141,9 +113,11 @@ export default {
     ToolScenarioExample: toolScenarioExample
   },
   methods: {
+    //매개변수로 currnetPageList == pageList(index)를 받아서 data에 있는 this.currentPageList에 넣어주는 부분 
     handlePageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
+    //매개변수로 selectedMenu (ex) background, character 를 받아서 data에 있는 this.selectedMenu에 넣어주눈 부분
     handleSelectedMenu(selectedMenu) {
       this.selectedMenu = selectedMenu;
     },

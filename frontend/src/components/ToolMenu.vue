@@ -10,13 +10,15 @@
     </div>
     <div class="menu-form">
       <div class="image-list">
-        <div class="image-list-char" v-show="selectedMenu == 'character'">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId"
+        <div id="item">
+          <div class="image-list-char" v-show="selectedMenu == 'character'">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id"
             :style="{ height: item.height }" v-for="item, index in charList">
-        </div>
-        <div class="image-list-back" v-show="selectedMenu == 'background'">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId"
-            :style="{ height: item.height }" v-for="item, index in backList">
+          </div>
+          <div class="image-list-back" v-show="selectedMenu == 'background'">
+            <img :src="item.src" :draggable="item.draggable" :id="item.id"
+              :style="{ height: item.height }" v-for="item, index in backList">
+          </div>
         </div>
       </div>
       <div class="uploadImage">
@@ -72,29 +74,27 @@ export default {
       finalScenario: [],
       isReScenario: false,
       scenarioKeyword: {},
-
-        //리스트 변경 해야함.
-        charList: [
+      //기본적으로 있는 캐릭터 배열.
+      charList: [
         {
           src: '/images/pngwing.com.png',
-          id: 'item',
+          id: 'character1',
           draggable: "true",
-          dataId: 'i1',
-          height: "100",
+          height: "100px",
         },
         {
           src: '/images/pngwing2.com.png',
-          id: 'item',
+          id: 'character2',
           draggable: "true",
-          dataId: 'i2',
-          height: "100",
-        }],
+          height: "100px",
+        }
+      ],
+      //기본적으로 있는 배경 배열.
       backList: [
         {
           src: '/images/field.png',
-          id: 'item',
+          id: 'background1',
           draggable: 'true',
-          dataId: 'i3',
           height: '100px',
         }],
       selectedMenu: 'scenario',
@@ -104,6 +104,7 @@ export default {
       imageIndex: 0,
     }
   },
+  //props로 toolView에서 보낸 데이터를 받음
   props: {
     currentPageList: Object,
     finalScenario2: Array,
@@ -111,12 +112,9 @@ export default {
   },
   mounted() {
     this.$emit('selectedMenu', this.selectedMenu);
-    this.existingImageEventDragStart();
+    this.imageEventDragStart();
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
     this.finalScenario = this.finalScenario2;
-  },
-  updated() {
-    this.addImageEventDragstart();
   },
   methods: {
     // 시나리오 label 나누는 함수
@@ -194,6 +192,7 @@ export default {
           this.isReScenario = false;
         })
     },
+
     setScenarioArr() {
       // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
       const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
@@ -210,6 +209,7 @@ export default {
         this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
       });
     },
+
     async setImage(menu) {
       console.log(menu);
       try {
@@ -221,60 +221,49 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         });
-        this.isUpload = true;
+        //업로드 되면 추가 이미지가 추가되는 부분
         if (menu === 'background') {
           this.src = "/images/" + res.data;
           this.backList.push({
             src: this.src,
-            id: 'item',
+            id: 'upload' + this.uploadId,
             draggable: "true",
-            dataId: 'upload' + this.uploadId,
             height: "100px",
           });
         } else if (menu === 'character') {
           this.src = "/images/" + res.data;
           this.charList.push({
             src: this.src,
-            id: 'item',
+            id: 'upload' + this.uploadId,
             draggable: "true",
-            dataId: 'upload' + this.uploadId,
             height: "100px",
           });
         }
+        this.uploadId++;
         console.log("전송 성공");
         document.getElementById("image").value = "";
       } catch (e) {
         console.log(e);
       }
     },
-      setSelectedMenu(menu) {
-        this.selectedMenu = menu;
-        this.$emit('selectedMenu', this.selectedMenu);
-      },
-    existingImageEventDragStart() {
+
+    setSelectedMenu(menu) {
+      this.selectedMenu = menu;
+      this.$emit('selectedMenu', this.selectedMenu);
+    },
+
+    //기존 이미지 배열에 있는 이미지들에게 drag이벤트 추가
+    imageEventDragStart() {
       document.querySelectorAll(".menu .image-list #item").forEach((element) => {
         element.addEventListener("dragstart", (e) => {
           const x = e.offsetX;
           const y = e.offsetY;
-          e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
+          //기본적으로 e.target.id -> img<id> 클릭했을 때 해당이미지의 x 좌표 y 좌표를 setData해줌
+          e.dataTransfer.setData("text/plain", `${e.target.id}, ${x}, ${y}`);
         });
       });
     },
-    addImageEventDragstart() {
-      if (this.isUpload) {
-        const uploadImage = document.querySelector(`.menu .image-list #item[data-id=upload${this.uploadId}]`);
-        if (uploadImage !== null) {
-          uploadImage.addEventListener('dragstart', e => {
-            const x = e.offsetX;
-            const y = e.offsetY;
-            e.dataTransfer.setData("text/plain", `${e.target.dataset["id"]}, ${x}, ${y}`);
-          });
-        }
-        this.uploadId++;
-        }
-        this.isUpload = false;
-      },
-    },
+  },
   }
 </script>
 <style scoped>

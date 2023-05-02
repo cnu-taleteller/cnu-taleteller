@@ -2,9 +2,7 @@
   <div class='page-form' ref="pageForm">
     <div class='selected-page'>
       <div class='drag-image' ref="dragImage">
-        <div class='object' ref='pageObject'>
-          
-        </div>
+        <div class='object' ref='pageObject'></div>
       </div>
     </div>
     <div id="popupMenu" style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
@@ -18,6 +16,8 @@
   </div>
 </template>
 <script>
+import html2canvas from 'html2canvas';
+
 export default {
   props: {
     currentPageList: Object,
@@ -28,6 +28,7 @@ export default {
       thisObjId : '',
       imageIndex : 0,
       nextId : 1,
+      objArea2 : this.$refs.pageObject,
     }
   },
   mounted() {
@@ -68,7 +69,6 @@ export default {
           popupMenu.style.display = "none";
       }
     });
-
 
     function dragStart(e) {
       if (e.button === 0) {
@@ -111,6 +111,10 @@ export default {
       document.body.style.cursor = '';
       active = false;
       document.removeEventListener('mousemove', drag);
+      html2canvas(imageArea).then(canvas => {
+        const dataUrl = canvas.toDataURL('image/png');
+        toolMenu.currentPageList.thumbnail = dataUrl;
+      });
     };
   },
   watch: {
@@ -162,6 +166,11 @@ export default {
         this.currentPageList.layerList.splice(indexOfElement, 1);
         this.currentPageList.layerList.splice(0, 0, item);
       }
+      const imageArea = this.$refs.dragImage;
+      html2canvas(imageArea).then(canvas => {
+        const dataUrl = canvas.toDataURL('image/png');
+        this.currentPageList.thumbnail = dataUrl;
+      });
     },
     frontmost(layerId) {
       const objectElement = this.$refs.pageObject;
@@ -171,6 +180,11 @@ export default {
       this.currentPageList.layerList.splice(indexOfElement, 1);
       this.currentPageList.layerList.splice(this.currentPageList.layerList.length, 0, item);
       objectElement.appendChild(elementDoc);
+      const imageArea = this.$refs.dragImage;
+      html2canvas(imageArea).then(canvas => {
+        const dataUrl = canvas.toDataURL('image/png');
+        this.currentPageList.thumbnail = dataUrl;
+      });
     },
     next(layerId) {
       const objectElement = this.$refs.pageObject;
@@ -182,6 +196,11 @@ export default {
         this.currentPageList.layerList.splice(indexOfElement, 1);
         this.currentPageList.layerList.splice(indexOfElement + 1, 0, item);
         objectElement.insertBefore(elementDoc, nextImage.nextElementSibling);
+        const imageArea = this.$refs.dragImage;
+        html2canvas(imageArea).then(canvas => {
+          const dataUrl = canvas.toDataURL('image/png');
+          this.currentPageList.thumbnail = dataUrl;
+        });
       }
     },
     back(layerId) {
@@ -197,6 +216,11 @@ export default {
         this.currentPageList.layerList.splice(indexOfElement, 1);
         this.currentPageList.layerList.splice(indexOfElement - 1, 0, item);
         objectElement.insertBefore(elementDoc, elementDoc.previousElementSibling);
+        const imageArea = this.$refs.dragImage;
+        html2canvas(imageArea).then(canvas => {
+          const dataUrl = canvas.toDataURL('image/png');
+          this.currentPageList.thumbnail = dataUrl;
+        });
       }
     },
     imageEventDragOver(element) {
@@ -207,13 +231,17 @@ export default {
     },
     imageEventDrop(element) {
         let nextId = this.nextId;
-        let toolSelectedPageDrag = document.querySelector('.page-form');
+        let toolSelectedPageDrag = this.$refs.pageForm;
+
         element.addEventListener("drop", (e) => {
           e.preventDefault();
           e.stopPropagation();
           let rX = e.pageX - toolSelectedPageDrag.offsetLeft;
           let rY = e.pageY - toolSelectedPageDrag.offsetTop;
           let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
+          if(data == null || x == null || y == null) {
+            return;
+          }
           let imageElement = document.querySelector(`.menu .image-list #item[data-id=${data}]`);
           let cloneImageElement = imageElement.cloneNode();
           let imageId = this.selectedMenu + nextId++;
@@ -244,7 +272,6 @@ export default {
             let elementToRemove = Array.from(document.querySelectorAll('.object #item[data-layer-id]'))
               .find(el => el.dataset.layerId.includes('background'));
             if (elementToRemove) {
-              layerListRemove = elementToRemove.dataset.layerId;
               this.currentPageList.layerList.splice(0, 1, newImage);
               elementToRemove.parentNode.removeChild(elementToRemove);
             } else {
@@ -275,6 +302,11 @@ export default {
             this.imageIndex = this.currentPageList.layerList.length;
             this.currentPageList.layerList[this.imageIndex] = newImage;
           }
+          const imageArea = this.$refs.dragImage;
+          html2canvas(imageArea).then(canvas => {
+            const dataUrl = canvas.toDataURL('image/png');
+            this.currentPageList.thumbnail = dataUrl;
+          });
         });
       },
   },

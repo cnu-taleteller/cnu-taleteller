@@ -5,7 +5,9 @@
       <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list">
         <li v-for="page, index in pageList" :key="index" class="one_page">
-          <div class="page-body" @click="clickPage(index)"></div>
+          <div class="page-body" @click="clickPage(index)">
+            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:120px; height: 120px">
+          </div>
           <label>
             {{ page.pageId }}
           </label>

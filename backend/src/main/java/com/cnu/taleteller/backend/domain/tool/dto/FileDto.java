@@ -22,7 +22,7 @@ public class FileDto {
 
     private String fileOriginName;
 
-    private Long bookId;
+//    private Long bookId;
 
     public File toEntity(){
         return File.builder()
@@ -30,7 +30,7 @@ public class FileDto {
                 .fileName(this.fileName)
                 .fileSize(this.fileSize)
                 .fileOriginName(this.fileOriginName)
-                .bookId(Book.builder().bookId(this.bookId).build())
+//                .bookId(Book.builder().bookId(this.bookId).build())
                 .build();
     }
 }

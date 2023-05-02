@@ -218,6 +218,8 @@ export default {
         this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
       });
     },
+    
+    // 이미지 업로드
     async setImage(menu) {
       console.log(menu);
       try {

@@ -2,8 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ToolView from '../views/ToolView.vue'
+import MyPageWork from '../views/MypageViewWork.vue'
+import MyPagePoint from '../views/MypageViewPoint.vue'
+import MyPageChargeResult from '../views/MypageViewChargeResult.vue'
 import ToolSubmitView from '../views/ToolSubmitView.vue'
-import MyPageView from '../views/MyView.vue'
 import SearchView from "../views/SearchView.vue";
 import BookDetailView from "../views/BookDetailView.vue";
 
@@ -25,10 +27,20 @@ const routes = [
     name: "ToolSubmit",
     component: ToolSubmitView
   },
-   {
-    path: '/mypage',
-    name: 'MyPage',
-    component: MyPageView
+  {
+    path: '/mypage/workmanage',
+    name: 'MyPageWork',
+    component: MyPageWork
+  },
+  {
+    path: '/mypage/pointmanage',
+    name: 'MyPagePoint',
+    component: MyPagePoint
+  },
+  {
+    path: '/mypage/chargeResult',
+    name: 'MyPageChargeResult',
+    component: MyPageChargeResult
   },
   {
     path: '/search',

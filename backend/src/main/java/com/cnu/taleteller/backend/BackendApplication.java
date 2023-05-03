@@ -2,7 +2,9 @@ package com.cnu.taleteller.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+@EnableJpaAuditing //JPA Auditing 활성화(등록/수정일 관련)
 @SpringBootApplication
 public class BackendApplication {
 

@@ -20,7 +20,7 @@ export default {
         saveToSessionStorage() {
             sessionStorage.removeItem('bookName');
             sessionStorage.setItem("projectTitle", this.contentName);
-            this.$router.push("/mypage");
+            this.$router.push("/mypage/workmanage");
         },
     },
 };

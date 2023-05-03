@@ -8,6 +8,8 @@ import MyPageChargeResult from '../views/MypageViewChargeResult.vue'
 import ToolSubmitView from '../views/ToolSubmitView.vue'
 import SearchView from "../views/SearchView.vue";
 import BookDetailView from "../views/BookDetailView.vue";
+import LoginView from '../views/LoginView.vue'
+import SignupView from '../views/SignupView.vue'
 
 Vue.use(VueRouter)
 
@@ -51,7 +53,17 @@ const routes = [
     path: '/detail/:id',
     name: 'BookDetail',
     component: BookDetailView
-  }
+  },
+  {
+    path: '/LoginView',
+    name: 'LoginView',
+    component: LoginView
+  },
+  {
+    path: '/SignupView',
+    name: 'SignupView',
+    component: SignupView
+  },
 ]
 
 const router = new VueRouter({

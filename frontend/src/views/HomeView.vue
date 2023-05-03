@@ -44,19 +44,22 @@
 
 <script>
 import GoingTool from '../components/GoingTool.vue';
+import RecommendationSort from '../components/RecommendationSort.vue';
+import PopularitySort from '../components/PopularitySort.vue';
 
 export default {
   name: "Tab",
   components: {
     GoingTool,
-
+    RecommendationSort,
+    PopularitySort
   },
   data() {
     return {
       currentTab: null,
       tabList: [
-        { name: "인기순", component: "Employ" },
-        { name: "추천순", component: "Career" },
+        { name: "인기순", component: "PopularitySort" },
+        { name: "추천순", component: "RecommendationSort" },
         { name: "만들어보기", component: "GoingTool" },
       ],
     };

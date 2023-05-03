@@ -16,6 +16,13 @@
                     </router-link>
                 </form>
             </div>
+            <div class="member" v-if="$route.query.user === '테스트'">
+             <a href="/Myview">마이페이지</a>
+            </div>
+            <div class="member" v-else>
+                <a href="/LoginView">로그인</a>
+                <a href="/SignupView">회원가입</a>
+            </div>
         </div>
     </header>
 </template>
@@ -98,5 +105,18 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
     background-color: darkgray;
+}
+
+.member a {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  background-color: #fff;
+  transition: background-color 0.3s ease;
 }
 </style>

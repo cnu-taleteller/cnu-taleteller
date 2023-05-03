@@ -36,7 +36,8 @@ export default {
 <style scoped>
 .example-scenario{
     width: 100%;
-
+    border-left: 2px solid #aaaaaa;
+    padding-left: 30px;
 }
 .example-input{
     height: 500px;

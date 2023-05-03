@@ -6,8 +6,14 @@
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
       <div class="scenario-btn">
-        <button @click="selectScenarioMenu('gpt')">시나리오 추천 받기</button>
-        <button @click="selectScenarioMenu('write')">시나리오 직접 쓰기</button>
+        <button @click="selectScenarioMenu('gpt')">
+          <img src="@/assets/book1.png" width="200">
+          <p>시나리오 추천 받기</p>
+        </button>
+        <button @click="selectScenarioMenu('write')">
+          <img src="@/assets/book2.png" width="200">
+          <p>시나리오 직접 쓰기</p>
+        </button>
       </div>
     </div>
     <!-- gpt가 쓰는 시나리오 -->
@@ -240,6 +246,7 @@ export default {
 <style scoped>
 textarea {
   resize: none;
+  border: 1px solid #dfdfdf;
 }
 
 .tool {
@@ -249,6 +256,7 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color:#F7F7F7;
 }
 
 .tool-header {
@@ -268,17 +276,17 @@ textarea {
 }
 
 .tool-left {
-  height: 100%;
+  height: 80vh;
   width: 15%;
 }
 
 .tool-center {
-  height: 100%;
+  height: 80vh;
   width: 60%;
 }
 
 .tool-right {
-  height: 100%;
+  height: 80vh;
   width: 25%;
 }
 
@@ -312,6 +320,14 @@ textarea {
 
 .submit-btn {
   width: 50%;
+  padding: 5px 10px;
+  border: none;
+  background-color: #ccc;
+  font-weight: bold;
+  color: #353535;
+}
+.submit-btn:hover{
+  opacity: 0.7;
 }
 
 .scenario-btn {
@@ -319,24 +335,32 @@ textarea {
   display: flex;
   justify-content: space-around;
   position: absolute;
-  top: 50%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .scenario-btn>button {
-  width: 250px;
-  height: 250px;
-  border: 1px solid grey;
-}
-
-.scenario-btn>button:hover {
-  background-color: rgb(181, 181, 181);
+  width: 300px;
+  height: 300px;
+  border-radius: 20px;
   border: none;
+  padding-top: 20px;
+  background-color: #dfdfdf;
+}
+.scenario-btn>button>p {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(50, 50, 50);
+  margin-top: 20px;
+}
+.scenario-btn>button:hover {
+  opacity: 0.7;
 }
 
 .center {
   display: flex;
   align-items: center;
 }
+
 </style>

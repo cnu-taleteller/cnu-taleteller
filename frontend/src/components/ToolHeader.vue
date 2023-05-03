@@ -54,8 +54,9 @@ export default{
 <style scoped>
 .header {
   width: 100%;
-  background-color: rgb(222, 222, 222);
-  /* border: 1px solid gray; */
+  /* background-color: #6CC4F0;  */
+  background-color: #bce9ff;
+  border: 1px solid rgb(231, 231, 231);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +73,8 @@ export default{
   border: none;
   font-size: large;
   font-weight: bold;
-  border-bottom: 1px solid gray;
+  border-bottom: 3px solid gray;
+   background-color: #bce9ff;
   text-align: center;
 }
 .header-menu {
@@ -90,6 +92,15 @@ export default{
 }
 
 button {
-  margin-left: 15px;
+  background-color: #bce9ff;
+  margin-right: 20px;
+  border: none;
+  /* background-color: white; */
+  padding: 5px 10px;
+  font-weight: bold;
+}
+button:hover{
+  opacity: 0.7;
+  background-color: #bce9ff;
 }
 </style>

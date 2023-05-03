@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payment {
+public class Payment extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +19,6 @@ public class Payment {
 
     @Column(length = 15)
     private String paySort; //구분
-
-    @Column
-    private LocalDateTime payDate; //일자
 
     @Column
     private int payCount; //개수

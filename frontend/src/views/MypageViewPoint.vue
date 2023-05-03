@@ -7,9 +7,8 @@
       <div class='mypage-side'>
           <ul>
             <li v-for='list in linklist'>
-            <router-link
-              style=text-decoration:none;color:black;
-              :to='list.link' >{{ list.content }}
+            <router-link class="side-link" :to='list.link' >
+              {{ list.content }}
             </router-link>
             </li>
           </ul>
@@ -17,20 +16,22 @@
     <div class="mypage-main">
       <div class="mypage-wallet">
         <div class="point-wallet">
-          <h1>보유 엽전 0개</h1>
+          <h1>보유 엽전 : {{ pointTotal }} 개</h1>
+          <button @click="pointReturn(pointTotal*-1)" class="point-returnbtn">환급하기</button>
         </div>
       </div>
       <div class="mypage-content">
         <div class="point-content">
           <div class="point-button">
           <button @click="changeTab('PointCharge')">충전하기</button>
-          <button @click="changeTab('PointDetails')">충전내역</button>
+          <button @click="changeTab('PointDetails')">엽전내역</button>
+          <hr>
           </div>
-          <div>
+          
             <keep-alive>
                 <component :is="component"></component>
             </keep-alive>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -38,9 +39,12 @@
 </div>
   </template>
 <script>
+import axios from 'axios';
+
   export default {
     data () {
     return {
+      detailsResult: [],
       fade: false,
       linklist: [
         {content: '홈', link: '/'},
@@ -54,29 +58,54 @@
   },
   computed: {
     component() {
-            const tab = this.tab;
-            //본문 버튼 클릭 시 changeTab메서드를 통해 tab값 변경
-            //이후 tab 변수에 대입되어 동적 컴포넌트 구현
-            return () => import(`@/components/MyPage/${tab}`);
-        }
+      const tab = this.tab;
+      //본문 버튼 클릭 시 changeTab메서드를 통해 tab값 변경
+      //이후 tab 변수에 대입되어 동적 컴포넌트 구현
+      return () => import(`@/components/MyPage/${tab}`);
+    },
+
+    pointTotal() {
+      let sum = 0;
+      return this.detailsResult.reduce((sum, result) => sum + result.payCount, 0);
+    },
   },
-    methods: {
-      resize: function () {
-        $(window).resize(function () {
-          var height = (window.innerHeight / 2) + 'px'
-          $('#left_btn').css({'top': height})
-        })
-      },
+  methods: {
       getSessionStorage(){
         var workname = sessionStorage.getItem("projectTitle");
         return workname;
       },
+      
       changeTab(tab) {
             this.tab = tab;
       },
+
+      getDetails(){
+        axios.get("/api/point/wallet")
+        .then((res) => {
+          console.log(res);
+          this.detailsResult = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      },
+
+      pointReturn(returnValue){
+        if(confirm("환급하시겠습니까?")){
+          axios.post("/api/point/return", {
+            returnPoint: returnValue,
+          })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });  
+        }
+      },
     },
     created () {
-      //this.resize()
+      this.getDetails()
     }
   }
 </script>
@@ -116,13 +145,17 @@
       flex-direction: column;
       margin: 0 0 10px 10px;
     }
+    .side-link{
+      text-decoration:none;
+      color:black;
+    }
     .mypage-side ul {padding: 0 30px;}
     .mypage-side ul li {
         font-size:25px;
         height:75px;
         list-style:none;
         font-weight:bold;
-    } 
+    }
     .mypage-wallet{
       width: 100%;
       height: 100px;
@@ -156,11 +189,16 @@
       border: 1px solid gray; 
     }
     .point-button{
-      margin: 5%;
+      margin: 3%;
     }
     .point-button button{
-      width: 30%;
-      height: 50px; 
+      width: 20%;
+      height: 70px;
+      font-weight: bold;
+      font-size: large;
+    }
+    .point-returnbtn{
+      margin-left: 20px;
     }
 
 </style>

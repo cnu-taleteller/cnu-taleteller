@@ -65,19 +65,12 @@
     }
   },
     methods: {
-      resize: function () {
-        $(window).resize(function () {
-          var height = (window.innerHeight / 2) + 'px'
-          $('#left_btn').css({'top': height})
-        })
-      },
       getSessionStorage(){
         var workname = sessionStorage.getItem("projectTitle");
         return workname;
-      }
+      },
     },
     created () {
-      this.resize()
     }
   }
   </script>

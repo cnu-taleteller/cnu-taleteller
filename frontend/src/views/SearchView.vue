@@ -43,7 +43,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .search-result {
     display: flex;
     flex-direction: column;

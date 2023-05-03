@@ -1,8 +1,8 @@
 <template>
 <div class="mypage-all">
-    <div class="mypage-header">
+    <!-- <div class="mypage-header">
         <h3>헤더</h3>
-    </div>
+    </div> -->
     <div class="mypage-body">
       <div class='mypage-side'>
           <ul>

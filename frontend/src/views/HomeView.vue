@@ -15,7 +15,7 @@
     </div>
   </div>
 </template>
-<style>
+<style scoped>
 .tab button {
   background-color: white;
   border: 1px white;

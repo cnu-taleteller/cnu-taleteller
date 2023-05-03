@@ -1,6 +1,5 @@
 package com.cnu.taleteller.backend.domain.book.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +10,6 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Table(name = "books")
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class Book {
 
@@ -41,5 +38,26 @@ public class Book {
 
     @Column(length = 1)
     private String bookPublic;
+
+    @Builder
+    public Book(Long bookId, String bookName, Timestamp bookRegdate, String bookSize, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic) {
+        this.bookId = bookId;
+        this.bookName = bookName;
+        this.bookRegdate = bookRegdate;
+        this.bookSize = bookSize;
+        this.bookDescription = bookDescription;
+        this.bookStatus = bookStatus;
+        this.bookCategory = bookCategory;
+        this.bookRecommend = bookRecommend;
+        this.bookPublic = bookPublic;
+    }
+
+    public void incrementRecommend() {
+       this.bookRecommend = bookRecommend + 1;
+        this.bookId = bookId;
+        this.bookName = bookName;
+        this.bookDescription = bookDescription;
+        // 로그인 기능 되면 사용자 이름도 추가
+    }
 
 }

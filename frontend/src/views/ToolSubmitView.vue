@@ -1,9 +1,8 @@
 <template>
     <div>
-        헤더
         <h2>저장하기</h2>
         <input type="text" v-model="contentName" disabled/>
-        <button @click.prevent="saveToSessionStorage">저장</button>
+        <button @click.prevent="saveToSessionStorage()">저장</button>
     </div>
 </template>
 
@@ -15,10 +14,11 @@ export default {
         };
     },
     created() {
-        this.contentName = this.$route.params.contentName;
+        this.contentName = sessionStorage.getItem('bookName');
     },
     methods: {
         saveToSessionStorage() {
+            sessionStorage.removeItem('bookName');
             sessionStorage.setItem("projectTitle", this.contentName);
             this.$router.push("/mypage/workmanage");
         },

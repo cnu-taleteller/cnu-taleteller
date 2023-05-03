@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="selected-page-form">
     <!-- 자막 메뉴 영역 -->
     <div class='caption-menu-form'>
       {{ this.currentPageList.caption.content }}
@@ -329,22 +329,31 @@ export default {
 
 </script>
 <style scoped>
-.page-form {
+.selected-page-form{
   width: 100%;
-  height: 450px;
+  height: 550px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.page-form {
+  width: 80%;
+  height: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   touch-action: none;
+  background-color: white;
   position: relative;
-  border: 1px solid gray;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, .1), 0 0 0 1px #ddd;
 }
 
 .caption-menu-form {
-  width: 100%;
+  width: 80%;
   /* height: 450px; */
-  border: 1px solid gray;
+  /* border: 1px solid gray; */
 }
 
 textarea {
@@ -355,7 +364,7 @@ textarea {
 
 .selected-page {
   width: 100%;
-  height: 450px;
+  height: 500px;
 }
 
 .character-image {
@@ -365,7 +374,7 @@ textarea {
 
 .drag-image {
   width: 100%;
-  height: 450px;
+  height: 500px;
   /* height: 60vh; */
   position: absolute;
 }

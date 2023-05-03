@@ -1,6 +1,5 @@
 <template>
   <div class="left-side-bar">
-    <h3>페이지</h3>
     <div class="page-all">
       <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list">
@@ -12,7 +11,10 @@
         </li>
       </draggable>
     </div>
-    <button @click="addPage()">페이지 추가</button>
+    <div>
+      <button @click="addPage()"><img src="@/assets/icon.png" width="40"></button>
+      <button><img src="@/assets/trash.png" width="35" style="opacity: 0.8;"></button>
+    </div>
   </div>
 </template>
 
@@ -28,17 +30,17 @@ export default {
     return {
       book_id: null,
       pageList: [
-      {
-          pageId : 1,
+        {
+          pageId: 1,
           pageStatus: 1,
-          caption : {
+          caption: {
             size: 10,
             content: null,
             location: null,
             isTextAreaVisible: false,
           },
           thumbnail: null,
-          layerList : []
+          layerList: []
         }
       ],
       currentPageNo: 1,
@@ -97,15 +99,14 @@ export default {
   },
 }
 </script>
-<style>
+<style scoped>
 .left-side-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 10px;
+  border-right: 1px solid #dfdfdf;
   height: 100%;
-  border: 1px solid gray;
 }
 
 .page-all {
@@ -116,7 +117,20 @@ export default {
 }
 
 .page-all::-webkit-scrollbar {
-  display: none;
+  width: 10px;
+}
+
+.page-all::-webkit-scrollbar-thumb {
+  background-color: rgb(194, 194, 194);
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+.page-all::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0px 0px 5px white;
 }
 
 .one-page {
@@ -131,10 +145,23 @@ export default {
 .page-body {
   width: 90%;
   height: 120px;
-  border: 1px solid gray;
+  border: #ccc solid 1px;
+}
+
+label {
+  opacity: 0.95;
 }
 
 .page-list {
   list-style: none;
 }
-</style>
+
+button {
+  margin-right: 20px;
+  border: none;
+  background-color: #F7F7F7;
+}
+
+button:hover {
+  opacity: 0.7;
+}</style>

@@ -9,16 +9,6 @@
         @click="setSelectedMenu('scenario')">시나리오</button>
     </div>
     <div class="menu-form">
-      <div class="image-list">
-        <div class="image-list-char" v-show="selectedMenu == 'character'">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId"
-            :style="{ height: item.height }" v-for="item, index in charList">
-        </div>
-        <div class="image-list-back" v-show="selectedMenu == 'background'">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId"
-            :style="{ height: item.height }" v-for="item, index in backList">
-        </div>
-      </div>
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
           <input type="file" @change="setImage('background')" accept="image/*" id="image">
@@ -27,7 +17,7 @@
           <input type="file" @change="setImage('character')" accept="image/*" id="image">
         </div>
         <!-- 시나리오 -->
-        <div v-else-if="selectedMenu == 'scenario'">
+        <div class="scenario-form2" v-else-if="selectedMenu == 'scenario'">
           <!-- gpt 시나리오 없을 때 -->
           <div v-if="select==false && gpt == true">
             <div class="spinner-border" role="status"></div>
@@ -36,7 +26,7 @@
           <!-- 내가 적은 시나리오 없을 때 -->
           <div v-else-if="select==false && gpt == false && finalScenario[0].length === 0">
             <p>입력된 시나리오가 없습니다.<br>시나리오를 입력해주세요.</p>
-            <button @click="addScenario()">추가</button>
+            <button class="submit-btn" @click="addScenario()">추가</button>
           </div>
           <!-- 시나리오 선택 완료 -->
           <div v-else-if="select==true">
@@ -45,16 +35,16 @@
               <textarea v-model="selectScenario[index]" class="story-input"
                 :disabled="isDisabled">{{ story }}</textarea>
             </p>
-            <button v-show="isDisabled" :disabled="isDisabled2" @click="editScenario('edit')">수정</button>
-            <button v-show="!isDisabled" @click="editScenario('save')">저장</button>
+            <button class="submit-btn" v-show="isDisabled" :disabled="isDisabled2" @click="editScenario('edit')">수정</button>
+            <button class="submit-btn" v-show="!isDisabled" @click="editScenario('save')">저장</button>
           </div>
           <!-- 시나리오 고르는 중 -->
           <div v-else>
-            <button v-show="finalScenario[0][0]" @click="setNum(0)">1</button>
-            <button v-show="finalScenario[1][0]" @click="setNum(1)">2</button>
-            <button v-show="finalScenario[2][0]" @click="setNum(2)">3</button>
-            <button v-show="finalScenario[3][0]" @click="setNum(3)">4</button>
-            <button v-show="finalScenario[4][0]" @click="setNum(4)">5</button>
+            <button class="scenario-btn" v-show="finalScenario[0][0]" @click="setNum(0)">1</button>
+            <button class="scenario-btn" v-show="finalScenario[1][0]" @click="setNum(1)">2</button>
+            <button class="scenario-btn" v-show="finalScenario[2][0]" @click="setNum(2)">3</button>
+            <button class="scenario-btn" v-show="finalScenario[3][0]" @click="setNum(3)">4</button>
+            <button class="scenario-btn" v-show="finalScenario[4][0]" @click="setNum(4)">5</button>
             <!-- 다시 작성 -->
             <div v-show="isReScenario">
               <div class="spinner-border" role="status"></div>
@@ -65,14 +55,23 @@
               <textarea v-model="finalScenario[scenarioNum][index]" class="story-input"
                 :disabled="isDisabled">{{ story }}</textarea>
             </p>
-            <button :disabled="isDisabled2" @click="reKeyword()">키워드 변경</button>
-            <button :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
-            <button :disabled="isDisabled2" @click="setScenario()">선택</button>
+            <button class="submit-btn" :disabled="isDisabled2" @click="reKeyword()">키워드 변경</button>
+            <button class="submit-btn" :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
+            <button class="submit-btn select-btn" :disabled="isDisabled2" @click="setScenario()">선택</button>
           </div>
-          
         </div>
-
       </div>
+      <div class="image-list">
+        <div class="image-list-char" v-show="selectedMenu == 'character'">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId"
+            :style="{ height: item.height }" v-for="item, index in charList">
+        </div>
+        <div class="image-list-back" v-show="selectedMenu == 'background'">
+          <img :src="item.src" :draggable="item.draggable" :id="item.id" :data-id="item.dataId"
+            :style="{ height: item.height }" v-for="item, index in backList">
+        </div>
+      </div>
+     
     </div>
   </div>
 </template>
@@ -342,6 +341,7 @@ export default {
             draggable: "true",
             dataId: 'upload' + this.uploadId,
             height: "100px",
+            width: "100px",
           });
         }
         console.log("전송 성공");
@@ -382,13 +382,44 @@ export default {
 </script>
 <style scoped>
 .menu {
-  margin: 10px;
   height: 80vh;
-  border: 1px solid gray;
+  background-color: white;
+  border-left: 1px solid #dfdfdf;
 }
 
 .menu-list {
-  text-align: left;
+  padding: 10px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  border-bottom: 2px solid rgb(236, 236, 236);
+}
+.image-list-char {
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.image-list-char>img {
+  /* width: 90%; */
+  margin: 5px;
+}
+
+input[type=file]::file-selector-button {
+  width: 150px;
+  height: 30px;
+  background: #fff;
+  border: 1px solid gray;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+input[type=file]::file-selector-button:hover {
+  background: rgb(77,77,77);
+  color: #fff;
 }
 
 .image-list {
@@ -398,7 +429,7 @@ export default {
 }
 
 .menu-form {
-  margin-top: 10px;
+  padding-top: 20px;
   overflow-y: scroll;
   height: 90%;
 }
@@ -408,10 +439,15 @@ export default {
 }
 
 .menu-btn {
-  border: 1px solid gray;
+  padding: 5px 10px;
+  /* border-radius: 50%; */
   background-color: white;
+  border: none;
 }
-
+.menu-btn:hover {
+  background-color: rgb(223, 223, 223);
+  border: none;
+}
 .menu-btn.active {
   background-color: gray;
   color: white;
@@ -424,6 +460,21 @@ export default {
   resize: none;
 }
 
+.story-input::-webkit-scrollbar {
+    width: 10px;
+  }
+  .story-input::-webkit-scrollbar-thumb {
+    background-color: rgb(223, 223, 223);
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+  .story-input::-webkit-scrollbar-track {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px white;
+  }
+
 .story-input:disabled {
   color: black;
   border: none;
@@ -434,6 +485,27 @@ export default {
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+.submit-btn {
+  border: none;
+  padding: 5px 10px;
+  margin: 5px;
+}
+
+.submit-btn:hover {
+  opacity: 0.7;
+}
+.select-btn{
+  background-color: #fceb6e;
+}
+.scenario-btn {
+  border: none;
+  font-weight: 600;
+  padding: 5px 10px;
+  /* background-color: #2F66FB; */
+  color: black;
+  margin-bottom: 20px;
+  margin-right: 10px;
 }
 </style>
   

@@ -29,12 +29,12 @@
         <!-- 시나리오 -->
         <div v-else-if="selectedMenu == 'scenario'">
           <!-- gpt 시나리오 없을 때 -->
-          <div v-if="gpt == true">
+          <div v-if="select==false && gpt == true">
             <div class="spinner-border" role="status"></div>
             <p>열심히 작성중입니다.<br>조금만 기다려주세요!ㅠㅠ</p>
           </div>
           <!-- 내가 적은 시나리오 없을 때 -->
-          <div v-else-if="gpt == false && finalScenario[0].length === 0">
+          <div v-else-if="select==false && gpt == false && finalScenario[0].length === 0">
             <p>입력된 시나리오가 없습니다.<br>시나리오를 입력해주세요.</p>
             <button @click="addScenario()">추가</button>
           </div>

@@ -19,32 +19,37 @@
         <!-- 시나리오 -->
         <div class="scenario-form2" v-else-if="selectedMenu == 'scenario'">
           <!-- gpt 시나리오 없을 때 -->
-          <div v-if="select==false && gpt == true">
+          <div v-if="select == false && gpt == true">
             <div class="spinner-border" role="status"></div>
             <p>열심히 작성중입니다.<br>조금만 기다려주세요!ㅠㅠ</p>
           </div>
           <!-- 내가 적은 시나리오 없을 때 -->
-          <div v-else-if="select==false && gpt == false && finalScenario[0].length === 0">
+          <div v-else-if="select == false && gpt == false && finalScenario[0].length === 0">
             <p>입력된 시나리오가 없습니다.<br>시나리오를 입력해주세요.</p>
             <button class="submit-btn" @click="addScenario()">추가</button>
           </div>
           <!-- 시나리오 선택 완료 -->
-          <div v-else-if="select==true">
+          <div v-else-if="select == true">
             <p v-for="(story, index) in selectScenario" :key="index">
               {{ setScenarioLabel(index) }} <br>
-              <textarea v-model="selectScenario[index]" class="story-input"
-                :disabled="isDisabled">{{ story }}</textarea>
+              <textarea v-model="selectScenario[index]" class="story-input" :disabled="isDisabled">{{ story }}</textarea>
             </p>
-            <button class="submit-btn" v-show="isDisabled" :disabled="isDisabled2" @click="editScenario('edit')">수정</button>
+            <button class="submit-btn" v-show="isDisabled" :disabled="isDisabled2"
+              @click="editScenario('edit')">수정</button>
             <button class="submit-btn" v-show="!isDisabled" @click="editScenario('save')">저장</button>
           </div>
           <!-- 시나리오 고르는 중 -->
           <div v-else>
-            <button class="scenario-btn" v-show="finalScenario[0][0]" @click="setNum(0)">1</button>
-            <button class="scenario-btn" v-show="finalScenario[1][0]" @click="setNum(1)">2</button>
-            <button class="scenario-btn" v-show="finalScenario[2][0]" @click="setNum(2)">3</button>
-            <button class="scenario-btn" v-show="finalScenario[3][0]" @click="setNum(3)">4</button>
-            <button class="scenario-btn" v-show="finalScenario[4][0]" @click="setNum(4)">5</button>
+            <button class="scenario-btn" :class="{ active: scenarioNum === 0 }" v-show="finalScenario[0][0]"
+              @click="setNum(0)">1</button>
+            <button class="scenario-btn" :class="{ active: scenarioNum === 1 }" v-show="finalScenario[1][0]"
+              @click="setNum(1)">2</button>
+            <button class="scenario-btn" :class="{ active: scenarioNum === 2 }" v-show="finalScenario[2][0]"
+              @click="setNum(2)">3</button>
+            <button class="scenario-btn" :class="{ active: scenarioNum === 3 }" v-show="finalScenario[3][0]"
+              @click="setNum(3)">4</button>
+            <button class="scenario-btn" :class="{ active: scenarioNum === 4 }" v-show="finalScenario[4][0]"
+              @click="setNum(4)">5</button>
             <!-- 다시 작성 -->
             <div v-show="isReScenario">
               <div class="spinner-border" role="status"></div>
@@ -57,7 +62,8 @@
             </p>
             <button class="submit-btn" :disabled="isDisabled2" @click="reKeyword()">키워드 변경</button>
             <button class="submit-btn" :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
-            <button class="submit-btn select-btn" :disabled="isDisabled2" @click="setScenario()">선택</button>
+            <br>
+            <button class="submit-btn select-btn" :disabled="isDisabled2" @click="setScenario()">이 시나리오 선택하기</button>
           </div>
         </div>
       </div>
@@ -71,7 +77,7 @@
             :style="{ height: item.height }" v-for="item, index in backList">
         </div>
       </div>
-     
+
     </div>
   </div>
 </template>
@@ -84,7 +90,7 @@ export default {
       bookId: null,
       isDisabled: true, // 시나리오 textarea 비활성화
       isDisabled2: false, // 수정버튼 활성화
-      select:false,
+      select: false,
       pageNo: 0,
       resultScenario: [],
       finalScenario: [[], [], [], [], []],
@@ -181,7 +187,7 @@ export default {
       this.scenarioNum = num;
     },
     // 최종 선택
-    setScenario(){
+    setScenario() {
       this.selectScenario = this.finalScenario[this.scenarioNum];
       this.select = true;
     },
@@ -230,7 +236,7 @@ export default {
     },
     // 시나리오 다시 받기
     reScenario() {
-      if(this.finalScenario[4].length > 0){
+      if (this.finalScenario[4].length > 0) {
         alert('시나리오는 작품당 5번만 받을 수 있습니다.');
         return;
       }
@@ -285,13 +291,13 @@ export default {
       let num = 0;
       if (this.finalScenario[0].length > 0) {
         num = 1;
-      } 
+      }
       if (this.finalScenario[1].length > 0) {
         num = 2;
-      } 
-      if(this.finalScenario[2].length > 0) {
+      }
+      if (this.finalScenario[2].length > 0) {
         num = 3;
-      } 
+      }
       if (this.finalScenario[3].length > 0) {
         num = 4;
       }
@@ -394,6 +400,7 @@ export default {
   justify-content: space-evenly;
   border-bottom: 2px solid rgb(236, 236, 236);
 }
+
 .image-list-char {
   width: 90%;
   display: flex;
@@ -417,8 +424,9 @@ input[type=file]::file-selector-button {
   cursor: pointer;
   margin-bottom: 20px;
 }
+
 input[type=file]::file-selector-button:hover {
-  background: rgb(77,77,77);
+  background: rgb(77, 77, 77);
   color: #fff;
 }
 
@@ -444,10 +452,12 @@ input[type=file]::file-selector-button:hover {
   background-color: white;
   border: none;
 }
+
 .menu-btn:hover {
   background-color: rgb(223, 223, 223);
   border: none;
 }
+
 .menu-btn.active {
   background-color: gray;
   color: white;
@@ -461,19 +471,21 @@ input[type=file]::file-selector-button:hover {
 }
 
 .story-input::-webkit-scrollbar {
-    width: 10px;
-  }
-  .story-input::-webkit-scrollbar-thumb {
-    background-color: rgb(223, 223, 223);
-    border-radius: 10px;
-    background-clip: padding-box;
-    border: 2px solid transparent;
-  }
-  .story-input::-webkit-scrollbar-track {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: inset 0px 0px 5px white;
-  }
+  width: 10px;
+}
+
+.story-input::-webkit-scrollbar-thumb {
+  background-color: rgb(223, 223, 223);
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+.story-input::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0px 0px 5px white;
+}
 
 .story-input:disabled {
   color: black;
@@ -486,6 +498,7 @@ input[type=file]::file-selector-button:hover {
   justify-content: center;
   width: 100%;
 }
+
 .submit-btn {
   border: none;
   padding: 5px 10px;
@@ -495,9 +508,12 @@ input[type=file]::file-selector-button:hover {
 .submit-btn:hover {
   opacity: 0.7;
 }
-.select-btn{
+
+.select-btn {
   background-color: #fceb6e;
+  margin-bottom: 20px;
 }
+
 .scenario-btn {
   border: none;
   font-weight: 600;
@@ -507,5 +523,9 @@ input[type=file]::file-selector-button:hover {
   margin-bottom: 20px;
   margin-right: 10px;
 }
-</style>
+
+.scenario-btn.active {
+  background-color: #50c3fd;
+  color: white;
+}</style>
   

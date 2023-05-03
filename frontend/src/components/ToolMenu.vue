@@ -29,31 +29,47 @@
         <!-- 시나리오 -->
         <div v-else-if="selectedMenu == 'scenario'">
           <!-- gpt 시나리오 없을 때 -->
-          <div v-if="gpt == true && (!finalScenario || finalScenario.length === 0)">
+          <div v-if="gpt == true">
             <div class="spinner-border" role="status"></div>
             <p>열심히 작성중입니다.<br>조금만 기다려주세요!ㅠㅠ</p>
           </div>
           <!-- 내가 적은 시나리오 없을 때 -->
-          <div v-else-if="gpt == false && (!finalScenario || finalScenario.length === 0)">
+          <div v-else-if="gpt == false && finalScenario[0].length === 0">
             <p>입력된 시나리오가 없습니다.<br>시나리오를 입력해주세요.</p>
             <button @click="addScenario()">추가</button>
           </div>
-          <!-- 시나리오 있을 때 -->
+          <!-- 시나리오 선택 완료 -->
+          <div v-else-if="select==true">
+            <p v-for="(story, index) in selectScenario" :key="index">
+              {{ setScenarioLabel(index) }} <br>
+              <textarea v-model="selectScenario[index]" class="story-input"
+                :disabled="isDisabled">{{ story }}</textarea>
+            </p>
+            <button v-show="isDisabled" :disabled="isDisabled2" @click="editScenario('edit')">수정</button>
+            <button v-show="!isDisabled" @click="editScenario('save')">저장</button>
+          </div>
+          <!-- 시나리오 고르는 중 -->
           <div v-else>
+            <button v-show="finalScenario[0][0]" @click="setNum(0)">1</button>
+            <button v-show="finalScenario[1][0]" @click="setNum(1)">2</button>
+            <button v-show="finalScenario[2][0]" @click="setNum(2)">3</button>
+            <button v-show="finalScenario[3][0]" @click="setNum(3)">4</button>
+            <button v-show="finalScenario[4][0]" @click="setNum(4)">5</button>
             <!-- 다시 작성 -->
             <div v-show="isReScenario">
               <div class="spinner-border" role="status"></div>
               <p>새로운 내용으로 작성중입니다.<br>조금만 기다려주세요!ㅠㅠ</p>
             </div>
-            <!-- 내용 보여주기 -->
-            <p v-for="(story, index) in finalScenario" :key="index">
+            <p v-for="(story, index) in finalScenario[scenarioNum]" :key="index">
               {{ setScenarioLabel(index) }} <br>
-              <textarea v-model="finalScenario[index]" class="story-input" :disabled="isDisabled">{{ story }}</textarea>
+              <textarea v-model="finalScenario[scenarioNum][index]" class="story-input"
+                :disabled="isDisabled">{{ story }}</textarea>
             </p>
-            <button v-show="gpt" :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
-            <button v-show="isDisabled" :disabled="isDisabled2" @click="editScenario('edit')">수정</button>
-            <button v-show="!isDisabled" @click="editScenario('save')">저장</button>
+            <button :disabled="isDisabled2" @click="reKeyword()">키워드 변경</button>
+            <button :disabled="isDisabled2" @click="reScenario()">시나리오 다시 받기</button>
+            <button :disabled="isDisabled2" @click="setScenario()">선택</button>
           </div>
+          
         </div>
 
       </div>
@@ -62,19 +78,28 @@
 </template>
 <script>
 import axios from 'axios';
+
 export default {
   data() {
     return {
+      bookId: null,
       isDisabled: true, // 시나리오 textarea 비활성화
       isDisabled2: false, // 수정버튼 활성화
+      select:false,
       pageNo: 0,
       resultScenario: [],
-      finalScenario: [],
+      finalScenario: [[], [], [], [], []],
+      selectScenario: [], // 최종 시나리오
       isReScenario: false,
-      scenarioKeyword: {},
+      scenarioKeyword: {
+        who: null,
+        when: null,
+        where: null,
+        event: null
+      },
 
-        //리스트 변경 해야함.
-        charList: [
+      //리스트 변경 해야함.
+      charList: [
         {
           src: '/images/pngwing.com.png',
           id: 'item',
@@ -98,6 +123,7 @@ export default {
           height: '100px',
         }],
       selectedMenu: 'scenario',
+      scenarioNum: 0,
       nextId: 1,
       uploadId: 0,
       isUpload: false,
@@ -112,6 +138,7 @@ export default {
   mounted() {
     this.$emit('selectedMenu', this.selectedMenu);
     this.existingImageEventDragStart();
+    this.bookId = sessionStorage.getItem('book_id');
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
     this.finalScenario = this.viewFinalScenario;
   },
@@ -135,25 +162,79 @@ export default {
       }
     },
     // 시나리오 직접 작성
-    addScenario(){
-      for(let i=0; i<4; i++){
-        this.finalScenario.push('');
+    addScenario() {
+      this.select = true;
+      for (let i = 0; i < 4; i++) {
+        this.selectScenario.push('');
       }
       this.editScenario('edit');
-      
     },
 
     // 시나리오 수정
     editScenario(arg) {
       this.isDisabled = !!!this.isDisabled;
-      this.resultScenario = '[도입]' + this.finalScenario[0] + '[전개]' + this.finalScenario[1] + '[위기]' + this.finalScenario[2] + '[결말]' + this.finalScenario[3];
+      this.resultScenario = '[도입]' + this.selectScenario[0] + '[전개]' + this.selectScenario[1] + '[위기]' + this.selectScenario[2] + '[결말]' + this.selectScenario[3];
       if (arg === 'save') {
         sessionStorage.setItem('scenario', this.resultScenario);
       }
     },
+    setNum(num) {
+      this.scenarioNum = num;
+    },
+    // 최종 선택
+    setScenario(){
+      this.selectScenario = this.finalScenario[this.scenarioNum];
+      this.select = true;
+    },
+    // 키워드 변경
+    reKeyword() {
+      const popupWidth = 500;
+      const popupHeight = 400;
+      const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
+      const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
+      const popup = window.open("", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
 
+      popup.document.body.innerHTML = `
+        <div class="scenario-form">
+        <div class="scenario-input">
+          <h4>키워드 변경</h4>
+          <p>변경할 키워드를 입력하세요.</p>
+          <p>사건은 구체적이게 적을수록 좋습니다!</p>
+          <p>누가: <input type="text" id="who" value="${this.scenarioKeyword.who}" placeholder="짱구가"></p>
+          <p>언제: <input type="text" id="when" value="${this.scenarioKeyword.when}" placeholder="주말 아침에"></p>
+          <p>어디서: <input type="text" id="where" value="${this.scenarioKeyword.where}" placeholder="숲에서"></p>
+          <p>사건: <input type="text" id="event" value="${this.scenarioKeyword.event}" placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></p>
+          <button onclick="setKeyword()">키워드 저장</button>
+        </div>
+      </div>`;
+
+      popup.setKeyword = () => {
+        const who = popup.document.querySelector("#who").value;
+        const when = popup.document.querySelector("#when").value;
+        const where = popup.document.querySelector("#where").value;
+        const event = popup.document.querySelector("#event").value;
+
+        if (who == null || when == null || where == null || event == null) {
+          popup.window.alert('빈 내용을 다 채워주세요!');
+          return;
+        }
+        else {
+          this.scenarioKeyword.who = who;
+          this.scenarioKeyword.when = when;
+          this.scenarioKeyword.where = where;
+          this.scenarioKeyword.event = event;
+          sessionStorage.setItem('scenarioKeyword', JSON.stringify(this.scenarioKeyword));
+          popup.window.alert("키워드 저장 후 다시 받기 버튼을 클릭해주세요!");
+          popup.window.close();
+        }
+      }
+    },
     // 시나리오 다시 받기
     reScenario() {
+      if(this.finalScenario[4].length > 0){
+        alert('시나리오는 작품당 5번만 받을 수 있습니다.');
+        return;
+      }
       this.isReScenario = true;
       this.isDisabled2 = true;
       console.log(this.scenarioKeyword);
@@ -187,24 +268,34 @@ export default {
           // console.log(res.data.choices[0].message.content);
           this.resultScenario = res.data.choices[0].message.content;
           sessionStorage.setItem('scenario', this.resultScenario);
-          this.finalScenario = [];
+          // console.log(this.finalScenario);
           this.setScenarioArr();
-          console.log(this.finalScenario);
-          this.$emit('finalScenario',this.finalScenario);
-          
           this.isDisabled2 = false;
         })
         .catch((err) => {
           alert('서버 오류로 시나리오 요청에 실패하였습니다.');
           console.log(err);
         })
-        .finally(()=>{
+        .finally(() => {
           this.isReScenario = false;
         })
     },
     setScenarioArr() {
       // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
       const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
+      let num = 0;
+      if (this.finalScenario[0].length > 0) {
+        num = 1;
+      } 
+      if (this.finalScenario[1].length > 0) {
+        num = 2;
+      } 
+      if(this.finalScenario[2].length > 0) {
+        num = 3;
+      } 
+      if (this.finalScenario[3].length > 0) {
+        num = 4;
+      }
       sections.forEach((section, index) => {
         const scenario = this.resultScenario;
         const start = scenario.indexOf(section);
@@ -215,10 +306,10 @@ export default {
         } else {
           end = scenario.length;
         }
-        this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
+        this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
       });
     },
-    
+
     // 이미지 업로드
     async setImage(menu) {
       console.log(menu);
@@ -226,7 +317,9 @@ export default {
         let frm = new FormData();
         let imageFile = document.getElementById("image");
         frm.append("image", imageFile.files[0]);
-        const res = await axios.post(`/api/tool/image?menu=${menu}`, frm, {
+        frm.append("menu", menu);
+        frm.append("bookId", this.bookId);
+        const res = await axios.post(`/api/tool/image`, frm, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -257,10 +350,10 @@ export default {
         console.log(e);
       }
     },
-      setSelectedMenu(menu) {
-        this.selectedMenu = menu;
-        this.$emit('selectedMenu', this.selectedMenu);
-      },
+    setSelectedMenu(menu) {
+      this.selectedMenu = menu;
+      this.$emit('selectedMenu', this.selectedMenu);
+    },
     existingImageEventDragStart() {
       document.querySelectorAll(".menu .image-list #item").forEach((element) => {
         element.addEventListener("dragstart", (e) => {
@@ -281,11 +374,11 @@ export default {
           });
         }
         this.uploadId++;
-        }
-        this.isUpload = false;
-      },
+      }
+      this.isUpload = false;
     },
-  }
+  },
+}
 </script>
 <style scoped>
 .menu {
@@ -334,5 +427,13 @@ export default {
 .story-input:disabled {
   color: black;
   border: none;
-}</style>
+}
+
+.scenario-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+</style>
   

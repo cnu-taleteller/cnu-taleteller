@@ -1,8 +1,7 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-      <ToolHeader :viewFinalScenario="this.finalScenario"
-      :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
+      <ToolHeader :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
@@ -24,24 +23,9 @@
         <p>어디서: <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서"></p>
         <p>사건: <textarea class="scenario-input" v-model="scenarioKeyword.event"
             placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></textarea></p>
-        <button class="submit-btn" @click="setScenario()">시나리오 받아보기</button>
+        <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
       </div>
       <ToolScenarioExample></ToolScenarioExample>
-    </div>
-    <!-- 내가 쓰는 시나리오 -->
-    <div v-else-if="toolState === 'write'" class="tool-content">
-      <div class="scenario-form">
-        <h4>시나리오</h4>
-        <p>시나리오를 입력해주세요.</p>
-        <p class="center">도입: <textarea class="scenario-input" v-model="write1"></textarea></p>
-        <p class="center">전개: <textarea class="scenario-input" v-model="write2"></textarea></p>
-        <p class="center">위기: <textarea class="scenario-input" v-model="write3"></textarea></p>
-        <p class="center">결말: <textarea class="scenario-input" v-model="write4"></textarea></p>
-        <div>
-          <button @click="saveScenario()">시나리오 저장</button>
-          <button @click="goTool()">나중에 쓸게요</button>
-        </div>
-      </div>
     </div>
     <!-- 툴 -->
     <div v-else class="tool-content">
@@ -49,11 +33,12 @@
         <ToolPageList @currentPageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-          <!--emit데이터 받아오기 위해서 변수 추가를 하였습니다 -->
-          <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged" :currentPageList="this.currentPageList" ></ToolSelectedPage>
+        <!--emit데이터 받아오기 위해서 변수 추가를 하였습니다 -->
+        <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged"
+          :currentPageList="this.currentPageList"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu @selectedMenu="handleSelectedMenu"  :currentPageList="this.currentPageList"
+        <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
           :viewFinalScenario="this.finalScenario" :gpt="this.gpt"></ToolMenu>
       </div>
     </div>
@@ -83,45 +68,45 @@ export default {
         event: null
       },
       resultScenario: [], // [도입][전개] 등 태그 전체 있는 배열
-      finalScenario: [], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
+      finalScenario: [[],[],[],[],[]], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
 
       // 직접 쓸 때 기승전결 받기
       write1: null,
       write2: null,
       write3: null,
       write4: null,
-      
-      selectedMenu : '',
+
+      selectedMenu: '',
 
       // 현재 선택한 페이지
       currentPageList: {
-          pageId : 1, // 작품마다 페이지 고유한 번호
-          pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-          // 자막 관련
-          caption : {
-              size: 10,
-              content: null,
-              location: null,
-              isTextAreaVisible: false,
+        pageId: 1, // 작품마다 페이지 고유한 번호
+        pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
+        // 자막 관련
+        caption: {
+          size: 10,
+          content: null,
+          location: null,
+          isTextAreaVisible: false,
+        },
+        thumbnail: null,
+        // 페이지 안에 있는 파일들(레이어)
+        layerList: [
+          {
+            id: 'item',
+            layerId: '0',
+            fileId: '/images/field.png',
+            menu: 'background',
+            draggable: 'true',
+            style: {
+              width: '1200px', // 가로사이즈
+              height: '800px', // 세로사이즈
+              left: "0px", // x 좌표
+              top: "0px", // y 좌표
+              position: "absolute",
+            },
           },
-          thumbnail: null,
-          // 페이지 안에 있는 파일들(레이어)
-          layerList : [
-              {
-                  id : 'item',
-                  layerId : '0',
-                  fileId : '/images/field.png',
-                  menu: 'background',
-                  draggable : 'true',
-                  style : {
-                      width: '1200px', // 가로사이즈
-                      height: '800px', // 세로사이즈
-                      left : "0px", // x 좌표
-                      top : "0px", // y 좌표
-                      position : "absolute",
-                  },
-              },
-          ]
+        ]
       },
       bookId: null, // 작품 번호
     }
@@ -137,20 +122,32 @@ export default {
       this.setScenarioArr();
     }
   },
+  mounted() {
+    window.addEventListener('beforeunload', this.unLoadEvent);
+  },
+  beforeUnmount() {
+    window.removeEventListener('beforeunload', this.unLoadEvent);
+  },
   components: {
     ToolHeader: toolHeader,
     ToolPageList: toolPageList,
     ToolSelectedPage: toolSelectedPage,
     ToolLayer: toolLayer,
     ToolMenu: toolMenu,
-    ToolScenarioExample: toolScenarioExample
+    ToolScenarioExample: toolScenarioExample,
   },
   methods: {
-    textareaValueChanged(newValue){
-      this.currentPageList.caption.content=newValue;
+    // 새로고침 방지
+    unLoadEvent(event) {
+      if (this.isLeaveSite) return;
+      event.preventDefault();
+      event.returnValue = '';
     },
-    change(){
-      this.currentPageList.caption.isTextAreaVisible=true;
+    textareaValueChanged(newValue) {
+      this.currentPageList.caption.content = newValue;
+    },
+    change() {
+      this.currentPageList.caption.isTextAreaVisible = true;
     },
     handlePageList(currentPageList) {
       this.currentPageList = currentPageList;
@@ -162,25 +159,20 @@ export default {
       this.toolState = arg;
       sessionStorage.setItem('toolState', arg);
     },
-    saveScenario() {
-      if (this.write1 == null || this.write2 == null || this.write3 == null || this.write4 == null) {
-        alert('빈 내용을 다 채워주세요!');
-        return;
-      }
-      else {
-        this.resultScenario = '[도입]' + this.write1 + '[전개]' + this.write2 + '[위기]' + this.write3 + '[결말]' + this.write4;
-        sessionStorage.setItem('scenario', this.resultScenario);
-        this.setScenarioArr();
-        console.log(this.finalScenario);
-        alert('시나리오가 저장되었습니다!');
-      }
-      this.goTool();
-    },
     goTool() {
       sessionStorage.removeItem('toolState');
       this.toolState = null;
     },
-    setScenario() {
+    setGptScenario() {
+      const who = this.scenarioKeyword.who;
+      const when = this.scenarioKeyword.when;
+      const where = this.scenarioKeyword.where;
+      const event = this.scenarioKeyword.event;
+
+      if (who == null || when == null || where == null || event == null) {
+        alert('빈 내용을 다 채워주세요!');
+        return;
+      }
       sessionStorage.setItem('scenarioKeyword', JSON.stringify(this.scenarioKeyword));
       this.gpt = true;
       this.goTool();
@@ -190,10 +182,10 @@ export default {
           "model": "gpt-3.5-turbo",
           "messages": [{
             "role": "user",
-            "content": `누가: ${this.scenarioKeyword.who},
-                        언제: ${this.scenarioKeyword.when}, 
-                        어디서: ${this.scenarioKeyword.where},
-                        사건: ${this.scenarioKeyword.event}
+            "content": `누가: ${who},
+                        언제: ${when}, 
+                        어디서: ${where},
+                        사건: ${event}
                         라는 내용을 가진 동화책을 '도입/전개/위기/결말' 로 나눠서 써줘.
                         내용을 나눌 때 형식은 
                         [도입] 내용
@@ -211,10 +203,12 @@ export default {
         }
       )
         .then((res) => {
-          console.log(res.data.choices[0].message.content);
+          // console.log(res.data.choices[0].message.content);
           this.resultScenario = res.data.choices[0].message.content;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
+          console.log(this.finalScenario);
+          this.gpt = false;
         })
         .catch((err) => {
           this.gpt = false;
@@ -235,7 +229,7 @@ export default {
         } else {
           end = scenario.length;
         }
-        this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
+        this.finalScenario[0][index] = scenario.slice(start, end).replace(section, '').trim();
       });
     }
   },
@@ -344,4 +338,5 @@ textarea {
 .center {
   display: flex;
   align-items: center;
-}</style>
+}
+</style>

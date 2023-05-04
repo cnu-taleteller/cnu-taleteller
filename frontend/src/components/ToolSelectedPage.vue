@@ -27,9 +27,6 @@
         </ul>
       </div>
     </div>
-
-    <!-- 자막 영역 -->
-    <textarea v-if="this.currentPageList.caption.isTextAreaVisible" v-model="textareaValue"></textarea>
   </div>
   </div>
 </template>
@@ -55,7 +52,7 @@ export default {
     }
   },
   mounted() {
-    const color = this.$refs.colorPicker;
+    // const color = this.$refs.colorPicker;
     const dragArea = this.$refs.pageForm;
     const objArea = this.$refs.pageObject;
     const imageArea = this.$refs.dragImage;

@@ -1,21 +1,20 @@
 <template>
   <div class="selected-page-form">
     <div class="content">
-      <button @click="addContent()">자막추가</button>
-      <input :value="this.fontSize" @input="fontSize = $event.target.value" type="number" style="width:40px">
-      <!-- <input id="color-picker" ref="colorPicker" :value='this.currentColor'/>
-      <div id="color-preview"></div> -->
-      <!-- <div id="preview">
-        <div id="color-preview" class="sp-colorize"></div>
-        <div id="change-color">▼</div>
-      </div> -->
+      <div id="content-option">
+        <button @click="addContent()">자막추가</button>
+        <input :value="this.fontSize" @input="fontSize = $event.target.value" type="number" style="width:40px">
+        <div id=content-color ref="contentColor">
+          <div id="color-preview" class="sp-colorize" ref="colorPreview" :value="this.currentColor" style="width: 20px; height: 20px;"></div>
+          <div id="color-picker" ref="colorPicker">▼</div>
+        </div>
+      </div>
     </div>
     <div class='page-form' ref="pageForm">
     <div class='selected-page'>
       <div class='drag-image' ref="dragImage">
         <div class='object' ref='pageObject'></div>
       </div>
-
       <!-- 이미지 우클릭 영역 -->
       <div id="popupMenu"
         style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
@@ -52,26 +51,50 @@ export default {
     }
   },
   mounted() {
-    // const color = this.$refs.colorPicker;
+    const color = this.$refs.contentColor;
+    const colorPreview = this.$refs.colorPreview;
     const dragArea = this.$refs.pageForm;
     const objArea = this.$refs.pageObject;
     const imageArea = this.$refs.dragImage;
     const popupMenu = document.querySelector("#popupMenu");
 
-    // var colorPreview = document.getElementById("color-preview");
-    // colorPicker.addEventListener("input", function() {
-    //   var color = colorPicker.value; // 색상 값 가져오기
-    //   colorPreview.style.backgroundColor = color; // 배경색 변경하기
-    // });
+    let textArea;
+    let currentColor;
 
-    // $(color).spectrum({
-    //   type: "component",
-    //   showPaletteOnly: true,
-    //   togglePaletteOnly: true,
-    //   hideAfterPaletteSelect: true,
-    //   showInput: true,
-    //   showInitial: true
-    // });   
+    //디폴트 값으로 검은색
+    colorPreview.style.backgroundColor = this.currentColor;
+
+    // 컬러 선택 창 열기
+    $(color).spectrum({
+      type: "component",
+      showPaletteOnly: true,
+      togglePaletteOnly: true,
+      hideAfterPaletteSelect: true,
+      showInput: true,
+      showInitial: true,
+      change: function(color) {
+        textArea = document.getElementById('textArea');
+        if (textArea) {
+          textArea.style.color = currentColor;
+        }
+        currentColor = color.toHexString();
+        console.log(currentColor);
+        colorPreview.style.backgroundColor = currentColor;
+        this.currentColor = currentColor;
+        this.currentPageList.caption.fontColor = currentColor;
+        this.canvas();
+      }.bind(this),
+      move: function(color) {
+        textArea = document.getElementById('textArea');
+        if (textArea) {
+          textArea.style.color = currentColor;
+        }
+        currentColor = color.toHexString();
+        colorPreview.style.backgroundColor = currentColor;
+        this.currentColor = currentColor;
+        this.currentPageList.caption.fontColor = currentColor;
+      }.bind(this)
+    });
 
     let toolMenu = this;
     let active = false;
@@ -83,43 +106,6 @@ export default {
     let moveY;
     let currentObjId = null;
     let currentObj;
-
-    // $(color).on("change.spectrum", function(e, color) {
-    //   this.currentColor = color.toHexString(); // 선택된 색상 값을 문자열 형태로 가져옴
-    //   const textArea = document.getElementById('textArea');
-    //   if (textArea) {
-    //     textArea.style.color = color;
-    //     console.log(color);
-    //     toolMenu.currentPageList.caption.fontColor = color;
-    //     toolMenu.canvas();
-    //   }
-    // });
-
-    // var colorPicker = document.getElementById("color-picker");
-    // var colorPreview = document.getElementById("color-preview");
-
-    // // 초기 색상 설정
-    // var currentColor = colorPicker.value;
-    // colorPreview.style.backgroundColor = currentColor;
-
-    // 컬러 선택 창 열기
-    // $(colorPicker).spectrum({
-    //   type: "component",
-    //   showPaletteOnly: true,
-    //   togglePaletteOnly: true,
-    //   hideAfterPaletteSelect: true,
-    //   showInput: true,
-    //   showInitial: true,
-    //   // 컬러 선택 시
-    //   change: function(color) {
-    //     // 색상 값 가져오기
-    //     currentColor = color.toHexString();
-    //     // 미리보기 색상 변경하기
-    //     colorPreview.style.backgroundColor = currentColor;
-    //     // this.currentColor 값 업데이트
-    //     this.currentColor = currentColor;
-    //   }.bind(this)
-    // });
 
     this.imageEventDrop(imageArea);
     this.imageEventDragOver(imageArea);
@@ -141,14 +127,14 @@ export default {
       popupMenu.style.display = "block";
     });
 
-    //그림 드래그 부분 제외 버튼 클릭 시 메뉴 안보이게
     document.addEventListener("click", function(e) {
+      //그림 드래그 부분 제외 버튼 클릭 시 메뉴 안보이게
       if (e.target !== objArea && e.target !== popupMenu) {
         popupMenu.style.display = "none";
       }
+      //만약 자막 부분이 아니라면 드래그 할 수 있도록
       if(e.target.id != "textArea") {
         toolMenu.inputValue = false;
-        toolMenu.canvas();
       }
     });
     
@@ -237,10 +223,6 @@ export default {
         textArea.style.fontSize = newVal + 'px';
         this.currentPageList.caption.fontSize = newVal;
       }
-    },
-    //자막 내용 보내기
-    textareaValue(newValue) {
-      this.$emit('textareaValueChanged', newValue);
     },
   },
   methods: {
@@ -487,17 +469,19 @@ export default {
         addDiv.setAttribute("data-text-content", true);
         addDiv.style.width = "400px";
         addDiv.style.height = "200px";
-        addDiv.style.left = "306px";
-        addDiv.style.top = "229px"
+        addDiv.style.left = "214px";
+        addDiv.style.top = "274px"
         addDiv.style.fontWeight = "bold";
         addDiv.style.fontSize = this.fontSize + "px";
         addDiv.style.position ="absolute";
+        addDiv.style.color = '#000000';
         addDiv.id = "textArea";
         addDiv.innerText ="자막 추가해주세요";
         addDiv.style.zIndex = 2;
         objectArea.appendChild(addDiv);
         caption.content = '자막 추가해주세요';
         caption.fontSize = addDiv.style.fontSize;
+        caption.fontColor = addDiv.style.color;
         caption.width = addDiv.style.width;
         caption.height = addDiv.style.height;
         caption.left = addDiv.style.left;
@@ -572,4 +556,27 @@ textarea {
 .file-order:hover {
   background-color: gray;
   color: white;
-}</style>
+}
+
+#content-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#content-option button,
+#content-option input,
+#content-color {
+  margin-right: 10px;
+}
+
+#content-color {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#color-preview {
+  margin-right: 5px;
+}
+</style>

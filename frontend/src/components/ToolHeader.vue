@@ -172,8 +172,6 @@ export default {
       if (this.pageList[currentIndex].caption.content !== null) {
           const caption = this.pageList[currentIndex].caption;
           const divEle = newWindow.document.createElement('div');
-          divEle.contentEditable = true;
-          divEle.setAttribute("data-text-content", true);
           divEle.style.left = caption.left;
           divEle.style.top = caption.top;
           divEle.style.width = caption.width;
@@ -181,9 +179,10 @@ export default {
           divEle.style.fontWeight = "bold";
           divEle.style.fontSize = caption.fontSize;
           divEle.style.position ="absolute";
-          divEle.style.zIndex = 1;
-          divEle.id = "textArea";
+          divEle.style.textAlign = "center";
+          divEle.style.color = caption.fontColor;
           divEle.innerText = caption.content;
+          divEle.style.zIndex = 2;
           list.appendChild(divEle);
         }
     }

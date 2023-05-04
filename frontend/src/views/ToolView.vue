@@ -1,7 +1,8 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-      <ToolHeader></ToolHeader>
+      <!-- 전체 페이지 리스트 전달 -->
+      <ToolHeader :pageList="this.pageList" :currentPageList="this.currentPageList"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
@@ -44,8 +45,8 @@
     <!-- 툴 -->
     <div v-else class="tool-content">
       <div class="tool-left">
-        <!-- currentPageList 에 handlePageList 메서드로 툴 페이지리스트 컴포넌트에서 $emit으로 받은 pageList(index) 를 넣음 -->
-        <ToolPageList @currentPageList="handlePageList"></ToolPageList>
+        <!-- currentPageList 에 handlePageList 메서드로 툴 페이지리스트 컴포넌트에서 $emit으로 받은 pageList(index) 를 넣음, pageList 변경시 -> 썸네일 변경시 새로운 데이터를 전달 -->
+        <ToolPageList @currentPageList="handleCurrentPageList" @pageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
         <!-- toolSelectedPage에 값을 전달해줌 -->
@@ -90,6 +91,7 @@ export default {
       write4: null,
       selectedMenu : '',
       currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
+      pageList: [],
       bookId: null, // 작품 번호
     }
   },
@@ -114,8 +116,11 @@ export default {
   },
   methods: {
     //매개변수로 currnetPageList == pageList(index)를 받아서 data에 있는 this.currentPageList에 넣어주는 부분 
-    handlePageList(currentPageList) {
+    handleCurrentPageList(currentPageList) {
       this.currentPageList = currentPageList;
+    },
+    handlePageList(pageList) {
+      this.pageList = pageList;
     },
     //매개변수로 selectedMenu (ex) background, character 를 받아서 data에 있는 this.selectedMenu에 넣어주눈 부분
     handleSelectedMenu(selectedMenu) {
@@ -201,7 +206,7 @@ export default {
         }
         this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
       });
-    }
+    },
   },
 }
 

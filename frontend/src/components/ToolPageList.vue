@@ -7,7 +7,7 @@
         <li v-for="page, index in pageList" :key="index" class="one_page">
           <div class="page-body" @click="clickPage(index)">
             <!-- 썸네일 부분 -->
-            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:120px; height: 120px">
+            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:90%; height: 90%">
           </div>
           <label>
             {{ page.pageId }}
@@ -36,9 +36,13 @@ export default {
           pageId : 1,
           pageStatus: 1,
           caption : {
-            size: 10,
+            fontSize: "20px",
+            fontColor : '#000000',
             content: null,
-            location: null,
+            height: null,
+            width: null,
+            left: null,
+            top: null,
           },
           thumbnail: null,
           layerList : []
@@ -47,12 +51,21 @@ export default {
       currentPageNo: 1,
     }
   },
+  watch: {
+  pageList: {
+    handler: function (newPageList) {
+      this.$emit('pageList', newPageList);
+    },
+    deep: true,
+  },
+},
   created() {
     this.book_id = sessionStorage.getItem('book_id');
   },
   mounted() {
     //기본적으로 DOM에 내용이 만들어지면 배열의 첫번째 요소를 보냄 들어오면 1번 페이지를 보여주기 위해서
     this.$emit('currentPageList', this.pageList[0]);
+    this.$emit('pageList', this.pageList);
   },
   methods: {
     defalutReset() {
@@ -76,9 +89,13 @@ export default {
         0,
         {
           caption: {
-            size: 10,
+            fontSize: "20px",
+            fontColor : '#000000',
             content: null,
-            location: null,
+            height: null,
+            width: null,
+            left: null,
+            top: null,
           },
           thumbnail: null,
           pageId: newNo,

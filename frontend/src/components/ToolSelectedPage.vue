@@ -278,7 +278,7 @@ export default {
         divEle.style.fontWeight = "bold";
         divEle.style.fontSize = caption.fontSize;
         divEle.style.position ="absolute";
-        divEle.style.zIndex = 1;
+        divEle.style.zIndex = 2;
         divEle.style.color = caption.fontColor;
         divEle.id = "textArea";
         divEle.innerText = caption.content;

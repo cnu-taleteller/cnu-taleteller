@@ -21,7 +21,7 @@
           <!-- gpt 시나리오 없을 때 -->
           <div v-if="select == false && gpt == true">
             <div class="spinner-border" role="status"></div>
-            <p>열심히 작성중입니다.<br>조금만 기다려주세요!ㅠㅠ</p>
+            <p>열심히 작성중입니다.<br>조금만 기다려주세요!😥🙏</p>
           </div>
           <!-- 내가 적은 시나리오 없을 때 -->
           <div v-else-if="select == false && gpt == false && finalScenario[0].length === 0">
@@ -39,7 +39,7 @@
             <button class="submit-btn" v-show="!isDisabled" @click="editScenario('save')">저장</button>
           </div>
           <!-- 시나리오 고르는 중 -->
-          <div v-else>
+          <div v-else class="scenario-form2">
             <button class="scenario-btn" :class="{ active: scenarioNum === 0 }" v-show="finalScenario[0][0]"
               @click="setNum(0)">1</button>
             <button class="scenario-btn" :class="{ active: scenarioNum === 1 }" v-show="finalScenario[1][0]"
@@ -70,12 +70,12 @@
       <div class="image-list">
         <div id="item">
           <div class="image-list-char" v-show="selectedMenu == 'character'">
-          <img :src="item.src" :draggable="item.draggable" :id="item.id"
-            :style="{ height: item.height }" v-for="item, index in charList">
+            <img :src="item.src" :draggable="item.draggable" :id="item.id" :style="{ height: item.height }"
+              v-for="item, index in charList">
           </div>
           <div class="image-list-back" v-show="selectedMenu == 'background'">
-            <img :src="item.src" :draggable="item.draggable" :id="item.id"
-              :style="{ height: item.height }" v-for="item, index in backList">
+            <img :src="item.src" :draggable="item.draggable" :id="item.id" :style="{ height: item.height }"
+              v-for="item, index in backList">
           </div>
         </div>
       </div>
@@ -112,13 +112,29 @@ export default {
           id: 'character1',
           draggable: "true",
           height: "100px",
+          width: "100px",
         },
         {
           src: '/images/pngwing2.com.png',
           id: 'character2',
           draggable: "true",
           height: "100px",
-        }
+          width: "100px",
+        },
+        {
+          src: 'https://cdn.crowdpic.net/list-thumb/thumb_l_CDD94CBD46425E4EDBD18A7A17C199E7.jpg',
+          id: 'character3',
+          draggable: "true",
+          height: "100px",
+          width: "100px",
+        },
+        {
+          src: 'https://taleteller.s3.ap-northeast-2.amazonaws.com/static/B_381315fb-1240-454f-98ca-ff6e6e6fe77f_5dd65dd6-c036-4771-a86d-db8a83eb2fbb_bg.jpg',
+          id: 'character',
+          draggable: "true",
+          height: "100px",
+          width: "100px",
+        },
       ],
       //기본적으로 있는 배경 배열.
       backList: [
@@ -149,6 +165,67 @@ export default {
     this.finalScenario = this.viewFinalScenario;
   },
   methods: {
+
+    // 이미지 업로드
+    async setImage(menu) {
+      const maxSize = 5 * 1024 * 1024;
+      const fileSize = document.getElementById("image").files[0].size;
+      // console.log(fileSize);
+
+      if (fileSize > maxSize) {
+        alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
+        return;
+      }
+
+      try {
+        let frm = new FormData();
+        let imageFile = document.getElementById("image");
+        frm.append("image", imageFile.files[0]);
+        frm.append("menu", menu);
+        frm.append("bookId", this.bookId);
+        const res = await axios.post(`/api/tool/image`, frm, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        if (menu === 'background') {
+          this.backList.push({
+            src: res.data,
+            id: 'upload' + this.uploadId,
+            draggable: "true",
+            height: "100px",
+          });
+        } else if (menu === 'character') {
+          this.charList.push({
+            src: res.data,
+            id: 'upload' + this.uploadId,
+            draggable: "true",
+            height: "100px",
+          });
+        }
+        this.uploadId++;
+        console.log("S3 업로드 성공");
+        document.getElementById("image").value = "";
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    setSelectedMenu(menu) {
+      this.selectedMenu = menu;
+      this.$emit('selectedMenu', this.selectedMenu);
+    },
+
+    //기존 이미지 배열에 있는 이미지들에게 drag이벤트 추가
+    imageEventDragStart() {
+      document.querySelectorAll(".menu .image-list #item").forEach((element) => {
+        element.addEventListener("dragstart", (e) => {
+          const x = e.offsetX;
+          const y = e.offsetY;
+          //기본적으로 e.target.id -> img<id> 클릭했을 때 해당이미지의 x 좌표 y 좌표를 setData해줌
+          e.dataTransfer.setData("text/plain", `${e.target.id}, ${x}, ${y}`);
+        });
+      });
+    },
     // 시나리오 label 나누는 함수
     setScenarioLabel(index) {
       switch (index) {
@@ -191,25 +268,125 @@ export default {
     },
     // 키워드 변경
     reKeyword() {
-      const popupWidth = 500;
-      const popupHeight = 400;
+      const popupWidth = 600;
+      const popupHeight = 650;
       const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
       const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
       const popup = window.open("", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
 
       popup.document.body.innerHTML = `
-        <div class="scenario-form">
-        <div class="scenario-input">
-          <h4>키워드 변경</h4>
-          <p>변경할 키워드를 입력하세요.</p>
-          <p>사건은 구체적이게 적을수록 좋습니다!</p>
-          <p>누가: <input type="text" id="who" value="${this.scenarioKeyword.who}" placeholder="짱구가"></p>
-          <p>언제: <input type="text" id="when" value="${this.scenarioKeyword.when}" placeholder="주말 아침에"></p>
-          <p>어디서: <input type="text" id="where" value="${this.scenarioKeyword.where}" placeholder="숲에서"></p>
-          <p>사건: <input type="text" id="event" value="${this.scenarioKeyword.event}" placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></p>
-          <button onclick="setKeyword()">키워드 저장</button>
+      <div class="scenario-form">
+        <h2>키워드 변경하기</h2>
+        <p>변경할 키워드를 입력하세요 ✏️
+          <br>사건은 구체적이게 적을수록 좋습니다!
+        </p>
+        <div class="scenario-input-form">
+        <p>1. 주인공은 누구인가요?</p>
+        <input type="text" class="scenario-input" id="who" value="${this.scenarioKeyword.who}" placeholder="짱구가">
+        <p>2. 언제 일어난 일인가요?</p>
+        <input type="text" class="scenario-input" id="when" value="${this.scenarioKeyword.when}" placeholder="주말 아침에">
+        <p>3. 어디서 일어난 일인가요?</p> 
+        <input type="text" class="scenario-input" id="where" value="${this.scenarioKeyword.where}" placeholder="숲에서">
+        <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
+        <input type="text" class="scenario-input" id="event" value="${this.scenarioKeyword.event}" placeholder="외계인을 만나 당황했지만 재밌게 놀았던 이야기">
+        <button class="submit-btn" @click="setGptScenario()">키워드 변경하기</button>
         </div>
-      </div>`;
+      </div>
+      `;
+      popup.document.head.innerHTML = `
+        <style>
+        body{
+          margin: 0;
+        }
+        .scenario-form::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("https://img.freepik.com/premium-photo/white-watercolor-papar-texture-background-for-cover-card-design-or-overlay-aon-paint-art-background_1962-2255.jpg");
+          background-size: cover;
+          background-position: center;
+          opacity: 0.7;
+          z-index: -1;
+        }
+        .scenario-form{
+          width: 100%;
+          height: 100%;         
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+        .scenario-input-form{
+          width: 70%;
+        }
+        .scenario-input-form>p {
+          text-align: center;
+          width: 100%;
+          margin-bottom: 5px;
+          margin-top: 20px;
+        }
+        h2 {
+          font-weight: bold;
+          color: #3b3b3b;
+          text-shadow: 2px 2px 2px #d3d3d3;
+        }
+        .scenario-input {
+          width: 100%;
+          height: 30px;
+          outline: none;
+          border: none;
+          border-bottom: 1px solid #ccc;
+          background: center;
+        }
+
+        .scenario-input:focus {
+          box-shadow: 0px 0px 5px #cacaca;
+          background-color: none;
+          background-position: 2%;
+        }
+
+        textarea {
+          font-size: 12px;
+          resize: none;
+          border: 1px solid #dfdfdf;
+          padding: 2px 7px;
+        }
+        textarea::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+          background-color: rgb(223, 223, 223);
+          border-radius: 10px;
+          background-clip: padding-box;
+          border: 2px solid transparent;
+        }
+
+        textarea::-webkit-scrollbar-track {
+          background-color: white;
+          border-radius: 10px;
+          box-shadow: inset 0px 0px 5px white;
+        }
+        .submit-btn {
+          margin-top: 30px;
+          width: 50%;
+          padding: 10px;
+          border: none;
+          background-color: #E4E4E4;
+          font-weight: bold;
+          color: #353535;
+          border-radius: 3px;
+          font-size: 15px
+        }
+        .submit-btn:hover{
+          opacity: 0.7;
+        }
+        </style>
+        `;
 
       popup.setKeyword = () => {
         const who = popup.document.querySelector("#who").value;
@@ -313,70 +490,6 @@ export default {
         this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
       });
     },
-
-    // 이미지 업로드
-    async setImage(menu) {
-      const maxSize = 5 * 1024 * 1024;
-      const fileSize = document.getElementById("image").files[0].size;
-      // console.log(fileSize);
-
-      if(fileSize > maxSize){
-        alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
-        return;
-      }
-
-      try {
-        let frm = new FormData();
-        let imageFile = document.getElementById("image");
-        frm.append("image", imageFile.files[0]);
-        frm.append("menu", menu);
-        frm.append("bookId", this.bookId);
-        const res = await axios.post(`/api/tool/image`, frm, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        if (menu === 'background') {
-          // this.src = "/images/" + res.data;
-          this.backList.push({
-            src: res.data,
-            id: 'item',
-            draggable: "true",
-            height: "100px",
-          });
-        } else if (menu === 'character') {
-          // this.src = "/images/" + res.data;
-          this.charList.push({
-            src: res.data,
-            id: 'item',
-            draggable: "true",
-            height: "100px",
-            width: "100px",
-          });
-        }
-        this.uploadId++;
-        console.log("S3 업로드 성공");
-        document.getElementById("image").value = "";
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    setSelectedMenu(menu) {
-      this.selectedMenu = menu;
-      this.$emit('selectedMenu', this.selectedMenu);
-    },
-
-    //기존 이미지 배열에 있는 이미지들에게 drag이벤트 추가
-    imageEventDragStart() {
-      document.querySelectorAll(".menu .image-list #item").forEach((element) => {
-        element.addEventListener("dragstart", (e) => {
-          const x = e.offsetX;
-          const y = e.offsetY;
-          //기본적으로 e.target.id -> img<id> 클릭했을 때 해당이미지의 x 좌표 y 좌표를 setData해줌
-          e.dataTransfer.setData("text/plain", `${e.target.id}, ${x}, ${y}`);
-        });
-      });
-    },
   },
 }
 </script>
@@ -396,12 +509,14 @@ export default {
 }
 
 .image-list-char {
-  width: 90%;
+  width: 100%;
+  /* height: 70vh; */
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
+  overflow-y: scroll;
 }
 
 .image-list-char>img {
@@ -445,6 +560,7 @@ input[type=file]::file-selector-button:hover {
   /* border-radius: 50%; */
   background-color: white;
   border: none;
+  border-radius: 3px;
 }
 
 .menu-btn:hover {
@@ -464,18 +580,21 @@ input[type=file]::file-selector-button:hover {
   resize: none;
 }
 
-.story-input::-webkit-scrollbar {
+.story-input::-webkit-scrollbar,
+.image-list-char::-webkit-scrollbar {
   width: 10px;
 }
 
-.story-input::-webkit-scrollbar-thumb {
+.story-input::-webkit-scrollbar-thumb,
+.image-list-char::-webkit-scrollbar-thumb {
   background-color: rgb(223, 223, 223);
   border-radius: 10px;
   background-clip: padding-box;
   border: 2px solid transparent;
 }
 
-.story-input::-webkit-scrollbar-track {
+.story-input::-webkit-scrollbar-track,
+.image-list-char::-webkit-scrollbar-track {
   background-color: white;
   border-radius: 10px;
   box-shadow: inset 0px 0px 5px white;
@@ -491,6 +610,11 @@ input[type=file]::file-selector-button:hover {
   align-items: center;
   justify-content: center;
   width: 100%;
+  height: 100%;
+}
+.scenario-form2 {
+  width: 100%;
+  height: 100%;
 }
 
 .submit-btn {
@@ -515,11 +639,12 @@ input[type=file]::file-selector-button:hover {
   /* background-color: #2F66FB; */
   color: black;
   margin-bottom: 20px;
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .scenario-btn.active {
   background-color: #50c3fd;
   color: white;
-}</style>
+}
+</style>
   

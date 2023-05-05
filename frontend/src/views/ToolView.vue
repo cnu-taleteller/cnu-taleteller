@@ -220,7 +220,7 @@ textarea {
 
 .tool {
   width: 100%;
-  height: 100%;
+height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -229,7 +229,6 @@ textarea {
 }
 
 .tool-header {
-  height: 10%;
   width: 100%;
   display: flex;
   align-items: center;
@@ -237,7 +236,7 @@ textarea {
 }
 
 .tool-content {
-  height: 90%;
+  height: 100%;
   width: 100%;
   display: flex;
   align-items: center;
@@ -245,17 +244,17 @@ textarea {
 }
 
 .tool-left {
-  height: 80vh;
+  height: 100%;
   width: 15%;
 }
 
 .tool-center {
-  height: 80vh;
+  height: 100%;
   width: 60%;
 }
 
 .tool-right {
-  height: 80vh;
+  height: 100%;
   width: 25%;
 }
 

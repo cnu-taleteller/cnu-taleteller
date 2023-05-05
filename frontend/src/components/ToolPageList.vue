@@ -129,8 +129,7 @@ export default {
 
 .page-all {
   width: 90%;
-  height: 70vh;
-  /* height: 80vh; */
+  height: 80vh;
   overflow-y: scroll;
 }
 
@@ -153,6 +152,7 @@ export default {
 
 .one-page {
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -161,8 +161,8 @@ export default {
 }
 
 .page-body {
-  width: 90%;
-  height: 120px;
+  width: 70%;
+  height: 7vw;
   border: #ccc solid 1px;
 }
 

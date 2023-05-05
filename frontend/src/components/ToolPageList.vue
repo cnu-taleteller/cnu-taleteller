@@ -3,8 +3,11 @@
     <div class="page-all">
       <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list">
-        <li v-for="page, index in pageList" :key="index" class="one-page">
-          <div class="page-body" @click="clickPage(index)"></div>
+        <li v-for="page, index in pageList" :key="index" class="one_page">
+          <div class="page-body" @click="clickPage(index)">
+            <!-- 썸네일 부분 -->
+            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:90%; height: 90%">
+          </div>
           <label>
             {{ page.pageId }}
           </label>
@@ -29,41 +32,53 @@ export default {
   data() {
     return {
       book_id: null,
+      //현재 사용중인 데이터
       pageList: [
         {
-          pageId: 1,
+          pageId : 1,
           pageStatus: 1,
-          caption: {
-            size: 10,
+          caption : {
+            fontSize: "20px",
+            fontColor : '#000000',
             content: null,
-            location: null,
-            isTextAreaVisible: false,
+            height: null,
+            width: null,
+            left: null,
+            top: null,
           },
           thumbnail: null,
           layerList: []
         }
       ],
       currentPageNo: 1,
-      sortableOptions: {
-        animation: 300,
-        handle: '.page-body'
-      },
     }
   },
+  watch: {
+  pageList: {
+    handler: function (newPageList) {
+      this.$emit('pageList', newPageList);
+    },
+    deep: true,
+  },
+},
   created() {
     this.book_id = sessionStorage.getItem('book_id');
   },
   mounted() {
+    //기본적으로 DOM에 내용이 만들어지면 배열의 첫번째 요소를 보냄 들어오면 1번 페이지를 보여주기 위해서
     this.$emit('currentPageList', this.pageList[0]);
+    this.$emit('pageList', this.pageList);
   },
   methods: {
     defalutReset() {
       this.currentPageNo = items.length - 1;
     },
+    //페이지 변경 시 그 페이지의 내용들을 보냄
     clickPage(index) {
       this.currentPageNo = index;
       this.$emit('currentPageList', this.pageList[index]);
     },
+    //페이지 추가부분
     addPage() {
       let currnet = this.currentPageNo;
       var self = this;
@@ -76,10 +91,13 @@ export default {
         0,
         {
           caption: {
-            size: 10,
+            fontSize: "20px",
+            fontColor : '#000000',
             content: null,
-            location: null,
-            isTextAreaVisible: false,
+            height: null,
+            width: null,
+            left: null,
+            top: null,
           },
           thumbnail: null,
           pageId: newNo,

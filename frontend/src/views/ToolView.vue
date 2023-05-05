@@ -1,7 +1,8 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-      <ToolHeader :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
+      <!-- 전체 페이지 리스트 전달 -->
+      <ToolHeader :pageList="this.pageList" :currentPageList="this.currentPageList" :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
@@ -36,12 +37,12 @@
     <!-- 툴 -->
     <div v-else class="tool-content">
       <div class="tool-left">
-        <ToolPageList @currentPageList="handlePageList"></ToolPageList>
+        <!-- currentPageList 에 handlePageList 메서드로 툴 페이지리스트 컴포넌트에서 $emit으로 받은 pageList(index) 를 넣음, pageList 변경시 -> 썸네일 변경시 새로운 데이터를 전달 -->
+        <ToolPageList @currentPageList="handleCurrentPageList" @pageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-        <!--emit데이터 받아오기 위해서 변수 추가를 하였습니다 -->
-        <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged"
-          :currentPageList="this.currentPageList"></ToolSelectedPage>
+        <!-- toolSelectedPage에 값을 전달해줌 -->
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"></ToolSelectedPage>
       </div>
       <div class="tool-right">
         <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
@@ -81,39 +82,9 @@ export default {
       write2: null,
       write3: null,
       write4: null,
-
-      selectedMenu: '',
-
-      // 현재 선택한 페이지
-      currentPageList: {
-        pageId: 1, // 작품마다 페이지 고유한 번호
-        pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-        // 자막 관련
-        caption: {
-          size: 10,
-          content: null,
-          location: null,
-          isTextAreaVisible: false,
-        },
-        thumbnail: null,
-        // 페이지 안에 있는 파일들(레이어)
-        layerList: [
-          {
-            id: 'item',
-            layerId: '0',
-            fileId: '/images/field.png',
-            menu: 'background',
-            draggable: 'true',
-            style: {
-              width: '1200px', // 가로사이즈
-              height: '800px', // 세로사이즈
-              left: "0px", // x 좌표
-              top: "0px", // y 좌표
-              position: "absolute",
-            },
-          },
-        ]
-      },
+      selectedMenu : '',
+      currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
+      pageList: [],
       bookId: null, // 작품 번호
     }
   },
@@ -148,16 +119,14 @@ export default {
       if (this.isLeaveSite) return;
       event.preventDefault();
       event.returnValue = '';
-    },
-    textareaValueChanged(newValue) {
-      this.currentPageList.caption.content = newValue;
-    },
-    change() {
-      this.currentPageList.caption.isTextAreaVisible = true;
-    },
-    handlePageList(currentPageList) {
+    }, 
+    handleCurrentPageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
+    handlePageList(pageList) {
+      this.pageList = pageList;
+    },
+    //매개변수로 selectedMenu (ex) background, character 를 받아서 data에 있는 this.selectedMenu에 넣어주눈 부분
     handleSelectedMenu(selectedMenu) {
       this.selectedMenu = selectedMenu;
     },
@@ -237,7 +206,7 @@ export default {
         }
         this.finalScenario[0][index] = scenario.slice(start, end).replace(section, '').trim();
       });
-    }
+    },
   },
 }
 

@@ -14,7 +14,7 @@
           <input type="file" @change="setImage('background')" accept="image/*" id="image">
         </div>
         <div v-else-if="selectedMenu == 'character'">
-          <input type="file" @change="setImage('character')" accept="image/*" id="image">
+          <input type="file" @change="setImage('character')" max accept="image/*" id="image">
         </div>
         <!-- 시나리오 -->
         <div class="scenario-form2" v-else-if="selectedMenu == 'scenario'">
@@ -317,7 +317,15 @@ export default {
 
     // 이미지 업로드
     async setImage(menu) {
-      console.log(menu);
+      const maxSize = 5 * 1024 * 1024;
+      const fileSize = document.getElementById("image").files[0].size;
+      // console.log(fileSize);
+
+      if(fileSize > maxSize){
+        alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
+        return;
+      }
+
       try {
         let frm = new FormData();
         let imageFile = document.getElementById("image");
@@ -330,19 +338,20 @@ export default {
           }
         });
         this.isUpload = true;
+        console.log(res.data);
         if (menu === 'background') {
-          this.src = "/images/" + res.data;
+          // this.src = "/images/" + res.data;
           this.backList.push({
-            src: this.src,
+            src: res.data,
             id: 'item',
             draggable: "true",
             dataId: 'upload' + this.uploadId,
             height: "100px",
           });
         } else if (menu === 'character') {
-          this.src = "/images/" + res.data;
+          // this.src = "/images/" + res.data;
           this.charList.push({
-            src: this.src,
+            src: res.data,
             id: 'item',
             draggable: "true",
             dataId: 'upload' + this.uploadId,
@@ -350,7 +359,7 @@ export default {
             width: "100px",
           });
         }
-        console.log("전송 성공");
+        console.log("S3 업로드 성공");
         document.getElementById("image").value = "";
       } catch (e) {
         console.log(e);
@@ -388,7 +397,7 @@ export default {
 </script>
 <style scoped>
 .menu {
-  height: 80vh;
+  height: 100%;
   background-color: white;
   border-left: 1px solid #dfdfdf;
 }

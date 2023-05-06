@@ -31,7 +31,7 @@
                     <tr>
                         <td>
                             <!--동화책 썸네일 대체-->
-                            <img src='../assets/logo.png'>
+                            <!-- <img src assets/logo.png'> -->
                         </td>
                     </tr>
                 </thead>
@@ -66,7 +66,7 @@
   },
     methods: {
       getSessionStorage(){
-        var workname = sessionStorage.getItem("projectTitle");
+        var workname = sessionStorage.getItem("bookName");
         return workname;
       },
     },

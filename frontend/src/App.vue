@@ -10,6 +10,7 @@
 <script>
 import Header from './components/Header.vue';
 import SearchHeader from './components/SearchHeader.vue';
+
 export default {
   name: 'App',
   components: {
@@ -27,6 +28,7 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap');
+
 #app {
   font-family: 'IBM Plex Sans KR', Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

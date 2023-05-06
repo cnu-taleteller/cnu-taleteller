@@ -4,22 +4,22 @@
     <hr>
     <div class="column">
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
       <p></p>
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
       <p></p>
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
       <p></p>
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
     </div>

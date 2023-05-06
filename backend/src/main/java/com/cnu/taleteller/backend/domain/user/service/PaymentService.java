@@ -33,10 +33,10 @@ public class PaymentService {
     private KakaopayReadyVO kakaopayReadyVO;
     private KakaopayApprovalVO kakaopayApprovalVO;
 
-    public void pointChargeSet(int point) {
+    public void pointChargeSet(int point, String method) {
         paymentDto.setPayCount(point);
         paymentDto.setPaySort("충전");
-        paymentDto.setPayType("간편결제");
+        paymentDto.setPayType(method);
         paymentDto.setChargeCheck(true);
     }
 
@@ -61,10 +61,23 @@ public class PaymentService {
         System.out.println("환급 완료");
     }
 
+    public void bookPaymentSave(int point) {
+        paymentDto.setPayCount(point);
+        paymentDto.setPaySort("결제");
+        paymentDto.setPayType("엽전");
+        Payment payment = Payment.toPayment(paymentDto);
+        paymentRepository.save(payment);
+        System.out.println("상품 결제 완료");
+    }
+
     public List<Payment> findAll() {
         //List<Payment> list = paymentRepository.findAll();
         //List<PaymentDto> resultList = Arrays.asList((PaymentDto) list);
         return paymentRepository.findAll();
+    }
+
+    public List<Payment> findByLast() {
+        return paymentRepository.findFirstByOrderByPayIdDesc();
     }
 
     public String kakaopayReady() {
@@ -110,7 +123,7 @@ public class PaymentService {
         return kakaopayReadyVO.getNext_redirect_pc_url();
     }
 
-    public KakaopayApprovalVO kakaoPayInfo(String pg_token) {
+    public KakaopayApprovalVO kakaopayInfo(String pg_token) {
 
         log.info("KakaoPayInfoVO............................................");
         log.info("-----------------------------");
@@ -130,7 +143,7 @@ public class PaymentService {
         params.add("partner_order_id", "1001");
         params.add("partner_user_id", "gorany");
         params.add("pg_token", pg_token);
-        params.add("total_amount", "2100");
+        params.add("total_amount", String.valueOf(paymentDto.getPayCount()*100));
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<MultiValueMap<String, String>>(params, headers);
 

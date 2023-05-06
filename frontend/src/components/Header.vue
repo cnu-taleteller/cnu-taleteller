@@ -77,15 +77,6 @@ export default {
 </script>
 
 <style scoped>
-#logo img {
-    width: 40%;
-    height: auto;
-}
-
-.bar {
-    display: flex;
-    align-items: center;
-}
 
 .search {
     display: flex;
@@ -106,23 +97,33 @@ button[type="submit"] {
     border: 1px solid #ddd;
     border-radius: 3px;
     margin-left: 10px;
+    
+.bar {
+    display: flex;
+    align-items: center;
+    height: 10vh;
+    justify-content: space-between;
+  }
+
+#logo {
+  height: 100%;
 }
 
-input[type="text"] {
-    width: 25vw;
+#logo img{
+  width: auto;
+  height: 100%;
 }
 
-button[type="submit"] {
-    background-color: gray;
-    color: #ffffff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    margin-left: 10px;
+.logo {
+  display: block;
+  height: 100%;
 }
 
-button[type="submit"]:hover {
-    background-color: darkgray;
+.member {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 1vw;
+  margin-bottom: 2.5vh;
 }
 
 .member a {
@@ -136,4 +137,6 @@ button[type="submit"]:hover {
     color: #333;
     background-color: #fff;
     transition: background-color 0.3s ease;
-}</style>
+}
+
+</style>

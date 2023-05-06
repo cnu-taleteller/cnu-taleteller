@@ -34,11 +34,6 @@ export default {
         this.getDetails()
     },
     computed: {
-        amount(){
-            if(result.payCount<0){
-
-            }
-        }
 
     },
     methods: {
@@ -67,6 +62,7 @@ export default {
         position: relative;
         border: 1px solid gray;
         overflow-y: scroll;
+        font-size: 20px;
     }
     table th{
         background-color: gray;

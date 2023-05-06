@@ -17,7 +17,7 @@
                 </form>
             </div>
             <div class="member" v-if="$route.query.user === '테스트'">
-             <a href="/Myview">마이페이지</a>
+             <a href="/mypage/pointmanage">마이페이지</a>
             </div>
             <div class="member" v-else>
                 <a href="/LoginView">로그인</a>

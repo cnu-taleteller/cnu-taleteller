@@ -102,52 +102,81 @@
   }
   .mypage-side{
     width:300px; 
-    height: 620px; 
-    background:rgba(235, 235, 235, 0.6);  
+    height: 720px; 
+    background:rgba(210, 210, 210, 0.6);   
     padding:40px 0; 
     overflow: hidden;
     display: flex;
     flex-direction: column;
     margin: 0 0 10px 10px;
+    border-radius: 15px;
   }
   .mypage-side ul {padding: 0 30px;}
-  .mypage-side ul li {
+  .mypage-side li {
       font-size:25px;
       height:75px;
       list-style:none;
       font-weight:bold;
-  } 
+      background-color: orange;
+      border-radius: 15px;
+      margin: 5%;
+    }
+    .mypage-side a{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+      
+    }
+    .mypage-side a:hover{
+      background-color: yellow;
+      color:black;
+    }
+    .mypage-side li:nth-child(3){
+      background-color: yellow;
+      color:black;
+    }
   .mypage-search{
     width: 100%;
-    height: 70px;
-    background:rgba(235, 235, 235, 0.6); 
+    height: 80px;
+    background:rgba(210, 210, 210, 0.6);   
     overflow: hidden;
     display: flex;
     margin: 5px 10px 10px 0;
+    border-radius: 15px;
   }
   .search-bar{
-    height: 30px;
+    height: 40px;
     margin: 20px 5px;
     margin-left: 5%;
   }
   .search-btn{
-    height: 30px;
+    width: 7%;
+    height: 40px;
     margin-top: 20px;
     margin-bottom: 20px;
+    background-color: gray;
+    font-size:20px;
+    color:white;
+    border-width:0;
+    border-radius: 5px;
   }
   .sort-dropdown{
-    height: 30px;
+    width: 10%;
     margin: 20px 5px;
     margin-left: 10px;
   }
   .mypage-content{
     width: 100%;
-    height: 540px;
-    background:rgba(235, 235, 235, 0.6); 
-    padding:30px; 
+    height: 630px;
+    background:rgba(233, 233, 233, 0.6);
+    padding:20px; 
     overflow: hidden;
     display: flex;
     margin: 5px 10px 10px 0;
+    border-radius: 15px;
   }
   .thumbnail{
       margin-left: 5%;

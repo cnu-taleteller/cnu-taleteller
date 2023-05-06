@@ -13,7 +13,7 @@
             <div class="book-button">
                 <button @click="recommend">추천</button>
                 <button>즐겨찾기</button>
-                <button>감상</button>
+                <button @click="bookPayment(-10)">{{this.paymentCheck}}</button>
             </div>
         </div>
         <div class="book-reply">
@@ -34,7 +34,8 @@ export default {
         return {
             book: null,
             bookId: this.$route.params.id,
-            replies: []
+            replies: [],
+            paymentCheck:'결제',
         }
     },
     created() {
@@ -64,7 +65,23 @@ export default {
         },
         writeReply(reply) {
             this.replies.push(reply);
-        }
+        },
+        bookPayment(Value){
+            if(confirm("결제하시겠습니까?")){
+                axios.post("/api/point/bookPayment", {
+                    paymentPoint : Value,
+                })
+                .then((res) => {
+                    alert("상품이 결제되었습니다.")
+                    this.paymentCheck = "감상"
+                    console.log(res);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });  
+            }
+        },
+
     },
 };
 </script>

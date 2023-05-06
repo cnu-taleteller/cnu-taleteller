@@ -22,7 +22,7 @@
   }
   </script>
   
-  <style>
+  <style scoped>
   .container h1 a {
     color: black;
     text-decoration: none;

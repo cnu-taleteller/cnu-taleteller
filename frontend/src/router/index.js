@@ -55,12 +55,12 @@ const routes = [
     component: BookDetailView
   },
   {
-    path: '/LoginView',
+    path: '/loginview',
     name: 'LoginView',
     component: LoginView
   },
   {
-    path: '/SignupView',
+    path: '/signupview',
     name: 'SignupView',
     component: SignupView
   },

@@ -3,10 +3,10 @@
     <div class="page-all">
       <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list">
-        <li v-for="page, index in pageList" :key="index" class="one_page">
+        <li v-for="page, index in pageList" :key="index" class="one-page">
           <div class="page-body" @click="clickPage(index)">
             <!-- 썸네일 부분 -->
-            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:90%; height: 90%">
+            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:100%; height: 100%">
           </div>
           <label>
             {{ page.pageId }}
@@ -110,6 +110,7 @@ export default {
     },
     saveSession() {
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageList));
+      // this.$emit('pageList', this.pageList);
     }
     // deletePage(item, index) {
     //   this.items.splice(index, 1);
@@ -124,7 +125,8 @@ export default {
   align-items: center;
   justify-content: center;
   border-right: 1px solid #dfdfdf;
-  height: 100%;
+  /* height: 100%; */
+  height: 90vh;
 }
 
 .page-all {
@@ -161,13 +163,14 @@ export default {
 }
 
 .page-body {
-  width: 70%;
+  width: 80%;
   height: 7vw;
-  border: #ccc solid 1px;
+  background-color: white;
+  box-shadow: 1px 1px 5px rgba(139, 139, 139, 0.1);
 }
 
 label {
-  opacity: 0.95;
+  opacity: 0.9;
 }
 
 .page-list {

@@ -2,7 +2,7 @@
   <div class="tool">
     <div class="tool-header">
       <!-- 전체 페이지 리스트 전달 -->
-      <ToolHeader :pageList="this.pageList" :currentPageList="this.currentPageList" :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
+      <ToolHeader :pageList="this.pageList" :toolState="this.toolState" :currentPageList="this.currentPageList" :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
@@ -20,17 +20,22 @@
     <!-- gpt가 쓰는 시나리오 -->
     <div v-else-if="toolState === 'gpt'" class="tool-content tool-scenario">
       <div class="scenario-form">
-        <h4>시나리오</h4>
-        <p>키워드를 입력하세요.
-          <br>키워드는 변경 불가능하니 신중하게 적어주세요!
+        <h3>시나리오 추천 받기</h3>
+        <p>키워드를 입력하세요 ✏️
           <br>사건은 구체적이게 적을수록 좋습니다!
         </p>
-        <p>누가: <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가"></p>
-        <p>언제: <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에"></p>
-        <p>어디서: <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서"></p>
-        <p>사건: <textarea class="scenario-input" v-model="scenarioKeyword.event"
-            placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></textarea></p>
+        <div class="scenario-input-form">
+        <p>1. 주인공은 누구인가요?</p>
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가">
+        <p>2. 언제 일어난 일인가요?</p>
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에">
+        <p>3. 어디서 일어난 일인가요?</p> 
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서">
+        <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
+        <textarea class="scenario-input" v-model="scenarioKeyword.event"
+            placeholder="외계인을 만나 당황했지만 재밌게 놀았던 이야기"></textarea>
         <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
+        </div>
       </div>
       <ToolScenarioExample></ToolScenarioExample>
     </div>
@@ -46,7 +51,7 @@
       </div>
       <div class="tool-right">
         <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
-          :viewFinalScenario="this.finalScenario" :gpt="this.gpt"></ToolMenu>
+          :viewFinalScenario="this.finalScenario" :gpt="this.gpt" :pageList="this.pageList"></ToolMenu>
       </div>
     </div>
   </div>
@@ -213,14 +218,12 @@ export default {
 
 </script>
 <style scoped>
-textarea {
-  resize: none;
-  border: 1px solid #dfdfdf;
+button, textarea, input[type=text] {
+  transition: all ease-in 0.3s;
 }
-
 .tool {
   width: 100%;
-height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -230,17 +233,19 @@ height: 100vh;
 
 .tool-header {
   width: 100%;
+  height: 5vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tool-content {
-  height: 100%;
+  height: 90vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color:#F7F7F7;
 }
 
 .tool-left {
@@ -251,6 +256,9 @@ height: 100vh;
 .tool-center {
   height: 100%;
   width: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tool-right {
@@ -261,51 +269,63 @@ height: 100vh;
 .scenario-form {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 53%;
   align-items: center;
   justify-content: center;
 }
-
-.scenario-input {
-  width: 250px;
-}
-
-/*
-.scenario-content {
-    width: 60%;
-} */
 
 .tool-scenario {
   display: flex;
   flex-direction: row;
   width: 90%;
-  margin-top: 30px;
+}
+.scenario-input-form>p {
+  width: 100%;
+  margin-bottom: 5px;
+  margin-top: 20px;
+  /* font-weight: bold; */
+}
+
+h3 {
+  font-weight: bold;
+  color: #2f66ff;
+  text-shadow: 2px 2px 2px #d3d3d3;
 }
 
 .scenario-input {
-  width: 350px;
+  width: 100%;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.scenario-input:focus {
+  box-shadow: 0px 0px 5px #cacaca;
+  background-color: none;
+  background-position: 2%;
 }
 
 .submit-btn {
+  margin-top: 15px;
   width: 50%;
   padding: 5px 10px;
   border: none;
   background-color: #ccc;
   font-weight: bold;
   color: #353535;
+  border-radius: 3px;
 }
 .submit-btn:hover{
   opacity: 0.7;
 }
 
 .scenario-btn {
-  width: 50%;
   display: flex;
-  justify-content: space-around;
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  height: 100%;
+  width: 80%;
+  align-items: center;
+  justify-content: space-evenly;
+  padding-bottom: 5%;
 }
 
 .scenario-btn>button {
@@ -326,9 +346,28 @@ height: 100vh;
   opacity: 0.7;
 }
 
-.center {
-  display: flex;
-  align-items: center;
+
+textarea {
+  resize: none;
+  border: 1px solid #dfdfdf;
+  padding: 2px 7px;
+}
+
+textarea::-webkit-scrollbar {
+  width: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: rgb(223, 223, 223);
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+textarea::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0px 0px 5px white;
 }
 
 </style>

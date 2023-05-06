@@ -16,7 +16,7 @@
     <div class="mypage-main">
       <div class="mypage-wallet">
         <div class="point-wallet">
-          <h1>보유 엽전 : {{ pointTotal }} 개</h1>
+          보유 엽전 : {{ pointTotal }} 개
           <button @click="pointReturn(pointTotal*-1)" class="point-returnbtn">환급하기</button>
         </div>
       </div>
@@ -36,13 +36,17 @@
       </div>
     </div>
   </div>
+  
 </div>
   </template>
+  
 <script>
+
 import axios from 'axios';
 
   export default {
     data () {
+      
     return {
       detailsResult: [],
       fade: false,
@@ -56,6 +60,7 @@ import axios from 'axios';
       tab: "PointCharge",
     }
   },
+  
   computed: {
     component() {
       const tab = this.tab;
@@ -103,10 +108,15 @@ import axios from 'axios';
           });  
         }
       },
+
+      
     },
     created () {
       this.getDetails()
-    }
+      //alert(window.location.search)
+      //history.replaceState({}, null, location.pathname);
+    },
+    
   }
 </script>
 <style scoped>
@@ -130,48 +140,73 @@ import axios from 'axios';
     .mypage-header{
       height: 80px;
       margin: 10px;
-      background:rgba(200, 200, 200, 0.6);  
+      background:rgba(210, 210, 210, 0.6);  
       display: flex;
       align-items: center;
       justify-content: space-around;
     }
     .mypage-side{
       width:300px; 
-      height: 620px; 
-      background:rgba(235, 235, 235, 0.6);  
+      height: 720px; 
+      background:rgba(210, 210, 210, 0.6);  
       padding:40px 0; 
       overflow: hidden;
       display: flex;
       flex-direction: column;
       margin: 0 0 10px 10px;
+      border-radius: 15px;
     }
     .side-link{
       text-decoration:none;
       color:black;
     }
     .mypage-side ul {padding: 0 30px;}
-    .mypage-side ul li {
-        font-size:25px;
-        height:75px;
-        list-style:none;
-        font-weight:bold;
+    .mypage-side li {
+      font-size:25px;
+      height:75px;
+      list-style:none;
+      font-weight:bold;
+      background-color: orange;
+      border-radius: 15px;
+      margin: 5%;
     }
+    .mypage-side a{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+      
+    }
+    .mypage-side a:hover{
+      background-color: yellow;
+      color:black;
+    }
+    .mypage-side li:nth-child(4){
+      background-color: yellow;
+      color:black;
+    }
+  
     .mypage-wallet{
       width: 100%;
       height: 100px;
-      background:rgba(235, 235, 235, 0.6); 
+      background:rgba(210, 210, 210, 0.6);    
       overflow: hidden;
       display: flex;
       margin: 5px 10px 10px 0;
+      border-radius: 15px;
+      color: black;
     }
     .mypage-content{
       width: 100%;
-      height: 510px;
-      background:rgba(235, 235, 235, 0.6); 
+      height: 610px;
+      background:rgba(233, 233, 233, 0.6);
       padding:20px; 
       overflow: hidden;
       display: flex;
       margin: 5px 10px 10px 0;
+      border-radius: 15px;
     }
     .point-wallet{
       margin: auto;
@@ -180,13 +215,16 @@ import axios from 'axios';
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid gray;
+      background-color: orange;
       border-radius: 10px;
+      font-weight:bold;
+      font-size: 30px;
     }
+    
     .point-content{
       width: 100%;
       height: 100%;
-      border: 1px solid gray; 
+      border-radius: 15px;
     }
     .point-button{
       margin: 3%;
@@ -195,10 +233,29 @@ import axios from 'axios';
       width: 20%;
       height: 70px;
       font-weight: bold;
-      font-size: large;
+      font-size: 25px;
+      border-radius: 10px;
+      border-width: 0;
+      margin: 1%;
+      background-color:orange;
+    }
+    .point-button button:focus{
+      background-color: yellow;
+    }
+    .point-button button:hover{
+      background-color: yellow;
     }
     .point-returnbtn{
-      margin-left: 20px;
+      width: 15%;
+      height: 70%;
+      margin-left: 5%;
+      font-weight: bold;
+      font-size: 22px;
+      border-radius: 10px;
+      border-width: 0;
+    }
+    .point-returnbtn:hover{
+      background-color: yellow;
     }
 
 </style>

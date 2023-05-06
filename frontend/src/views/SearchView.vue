@@ -4,7 +4,7 @@
       <ul>
         <li v-for="result in searchResults" :key="result.bookId">
           <router-link :to="{ path: `/detail/${result.bookId}` }" class="book-link">
-              <img src="@/assets/book.png" class="book-image">
+              <img src="@/assets/bookDummies/book.png" class="book-image">
               <p class="book-title"> {{ result.bookName }} </p>
           </router-link>
       </li>

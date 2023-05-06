@@ -18,24 +18,27 @@
 <style scoped>
 .tab button {
   background-color: white;
-  border: 1px white;
+  border: none;
   font-size: 30px;
-  margin-right: 15%;
+  color: #333;
+  flex-grow: 1;
+  border-radius: 15px;
+  padding: 10px 20px;
 }
 .tab button:last-child {
   margin-right: 0;
   margin-left: 0;
 }
 .tab button.active {
-  color: green;
+  color: white;
+  background: #4aaee2;
 }
 .tab{
-  margin: 10px;
-  border: 4px solid #d3cccc;
   display: flex;
   justify-content: center;
-  margin: 10px;
+  margin: 20px 10px;
   text-align: center;
+
 }
 .tab-content{
   background-color: rgba(202, 179, 175, 0.203);
@@ -44,24 +47,24 @@
 
 <script>
 import GoingTool from '../components/GoingTool.vue';
-import RecommendationSort from '../components/RecommendationSort.vue';
+// import RecommendationSort from '../components/RecommendationSort.vue';
 import PopularitySort from '../components/PopularitySort.vue';
 
 export default {
   name: "Tab",
   components: {
     GoingTool,
-    RecommendationSort,
+  //  RecommendationSort,
     PopularitySort
   },
   data() {
     return {
       currentTab: null,
       tabList: [
-        { name: "인기순", component: "PopularitySort" },
-        { name: "추천순", component: "RecommendationSort" },
-        { name: "만들어보기", component: "GoingTool" },
-      ],
+        { name: "🔥인기순", component: "PopularitySort" },
+        { name: "🆕최신순", component: "PopularitySort" },
+        { name: "🛠️만들어보기", component: "GoingTool" },
+      ]
     };
   },
   created() {

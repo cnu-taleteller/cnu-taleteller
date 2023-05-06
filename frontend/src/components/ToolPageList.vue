@@ -110,6 +110,7 @@ export default {
     },
     saveSession() {
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageList));
+      // this.$emit('pageList', this.pageList);
     }
     // deletePage(item, index) {
     //   this.items.splice(index, 1);

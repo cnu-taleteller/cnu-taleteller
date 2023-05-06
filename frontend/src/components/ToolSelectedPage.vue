@@ -269,6 +269,8 @@ export default {
       caption.top = addDiv.style.top;
       this.canvas();
     },
+    // node_modules 폴더 안에 html2canvas.js 
+    // 5766번째 줄: img.src = /^data:image/.test(src) ? src : src + '?' + new Date().getTime(); 로 수정
     canvas() {
       try {
         const imageArea = this.$refs.dragImage;
@@ -444,8 +446,18 @@ export default {
           const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
           cloneImageElement.style.left = "0px";
           cloneImageElement.style.top = "0px";
-          cloneImageElement.style.width = dragImageWidth;
-          cloneImageElement.style.height = dragImageHeight;
+          if(dragImageWidth > 800) {
+            cloneImageElement.style.width = dragImageWidth;
+          } 
+          else {
+            cloneImageElement.style.width = "800px";
+          }
+          if(dragImageHeight > 550){
+            cloneImageElement.style.height = dragImageHeight;
+          }
+          else {
+            cloneImageElement.style.height = "550px";
+          }
           cloneImageElement.style.position = "absolute";
           cloneImageElement.style.zIndex = 1;
           let newImage = {

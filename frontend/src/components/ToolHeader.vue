@@ -67,7 +67,7 @@ export default {
      
       const screenWidth = window.screen.width;
       const screenHeight = window.screen.height;
-      const windowWidth = 800;
+      const windowWidth = 810;
       const windowHeight = 600;
       const left = (screenWidth - windowWidth) / 2;
       const top = (screenHeight - windowHeight) / 2;
@@ -89,16 +89,16 @@ export default {
             display: flex;
             align-items: center;
             justify-content: center;
-
-            // position: fixed;
-            // bottom: 20px;
-            // left: 50%;
-            // transform: translateX(-50%);
-            z-index: 2;
+            position: relative;
+            z-index: 3;
           }
           #list-wrapper{
             width: 100%;
             height: 94%;
+          }
+          #list {
+            width: 800px;
+            height: 500px;
           }
           button {
             margin-left: 10px;
@@ -178,13 +178,21 @@ export default {
           const imageEle = newWindow.document.createElement('img');
           imageEle.src = image.fileId;
           imageEle.id = image.id;
-          imageEle.style.left = image.style.left;
-          imageEle.style.top = image.style.top;
-          imageEle.style.left = `calc(${image.style.left} + 50px)`;
-          imageEle.style.top = `calc(${image.style.top} + 50px)`;
+          if (image.id.includes("background")) {
+            imageEle.style.left = 0;
+            imageEle.style.top = 0;
+            imageEle.style.width = '100%';
+            imageEle.style.height = '100%';
+          }
+          else {
+            imageEle.style.left = image.style.left;
+            imageEle.style.top = image.style.top;
+            imageEle.style.left = `calc(${image.style.left} + 50px)`;
+            imageEle.style.top = `calc(${image.style.top} + 50px)`;
+            imageEle.style.width = image.style.width;
+            imageEle.style.height = image.style.height;
+          }
           imageEle.style.position = image.style.position;
-          imageEle.style.width = image.style.width;
-          imageEle.style.height = image.style.height;
           imageEle.setAttribute('draggable', 'false');
           imageEle.style.zIndex = 1;
           list.appendChild(imageEle);
@@ -217,6 +225,7 @@ export default {
 <style scoped>
 .header {
   width: 100%;
+  height: 100%;
   /* background-color: #6CC4F0;  */
   background-color: #bce9ff;
   border: 1px solid rgb(231, 231, 231);

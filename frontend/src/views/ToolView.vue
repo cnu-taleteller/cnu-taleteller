@@ -51,7 +51,7 @@
       </div>
       <div class="tool-right">
         <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
-          :viewFinalScenario="this.finalScenario" :gpt="this.gpt"></ToolMenu>
+          :viewFinalScenario="this.finalScenario" :gpt="this.gpt" :pageList="this.pageList"></ToolMenu>
       </div>
     </div>
   </div>
@@ -233,6 +233,7 @@ button, textarea, input[type=text] {
 
 .tool-header {
   width: 100%;
+  height: 10%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,6 +325,7 @@ h3 {
   width: 80%;
   align-items: center;
   justify-content: space-evenly;
+  padding-bottom: 5%;
 }
 
 .scenario-btn>button {

@@ -225,7 +225,8 @@ export default {
 <style scoped>
 .header {
   width: 100%;
-  height: 100%;
+  height: 5vh;
+  /* height: 100%; */
   /* background-color: #6CC4F0;  */
   background-color: #bce9ff;
   border: 1px solid rgb(231, 231, 231);
@@ -243,9 +244,10 @@ export default {
 }
 
 .book-name-input {
+  height: 4vh;
   border: none;
   outline: none;
-  font-size: large;
+  font-size: 15px;
   font-weight: bold;
   border-bottom: 2px solid gray;
   background-color: #bce9ff;
@@ -260,7 +262,7 @@ export default {
 }
 
 .header-btn {
-  width: 25px;
+  width: 20px;
 }
 
 .header-btn:hover {

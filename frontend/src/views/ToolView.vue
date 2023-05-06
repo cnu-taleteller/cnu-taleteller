@@ -223,7 +223,7 @@ button, textarea, input[type=text] {
 }
 .tool {
   width: 100%;
-  height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -233,14 +233,14 @@ button, textarea, input[type=text] {
 
 .tool-header {
   width: 100%;
-  height: 10%;
+  height: 5vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tool-content {
-  height: 100%;
+  height: 90vh;
   width: 100%;
   display: flex;
   align-items: center;

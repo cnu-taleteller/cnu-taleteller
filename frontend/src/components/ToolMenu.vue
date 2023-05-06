@@ -600,7 +600,8 @@ button {
   border-radius: 3px;
 }
 .menu {
-  height: 100%;
+  /* height: 100%; */
+  height: 90vh;
   background-color: white;
   border-left: 1px solid #dfdfdf;
 }
@@ -649,7 +650,8 @@ input[type=file]::file-selector-button:hover {
 .menu-form {
   padding-top: 20px;
   overflow-y: scroll;
-  height: 90vh;
+  /* height: 90vh; */
+  height: 80vh;
 }
 
 .menu-form::-webkit-scrollbar {
@@ -715,7 +717,8 @@ input[type=file]::file-selector-button:hover {
 }
 .scenario-form2 {
   width: 100%;
-  height: 90vh;
+  /* height: 90vh; */
+  height: 80vh;
 }
 
 .scenario-form2 > p {

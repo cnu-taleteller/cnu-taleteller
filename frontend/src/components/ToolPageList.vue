@@ -125,7 +125,8 @@ export default {
   align-items: center;
   justify-content: center;
   border-right: 1px solid #dfdfdf;
-  height: 100%;
+  /* height: 100%; */
+  height: 90vh;
 }
 
 .page-all {

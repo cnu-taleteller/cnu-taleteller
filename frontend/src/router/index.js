@@ -6,8 +6,10 @@ import MyPageWork from '../views/MypageViewWork.vue'
 import MyPagePoint from '../views/MypageViewPoint.vue'
 import MyPageChargeResult from '../views/MypageViewChargeResult.vue'
 import ToolSubmitView from '../views/ToolSubmitView.vue'
-import SearchView from "../views/SearchView.vue";
-import BookDetailView from "../views/BookDetailView.vue";
+//import SearchView from "../views/SearchView.vue";
+import DummySearchView from "../views/DummySearchView.vue";
+import DummyDetailView from "../views/DummyDetailView.vue";
+//import BookDetailView from "../views/BookDetailView.vue";
 import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
 
@@ -47,20 +49,20 @@ const routes = [
   {
     path: '/search',
     name: 'Search',
-    component: SearchView
+    component: DummySearchView
   },
   {
     path: '/detail/:id',
     name: 'BookDetail',
-    component: BookDetailView
+    component: DummyDetailView
   },
   {
-    path: '/LoginView',
+    path: '/loginview',
     name: 'LoginView',
     component: LoginView
   },
   {
-    path: '/SignupView',
+    path: '/signupview',
     name: 'SignupView',
     component: SignupView
   },

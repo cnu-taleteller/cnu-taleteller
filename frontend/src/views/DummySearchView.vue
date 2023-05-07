@@ -1,15 +1,6 @@
 <template>
   <div class="container">
-    <div class="book-dummies" v-if="projectTitle">
-      <div class="wrapper" @click="goToDetail(10)">
-        <img src="@/assets/bookDummies/book.png" :alt="projectTitle">
-        <div>
-          <p>{{ projectTitle }}</p>
-          <button>#동화</button>
-        </div>
-      </div>
-    </div>
-    <div v-for="(bookDummy, index) in bookDummies" :key="index" class="book-dummies">
+    <div v-for="(bookDummy, index) in filteredBookDummies" :key="index" class="book-dummies">
       <div class="wrapper" @click="goToDetail(bookDummy.id)">
         <img :src="require(`@/assets/bookDummies/${bookDummy.image}`)" :alt="bookDummy.title">
         <div>
@@ -25,23 +16,35 @@
 export default {
   data() {
     return {
-      bookDummies: [
-        { id: 1, title: '양치질은 싫어요', image: 'book1.jpg' },
-        { id: 2, title: '수탉과 돼지', image: 'book2.png' },
-        { id: 3, title: '나도 편식할 거야', image: 'book3.jpg' },
-        { id: 4, title: '또박또박 읽고 써요', image: 'book4.jpg' },
-        { id: 5, title: '회사에 다녀요', image: 'book5.jpg' },
-        { id: 6, title: '오래 친구들', image: 'book6.jpg' },
-        { id: 7, title: '그림 형제', image: 'book7.jpg' },
-        { id: 8, title: '못난이 아기 잠자리', image: 'book8.jpg' },
-        { id: 9, title: '미녀와 야수', image: 'book9.jpg' },
-      ],
-      projectTitle: null
+      bookDummies: [],
+      searchType: "",
+      searchKeyword: "",
     }
   },
   created() {
-    sessionStorage.setItem('bookDummies', JSON.stringify(this.bookDummies));
-    this.projectTitle = sessionStorage.getItem('projectTitle');
+    this.bookDummies = JSON.parse(sessionStorage.getItem('bookDummies'));
+    const query = this.$route.query;
+    this.searchType = query.searchType;
+    this.searchKeyword = query.searchKeyword;
+  },
+  computed: {
+    filteredBookDummies() {
+      if (this.searchType === "name") {
+        return this.bookDummies.filter((bookDummy) =>
+            bookDummy.title.includes(this.searchKeyword)
+        );
+      } else if (this.searchType === "title") {
+        return this.bookDummies.filter((bookDummy) =>
+            bookDummy.title.includes(this.searchKeyword)
+        );
+      } else if (this.searchType === "content") {
+        return this.bookDummies.filter((bookDummy) =>
+            bookDummy.category.includes(this.searchKeyword)
+        );
+      } else {
+        return this.bookDummies;
+      }
+    },
   },
   methods: {
     goToDetail(id) {

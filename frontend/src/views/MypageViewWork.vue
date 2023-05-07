@@ -62,10 +62,11 @@ export default {
       ]
     }
   },
-  methods: {
-    getSessionStorage() {
-      var workname = sessionStorage.getItem("projectTitle");
-      return workname;
+    methods: {
+      getSessionStorage(){
+        var workname = sessionStorage.getItem("bookName");
+        return workname;
+      },
     },
   },
   created() {

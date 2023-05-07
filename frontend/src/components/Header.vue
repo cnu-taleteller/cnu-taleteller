@@ -2,7 +2,6 @@
     <header>
         <div class="bar">
           <h1 id="logo"><a href="/" class="logo"><img src="@/assets/logo.png"></a></h1>
-            </div>
             <div class="member" v-if="isLoggedIn">
                 <a href="/mypage/pointmanage">마이페이지</a>
                 <a href="/" @click="logout">로그아웃</a>
@@ -11,7 +10,7 @@
                 <a href="/loginview">로그인</a>
                 <a href="/signupview">회원가입</a>
             </div>
-        </div>
+          </div>
     </header>
 </template>
 

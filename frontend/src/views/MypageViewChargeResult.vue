@@ -50,25 +50,28 @@ export default {
 </script>
 <style scoped>
   .chargeResult-all{
-    width: 50%;
+    width: 40%;
     height: 100%;
-    background-color: gainsboro;
+    /* background-color: gainsboro; */
     margin:auto;
+    /* display: flex;
     align-items: center;
-    justify-content: center;
-    border-radius: 25px;
-    padding: 3%;
-    margin-top: 2%;
-    margin-bottom: 2%;
+    justify-content: center; */
+    /* border-radius: 25px; */
+    border: 2px solid #ccc;
+    margin-top: 20px;
+    /* padding: 3%; */
+   
+    /* margin-bottom: 2%;  */
   }
   .chargeResult-all ul{
     margin-right: 5%;
   }
   .chargeResult-all li{
-    font-size:25px;
+    /* font-size:25px; */
     height:75px;
     list-style:none;
-    font-weight:bold;
+    /* font-weight:bold; */
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -76,22 +79,25 @@ export default {
   }
   .chargeResult-main{
     width: 100%;
+    height: 400px;
     background:rgba(235, 235, 235, 0.6); 
-    overflow: hidden;
+    /* overflow: hidden; */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 25px;
+    
+    /* border-radius: 25px;
     padding-top: 7%;
     padding-bottom: 1%;
-    margin-bottom: 5%;
+    margin-bottom: 5%; */
   }
   .chargeResult-main li:nth-child(1){
-    font-size:30px;
+    font-size: 20px;
+    font-weight: bold;
     width: 90%;
-    margin: auto;
-    background-color: white;
-    border-radius: 20px;
+    /* margin: auto; */
+    /* background-color: white; */
+    /* border-radius: 20px; */
     margin-bottom: 5%;
   }
   .chargeResult-btn{
@@ -102,19 +108,20 @@ export default {
   }
   .chargeResult-btn button{
     width:100%;
-    height: 70px;
+    height: 50px;
     margin: 5%;
-    font-size: 22px;
-    border-radius: 10px;
-    border-width: 0;
-    background-color:orange;
-    color:white;
-    font-weight: bold;
+    /* font-size: 22px; */
+    border-radius: 3px;
+    background-color:#ccc;
+    border: none;
+    /* color:white; */
+    /* font-weight: bold; */
   }
 
   .chargeResult-btn button:hover{
-    color:black;
-    background-color: yellow;
+    opacity: 0.7;
+    /* color:black; */
+    /* background-color: yellow; */
   }
 
 

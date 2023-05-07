@@ -1,23 +1,23 @@
 <template>
   <div class="book" v-if="bookDummy">
-    <div class="book-detail" v-if="bookName">
+    <div class="book-detail" v-if="$route.path === '/detail/1'">
       <div class="book-image">
         <img src="@/assets/bookDummies/book.png" :alt="bookName">
       </div>
       <div class="book-info">
-        <!-- 이름이랑 설명은 세션에 저장되지 않아서 우선 비워 뒀습니다 -->
         <h1>{{ bookName }}</h1>
         <p>설명</p>
         {{ bookDescription }}
       </div>
     </div>
-    <div class="book-detail">
+    <div class="book-detail" v-else>
       <div class="book-image">
         <img :src="require(`@/assets/bookDummies/${bookDummy.image}`)" :alt="bookDummy.title">
       </div>
       <div class="book-info">
         <h1>{{ bookDummy.title }}</h1>
         <p>설명</p>
+        {{ bookDummy.description }}
       </div>
     </div>
     <div class="book-button">
@@ -32,9 +32,9 @@
       </form>
       <ul class="reply-list">
         <li v-for="reply in replies" :key="reply.id" class="reply-item">
-          <div class="reply-author">이름</div>
+          <div class="reply-author">{{ reply.userEmail }}</div>
           <div class="reply-content">{{ reply.content }}</div>
-          <div class="reply-time">{{ currentTime }}</div>
+          <div class="reply-time">{{ reply.time }}</div>
         </li>
       </ul>
     </div>
@@ -49,30 +49,36 @@ export default {
       bookDummy: null,
       bookName: null,
       bookDescription: null,
-      recommendCount: 0,
+      recommendCount: null,
       replies: [],
       newReply: '',
-      currentTime: new Date().toLocaleString()
+      userEmail: null
     };
   },
   created() {
     const bookDummies = JSON.parse(sessionStorage.getItem('bookDummies'));
     const id = this.$route.params.id;
     this.bookDummy = bookDummies.find(book => book.id === Number(id));
-    const bookWithId10 = bookDummies.find(book => book.id === 10);
-    this.bookName = bookWithId10.title;
-
-    setInterval(() => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      this.currentTime = `${hours}:${minutes}:${seconds}`;
-    }, 1000);
+    this.bookName = sessionStorage.getItem('bookName');
+    this.bookDescription = sessionStorage.getItem('bookDescription');
+    this.userEmail = sessionStorage.getItem('user');
+    this.recommendCount = JSON.parse(sessionStorage.getItem('recommendCount')) || 0;
 
     const savedReplies = JSON.parse(sessionStorage.getItem('replies'));
     if (savedReplies) {
       this.replies = savedReplies;
+    }
+  },
+  computed: {
+    currentTime() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hour = date.getHours().toString().padStart(2, '0');
+      const minute = date.getMinutes().toString().padStart(2, '0');
+      const second = date.getSeconds().toString().padStart(2, '0');
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
   },
   methods: {
@@ -83,7 +89,9 @@ export default {
       const newId = this.replies.length + 1;
       this.replies.push({
         id: newId,
-        content: this.newReply
+        userEmail: this.userEmail,
+        content: this.newReply,
+        time: this.currentTime
       });
       this.newReply = '';
       sessionStorage.setItem('replies', JSON.stringify(this.replies));
@@ -97,8 +105,9 @@ export default {
         this.recommendCount++;
         sessionStorage.setItem('recommend', true);
       }
-    },
-  }
+      sessionStorage.setItem('recommendCount', JSON.stringify(this.recommendCount));
+    }
+  },
 }
 </script>
 

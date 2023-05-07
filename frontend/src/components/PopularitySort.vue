@@ -1,15 +1,6 @@
 <template>
   <div class="container">
-    <div class="book-dummies" v-if="bookName">
-      <div class="wrapper" @click="goToDetail(10)">
-        <img src="@/assets/bookDummies/book.png" :alt="bookName">
-        <div>
-          <p>{{ bookName }}</p>
-          <button>#동화</button>
-        </div>
-      </div>
-    </div>
-    <div v-for="(bookDummy, index) in bookDummies" :key="index" class="book-dummies">
+    <div v-for="(bookDummy, index) in bookDummies" :key="index" class="book-dummies" v-if="bookDummy.title !== null">
       <div class="wrapper" @click="goToDetail(bookDummy.id)">
         <img :src="require(`@/assets/bookDummies/${bookDummy.image}`)" :alt="bookDummy.title">
         <div>
@@ -26,17 +17,19 @@ export default {
   data() {
     return {
       bookDummies: [
-        { id: 1, title: '양치질은 싫어요', image: 'book1.jpg' },
-        { id: 2, title: '수탉과 돼지', image: 'book2.png' },
-        { id: 3, title: '나도 편식할 거야', image: 'book3.jpg' },
-        { id: 4, title: '또박또박 읽고 써요', image: 'book4.jpg' },
-        { id: 5, title: '회사에 다녀요', image: 'book5.jpg' },
-        { id: 6, title: '오래 친구들', image: 'book6.jpg' },
-        { id: 7, title: '그림 형제', image: 'book7.jpg' },
-        { id: 8, title: '못난이 아기 잠자리', image: 'book8.jpg' },
-        { id: 9, title: '미녀와 야수', image: 'book9.jpg' },
+        { id: 1, title: sessionStorage.getItem('bookName'), image: 'book.png', description: sessionStorage.getItem('bookDescription')},
+        { id: 2, title: '양치질은 싫어요', image: 'book1.jpg', description: '설명' },
+        { id: 3, title: '수탉과 돼지', image: 'book2.png', description: '설명' },
+        { id: 4, title: '나도 편식할 거야', image: 'book3.jpg', description: '설명' },
+        { id: 5, title: '또박또박 읽고 써요', image: 'book4.jpg', description: '설명' },
+        { id: 6, title: '회사에 다녀요', image: 'book5.jpg', description: '설명' },
+        { id: 7, title: '오래 친구들', image: 'book6.jpg', description: '설명' },
+        { id: 8, title: '그림 형제', image: 'book7.jpg', description: '설명' },
+        { id: 9, title: '못난이 아기 잠자리', image: 'book8.jpg', description: '설명' },
+        { id: 10, title: '미녀와 야수', image: 'book9.jpg', description: '설명' }
       ],
-      bookName: null
+      bookName: null,
+      bookDescription: null
     }
   },
   created() {

@@ -36,7 +36,7 @@ export default {
 </script>
 <style scoped>
 .example-scenario {
-    width: 45%;
+    width: 50%;
     border-left: 2px dashed #aaaaaa;
     padding-left: 5%;
     display: flex;

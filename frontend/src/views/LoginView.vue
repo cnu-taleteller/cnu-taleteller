@@ -64,7 +64,7 @@ export default {
       console.log(response.data);
       sessionStorage.setItem('user', this.memberEmail);
       console.log(sessionStorage.getItem('user'));
-      this.$router.push("/"); // 리다이렉트할 경로
+      window.location.href = "/"; // 리다이렉트할 경로
     } else {
       alert("로그인에 실패하였습니다.\n아이디 비밀번호 확인 후 다시 진행해주세요.");
       this.$router.go();

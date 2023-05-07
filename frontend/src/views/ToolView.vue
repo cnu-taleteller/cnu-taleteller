@@ -26,14 +26,14 @@
         </p>
         <div class="scenario-input-form">
         <p>1. 주인공은 누구인가요?</p>
-        <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가">
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="백설공주가">
         <p>2. 언제 일어난 일인가요?</p>
-        <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에">
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="옛날 옛적에">
         <p>3. 어디서 일어난 일인가요?</p> 
         <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서">
         <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
         <textarea class="scenario-input" v-model="scenarioKeyword.event"
-            placeholder="외계인을 만나 당황했지만 재밌게 놀았던 이야기"></textarea>
+            placeholder="마녀가 준 사과를 먹고 쓰러졌고, 일어나보니 인어 공주가 있어서 인어 공주랑 재밌게 논 이야기"></textarea>
         <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
         </div>
       </div>
@@ -269,7 +269,7 @@ button, textarea, input[type=text] {
 .scenario-form {
   display: flex;
   flex-direction: column;
-  width: 53%;
+  width: 50%;
   align-items: center;
   justify-content: center;
 }

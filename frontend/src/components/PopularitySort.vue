@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <div class="book-dummies" v-if="projectTitle">
+    <div class="book-dummies" v-if="bookName">
       <div class="wrapper" @click="goToDetail(10)">
-        <img src="@/assets/bookDummies/book.png" :alt="projectTitle">
+        <img src="@/assets/bookDummies/book.png" :alt="bookName">
         <div>
-          <p>{{ projectTitle }}</p>
+          <p>{{ bookName }}</p>
           <button>#동화</button>
         </div>
       </div>
@@ -36,12 +36,12 @@ export default {
         { id: 8, title: '못난이 아기 잠자리', image: 'book8.jpg' },
         { id: 9, title: '미녀와 야수', image: 'book9.jpg' },
       ],
-      projectTitle: null
+      bookName: null
     }
   },
   created() {
     sessionStorage.setItem('bookDummies', JSON.stringify(this.bookDummies));
-    this.projectTitle = sessionStorage.getItem('projectTitle');
+    this.bookName = sessionStorage.getItem('bookName');
   },
   methods: {
     goToDetail(id) {

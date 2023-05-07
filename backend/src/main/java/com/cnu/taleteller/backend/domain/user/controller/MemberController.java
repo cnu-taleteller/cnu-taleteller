@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -33,10 +34,22 @@ public class MemberController {
 
     @PostMapping("/login")
     @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
-    public Boolean login(@RequestBody Map<String, String> loginInfo) {
+    public Boolean login(@RequestBody Map<String, String> loginInfo, HttpSession session) {
         String memberEmail = loginInfo.get("memberEmail");
         String memberPassword = loginInfo.get("memberPassword");
 
+        try {
+            UserDetails member = memberDetailsService.loadUserByUsername(memberEmail);
+            session.setAttribute("user", memberEmail);
+            return true;
+        } catch (UsernameNotFoundException e) {
+            return false; // 해당 이메일을 가진 회원이 존재하지 않음
+        }
+    }
+    @PostMapping("/checkemail")
+    @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
+    public Boolean checkemail(@RequestBody Map<String, String> loginInfo) {
+        String memberEmail = loginInfo.get("memberEmail");
         try {
             UserDetails member = memberDetailsService.loadUserByUsername(memberEmail);
             return true;

@@ -27,16 +27,16 @@ public class File {
     @Column(length = 100)
     private String fileOriginName;
 
-    @ManyToOne
-    @JoinColumn(name = "bookId")
-    private Book bookId;
+//    @ManyToOne
+//    @JoinColumn(name = "bookId")
+//    private Book bookId;
 
     @Builder
-    public File(Long fileId, String fileName, String fileSize, String fileOriginName, Book bookId) {
+    public File(Long fileId, String fileName, String fileSize, String fileOriginName) {
         this.fileId = fileId;
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileOriginName = fileOriginName;
-        this.bookId = bookId;
+//        this.bookId = bookId;
     }
 }

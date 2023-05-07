@@ -1,60 +1,57 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-      <ToolHeader :viewFinalScenario="this.finalScenario"
-      :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
+      <!-- 전체 페이지 리스트 전달 -->
+      <ToolHeader :pageList="this.pageList" :toolState="this.toolState" :currentPageList="this.currentPageList" :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
       <div class="scenario-btn">
-        <button @click="selectScenarioMenu('gpt')">시나리오 추천 받기</button>
-        <button @click="selectScenarioMenu('write')">시나리오 직접 쓰기</button>
+        <button @click="selectScenarioMenu('gpt')">
+          <img src="@/assets/book1.png" width="200">
+          <p>시나리오 추천 받기</p>
+        </button>
+        <button @click="selectScenarioMenu('write')">
+          <img src="@/assets/book2.png" width="200">
+          <p>시나리오 직접 쓰기</p>
+        </button>
       </div>
     </div>
     <!-- gpt가 쓰는 시나리오 -->
     <div v-else-if="toolState === 'gpt'" class="tool-content tool-scenario">
       <div class="scenario-form">
-        <h4>시나리오</h4>
-        <p>키워드를 입력하세요.
-          <br>키워드는 변경 불가능하니 신중하게 적어주세요!
+        <h3>시나리오 추천 받기</h3>
+        <p>키워드를 입력하세요 ✏️
           <br>사건은 구체적이게 적을수록 좋습니다!
         </p>
-        <p>누가: <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가"></p>
-        <p>언제: <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에"></p>
-        <p>어디서: <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서"></p>
-        <p>사건: <textarea class="scenario-input" v-model="scenarioKeyword.event"
-            placeholder="외계인을 만나 당황했지만 재밌게 노는 어린이 이야기"></textarea></p>
-        <button class="submit-btn" @click="setScenario()">시나리오 받아보기</button>
-      </div>
-      <ToolScenarioExample></ToolScenarioExample>
-    </div>
-    <!-- 내가 쓰는 시나리오 -->
-    <div v-else-if="toolState === 'write'" class="tool-content">
-      <div class="scenario-form">
-        <h4>시나리오</h4>
-        <p>시나리오를 입력해주세요.</p>
-        <p class="center">도입: <textarea class="scenario-input" v-model="write1"></textarea></p>
-        <p class="center">전개: <textarea class="scenario-input" v-model="write2"></textarea></p>
-        <p class="center">위기: <textarea class="scenario-input" v-model="write3"></textarea></p>
-        <p class="center">결말: <textarea class="scenario-input" v-model="write4"></textarea></p>
-        <div>
-          <button @click="saveScenario()">시나리오 저장</button>
-          <button @click="goTool()">나중에 쓸게요</button>
+        <div class="scenario-input-form">
+        <p>1. 주인공은 누구인가요?</p>
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="짱구가">
+        <p>2. 언제 일어난 일인가요?</p>
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="주말 아침에">
+        <p>3. 어디서 일어난 일인가요?</p> 
+        <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서">
+        <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
+        <textarea class="scenario-input" v-model="scenarioKeyword.event"
+            placeholder="외계인을 만나 당황했지만 재밌게 놀았던 이야기"></textarea>
+        <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
         </div>
       </div>
+      <ToolScenarioExample></ToolScenarioExample>
     </div>
     <!-- 툴 -->
     <div v-else class="tool-content">
       <div class="tool-left">
-        <ToolPageList @currentPageList="handlePageList"></ToolPageList>
+        <!-- currentPageList 에 handlePageList 메서드로 툴 페이지리스트 컴포넌트에서 $emit으로 받은 pageList(index) 를 넣음, pageList 변경시 -> 썸네일 변경시 새로운 데이터를 전달 -->
+        <ToolPageList @currentPageList="handleCurrentPageList" @pageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-          <!--emit데이터 받아오기 위해서 변수 추가를 하였습니다 -->
-          <ToolSelectedPage @change="change" @textareaValueChanged="textareaValueChanged" :currentPageList="this.currentPageList" ></ToolSelectedPage>
+        <!-- toolSelectedPage에 값을 전달해줌 -->
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu @selectedMenu="handleSelectedMenu"  :currentPageList="this.currentPageList"
-          :viewFinalScenario="this.finalScenario" :gpt="this.gpt"></ToolMenu>
+        <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
+          :viewFinalScenario="this.finalScenario" :gpt="this.gpt" :pageList="this.pageList"></ToolMenu>
       </div>
     </div>
   </div>
@@ -83,46 +80,16 @@ export default {
         event: null
       },
       resultScenario: [], // [도입][전개] 등 태그 전체 있는 배열
-      finalScenario: [], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
+      finalScenario: [[],[],[],[],[]], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
 
       // 직접 쓸 때 기승전결 받기
       write1: null,
       write2: null,
       write3: null,
       write4: null,
-      
       selectedMenu : '',
-
-      // 현재 선택한 페이지
-      currentPageList: {
-          pageId : 1, // 작품마다 페이지 고유한 번호
-          pageStatus: 1, // 페이지 있으면 1, 삭제하면 0
-          // 자막 관련
-          caption : {
-              size: 10,
-              content: null,
-              location: null,
-              isTextAreaVisible: false,
-          },
-          thumbnail: null,
-          // 페이지 안에 있는 파일들(레이어)
-          layerList : [
-              {
-                  id : 'item',
-                  layerId : '0',
-                  fileId : '/images/field.png',
-                  menu: 'background',
-                  draggable : 'true',
-                  style : {
-                      width: '1200px', // 가로사이즈
-                      height: '800px', // 세로사이즈
-                      left : "0px", // x 좌표
-                      top : "0px", // y 좌표
-                      position : "absolute",
-                  },
-              },
-          ]
-      },
+      currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
+      pageList: [],
       bookId: null, // 작품 번호
     }
   },
@@ -137,24 +104,34 @@ export default {
       this.setScenarioArr();
     }
   },
+  mounted() {
+    window.addEventListener('beforeunload', this.unLoadEvent);
+  },
+  beforeUnmount() {
+    window.removeEventListener('beforeunload', this.unLoadEvent);
+  },
   components: {
     ToolHeader: toolHeader,
     ToolPageList: toolPageList,
     ToolSelectedPage: toolSelectedPage,
     ToolLayer: toolLayer,
     ToolMenu: toolMenu,
-    ToolScenarioExample: toolScenarioExample
+    ToolScenarioExample: toolScenarioExample,
   },
   methods: {
-    textareaValueChanged(newValue){
-      this.currentPageList.caption.content=newValue;
-    },
-    change(){
-      this.currentPageList.caption.isTextAreaVisible=true;
-    },
-    handlePageList(currentPageList) {
+    // 새로고침 방지
+    unLoadEvent(event) {
+      if (this.isLeaveSite) return;
+      event.preventDefault();
+      event.returnValue = '';
+    }, 
+    handleCurrentPageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
+    handlePageList(pageList) {
+      this.pageList = pageList;
+    },
+    //매개변수로 selectedMenu (ex) background, character 를 받아서 data에 있는 this.selectedMenu에 넣어주눈 부분
     handleSelectedMenu(selectedMenu) {
       this.selectedMenu = selectedMenu;
     },
@@ -162,25 +139,20 @@ export default {
       this.toolState = arg;
       sessionStorage.setItem('toolState', arg);
     },
-    saveScenario() {
-      if (this.write1 == null || this.write2 == null || this.write3 == null || this.write4 == null) {
-        alert('빈 내용을 다 채워주세요!');
-        return;
-      }
-      else {
-        this.resultScenario = '[도입]' + this.write1 + '[전개]' + this.write2 + '[위기]' + this.write3 + '[결말]' + this.write4;
-        sessionStorage.setItem('scenario', this.resultScenario);
-        this.setScenarioArr();
-        console.log(this.finalScenario);
-        alert('시나리오가 저장되었습니다!');
-      }
-      this.goTool();
-    },
     goTool() {
       sessionStorage.removeItem('toolState');
       this.toolState = null;
     },
-    setScenario() {
+    setGptScenario() {
+      const who = this.scenarioKeyword.who;
+      const when = this.scenarioKeyword.when;
+      const where = this.scenarioKeyword.where;
+      const event = this.scenarioKeyword.event;
+
+      if (who == null || when == null || where == null || event == null) {
+        alert('빈 내용을 다 채워주세요!');
+        return;
+      }
       sessionStorage.setItem('scenarioKeyword', JSON.stringify(this.scenarioKeyword));
       this.gpt = true;
       this.goTool();
@@ -190,10 +162,10 @@ export default {
           "model": "gpt-3.5-turbo",
           "messages": [{
             "role": "user",
-            "content": `누가: ${this.scenarioKeyword.who},
-                        언제: ${this.scenarioKeyword.when}, 
-                        어디서: ${this.scenarioKeyword.where},
-                        사건: ${this.scenarioKeyword.event}
+            "content": `누가: ${who},
+                        언제: ${when}, 
+                        어디서: ${where},
+                        사건: ${event}
                         라는 내용을 가진 동화책을 '도입/전개/위기/결말' 로 나눠서 써줘.
                         내용을 나눌 때 형식은 
                         [도입] 내용
@@ -211,10 +183,12 @@ export default {
         }
       )
         .then((res) => {
-          console.log(res.data.choices[0].message.content);
+          // console.log(res.data.choices[0].message.content);
           this.resultScenario = res.data.choices[0].message.content;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
+          console.log(this.finalScenario);
+          this.gpt = false;
         })
         .catch((err) => {
           this.gpt = false;
@@ -235,42 +209,43 @@ export default {
         } else {
           end = scenario.length;
         }
-        this.finalScenario.push(scenario.slice(start, end).replace(section, '').trim());
+        this.finalScenario[0][index] = scenario.slice(start, end).replace(section, '').trim();
       });
-    }
+    },
   },
 }
 
 
 </script>
 <style scoped>
-textarea {
-  resize: none;
+button, textarea, input[type=text] {
+  transition: all ease-in 0.3s;
 }
-
 .tool {
   width: 100%;
-  height: 100%;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color:#F7F7F7;
 }
 
 .tool-header {
-  height: 10%;
   width: 100%;
+  height: 5vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tool-content {
-  height: 90%;
+  height: 90vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color:#F7F7F7;
 }
 
 .tool-left {
@@ -281,6 +256,9 @@ textarea {
 .tool-center {
   height: 100%;
   width: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tool-right {
@@ -291,57 +269,105 @@ textarea {
 .scenario-form {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 53%;
   align-items: center;
   justify-content: center;
 }
-
-.scenario-input {
-  width: 250px;
-}
-
-/*
-.scenario-content {
-    width: 60%;
-} */
 
 .tool-scenario {
   display: flex;
   flex-direction: row;
   width: 90%;
-  margin-top: 30px;
+}
+.scenario-input-form>p {
+  width: 100%;
+  margin-bottom: 5px;
+  margin-top: 20px;
+  /* font-weight: bold; */
+}
+
+h3 {
+  font-weight: bold;
+  color: #2f66ff;
+  text-shadow: 2px 2px 2px #d3d3d3;
 }
 
 .scenario-input {
-  width: 350px;
+  width: 100%;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.scenario-input:focus {
+  box-shadow: 0px 0px 5px #cacaca;
+  background-color: none;
+  background-position: 2%;
 }
 
 .submit-btn {
+  margin-top: 15px;
   width: 50%;
+  padding: 5px 10px;
+  border: none;
+  background-color: #ccc;
+  font-weight: bold;
+  color: #353535;
+  border-radius: 3px;
+}
+.submit-btn:hover{
+  opacity: 0.7;
 }
 
 .scenario-btn {
-  width: 50%;
   display: flex;
-  justify-content: space-around;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  height: 100%;
+  width: 80%;
+  align-items: center;
+  justify-content: space-evenly;
+  padding-bottom: 5%;
 }
 
 .scenario-btn>button {
-  width: 250px;
-  height: 250px;
-  border: 1px solid grey;
-}
-
-.scenario-btn>button:hover {
-  background-color: rgb(181, 181, 181);
+  width: 300px;
+  height: 300px;
+  border-radius: 20px;
   border: none;
+  padding-top: 20px;
+  background-color: #dfdfdf;
+}
+.scenario-btn>button>p {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(50, 50, 50);
+  margin-top: 20px;
+}
+.scenario-btn>button:hover {
+  opacity: 0.7;
 }
 
-.center {
-  display: flex;
-  align-items: center;
-}</style>
+
+textarea {
+  resize: none;
+  border: 1px solid #dfdfdf;
+  padding: 2px 7px;
+}
+
+textarea::-webkit-scrollbar {
+  width: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: rgb(223, 223, 223);
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+textarea::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0px 0px 5px white;
+}
+
+</style>

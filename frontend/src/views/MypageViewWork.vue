@@ -13,14 +13,34 @@
         </ul>
       </div>
       <div class="mypage-main">
-        <div class="mypage-search">
-          <input type="text" class="search-bar">
-          <input type="submit" value="검색" class="search-btn">
-          <select class="sort-dropdown">
-            <option>최신순</option>
-            <option>추천순</option>
-            <option>결제순</option>
-          </select>
+      <div class="mypage-search">
+        <input type="text" class="search-bar">
+        <input type="submit" value="검색" class="search-btn">
+        <select class="sort-dropdown">
+          <option>최신순</option>
+          <option>추천순</option>
+          <option>결제순</option>        
+        </select>
+      </div>
+      <div class="mypage-content"> 
+        <div class="thumbnail">
+            <table>
+                <thead>
+                    <tr>
+                        <td>
+                            <!--동화책 썸네일 대체-->
+                            <!-- <img src assets/logo.png'> -->
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {{getSessionStorage()}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="mypage-content">
           <div class="thumbnail">
@@ -46,6 +66,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 <script>
 export default {
@@ -62,12 +83,12 @@ export default {
       ]
     }
   },
-  methods: {
-    getSessionStorage() {
-      var workname = sessionStorage.getItem("projectTitle");
-      return workname;
+    methods: {
+      getSessionStorage(){
+        var workname = sessionStorage.getItem("bookName");
+        return workname;
+      },
     },
-  },
   created() {
   }
 }

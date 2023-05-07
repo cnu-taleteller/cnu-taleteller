@@ -2,11 +2,11 @@
     <div class="book">
         <div class="book-detail">
             <div class="book-image">
-                <img src="@/assets/book.png" class="book-image">
+                <img src="@/assets/bookDummies/book.png" class="book-image">
             </div>
             <div class="book-info">
                 <h1>{{ book && book.bookName }}</h1>
-                <p>저자: 테스트</p>
+                <p>{{ author }}</p>
                 <p>소개: {{ book && book.bookDescription }}</p>
                 <p>추천 수: {{ book && book.bookRecommend }}</p>
             </div>

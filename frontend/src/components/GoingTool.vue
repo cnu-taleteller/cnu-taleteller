@@ -4,22 +4,22 @@
     <hr>
     <div class="column">
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
       <p></p>
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
       <p></p>
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
       <p></p>
       <div class="column-icon">
-        <img src="@/assets/book.png">
+        <img src="@/assets/bookDummies/book.png">
         <small>미완성작품리스트</small>
       </div>
     </div>
@@ -34,6 +34,8 @@ export default {
     },
     // 새로 만드는 작품일 때, session에 toolState new 해줘야 시나리오 진입함
     makeNewBook(){
+      // 임시 book_id
+      sessionStorage.setItem('book_id', 1);
       sessionStorage.setItem('toolState', 'new');
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('bookName');
@@ -44,7 +46,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .container h1 a {
   color: black;
   text-decoration: none;

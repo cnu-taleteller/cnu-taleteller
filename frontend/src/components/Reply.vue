@@ -52,7 +52,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .reply {
     border: 1px solid #ccc;
     padding: 20px;

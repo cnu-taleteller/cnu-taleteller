@@ -18,31 +18,13 @@
 export default {
   data() {
     return {
-      searchType: "",
-      searchKeyword: "",
-      canSearch: false,
       isLoggedIn: false,
     };
-  },
-  computed: {
-    canSubmit() {
-      return this.searchType !== "" && this.searchKeyword !== "";
-    },
   },
   mounted() {
     this.checkLoginStatus();
   },
   methods: {
-    search() {
-      if (!this.canSubmit) {
-        alert("검색어를 입력해주세요.");
-        return;
-      }
-      this.$router.push({
-        path: "/search",
-        query: { searchType: this.searchType, searchKeyword: this.searchKeyword },
-      });
-    },
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem("user") !== null;
     },
@@ -50,14 +32,6 @@ export default {
       sessionStorage.removeItem("user");
       this.isLoggedIn = false;
       window.location.href = "/";
-    },
-  },
-  watch: {
-    searchType() {
-      this.canSearch = true;
-    },
-    searchKeyword() {
-      this.canSearch = true;
     },
   },
 };

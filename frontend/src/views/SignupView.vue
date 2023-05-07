@@ -89,10 +89,10 @@
         }
       },
       signup() {
-        if (!this.isSingupEnabled) {
-        return;
-      }
-      const memberAccount = this.accountPart1;
+        // if (!this.isSingupEnabled) {
+        //   return;
+        // }
+        const memberAccount = this.accountPart1;
 
         axios.post("/api/member/signup", {
           memberEmail: this.memberEmail,
@@ -103,9 +103,13 @@
         })
         .then(response => {
             console.log("성공했습니다");
+            alert("회원가입 성공! 로그인 후 이용해주세요!");
+            this.$router.push('/');
+
             this.memberInfo = response.data; // 반환된 데이터를 변수에 저장
         })
         .catch(error => {
+            alert("회원가입 실패");
             console.log("실패했습니다");
             console.log(error);
         });

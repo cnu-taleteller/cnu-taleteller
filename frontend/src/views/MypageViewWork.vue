@@ -29,7 +29,7 @@
                     <tr>
                         <td>
                             <!--동화책 썸네일 대체-->
-                            <!-- <img src assets/logo.png'> -->
+                            <img src='@/assets/book1.png'>
                         </td>
                     </tr>
                 </thead>
@@ -41,27 +41,6 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <div class="mypage-content">
-          <div class="thumbnail">
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <!--동화책 썸네일 대체-->
-                    <img src='../assets/logo.png'>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    {{ getSessionStorage() }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>

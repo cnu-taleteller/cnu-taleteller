@@ -4,7 +4,7 @@
           <h1 id="logo"><a href="/" class="logo"><img src="@/assets/logo.png"></a></h1>
             <div class="member" v-if="isLoggedIn">
                 <a href="/mypage/pointmanage">마이페이지</a>
-                <a href="/" @click="logout">로그아웃</a>
+                <button @click="logout()">로그아웃</button>
             </div>
             <div class="member" v-else>
                 <a href="/loginview">로그인</a>
@@ -29,7 +29,7 @@ export default {
       return this.searchType !== "" && this.searchKeyword !== "";
     },
   },
-  created() {
+  mounted() {
     this.checkLoginStatus();
   },
   methods: {
@@ -49,6 +49,7 @@ export default {
     logout() {
       sessionStorage.removeItem("user");
       this.isLoggedIn = false;
+      window.location.href = "/";
     },
   },
   watch: {
@@ -93,6 +94,7 @@ export default {
   margin-bottom: 2.5vh;
 }
 
+.member button,
 .member a {
     display: inline-block;
     padding: 0 16px;
@@ -100,7 +102,8 @@ export default {
     font-size: 16px;
     font-weight: bold;
     color: #333;
+    background-color : white;
     transition: background-color 0.3s ease;
+    border: none;
 }
-
 </style>

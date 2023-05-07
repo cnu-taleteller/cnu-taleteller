@@ -514,7 +514,7 @@ export default {
 </script>
 <style scoped>
 .selected-page-form {
-  width: 100%;
+  width: 900px;
   height: 550px;
   display: flex;
   justify-content: center;

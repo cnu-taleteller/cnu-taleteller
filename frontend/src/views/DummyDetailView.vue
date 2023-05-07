@@ -1,13 +1,14 @@
 <template>
   <div class="book" v-if="bookDummy">
-    <div class="book-detail" v-if="projectTitle">
+    <div class="book-detail" v-if="bookName">
       <div class="book-image">
-        <img src="@/assets/bookDummies/book.png" :alt="projectTitle">
+        <img src="@/assets/bookDummies/book.png" :alt="bookName">
       </div>
       <div class="book-info">
         <!-- 이름이랑 설명은 세션에 저장되지 않아서 우선 비워 뒀습니다 -->
-        <h1>{{ projectTitle }}</h1>
+        <h1>{{ bookName }}</h1>
         <p>설명</p>
+        {{ bookDescription }}
       </div>
     </div>
     <div class="book-detail">
@@ -46,7 +47,8 @@ export default {
   data() {
     return {
       bookDummy: null,
-      projectTitle: null,
+      bookName: null,
+      bookDescription: null,
       recommendCount: 0,
       replies: [],
       newReply: '',
@@ -58,7 +60,8 @@ export default {
     const id = this.$route.params.id;
     this.bookDummy = bookDummies.find(book => book.id === Number(id));
     const bookWithId10 = bookDummies.find(book => book.id === 10);
-    this.projectTitle = bookWithId10.title;
+    this.bookName = bookWithId10.title;
+
     setInterval(() => {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, '0');

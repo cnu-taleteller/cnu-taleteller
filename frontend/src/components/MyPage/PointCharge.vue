@@ -36,7 +36,6 @@
 <script>
 import axios from "axios"
 import { loadTossPayments } from '@tosspayments/payment-sdk'
-var clientKey = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq'
 
 export default {
   props: {
@@ -45,6 +44,7 @@ export default {
   data() {
     return {
       kakaopayUrl: "",
+      clientKey: process.env.VUE_APP_CHARGE_KEY
     }
   },
   methods: {
@@ -71,7 +71,7 @@ export default {
         paymentMethod: method,
       });
 
-      loadTossPayments(clientKey).then(tossPayments => {
+      loadTossPayments(this.clientKey).then(tossPayments => {
         tossPayments.requestPayment(method, {
           amount: 10000,
           orderId: 'xnDIqpt7Dlfdtd99WwXgu',

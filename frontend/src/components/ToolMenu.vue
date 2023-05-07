@@ -299,7 +299,7 @@ export default {
       this.flowMenu = true;
       let len = this.pageList.length;
 
-      if(len < 4) {
+      if(len < 3) {
         alert('3페이지 이상 작업하셔야 흐름을 파악할 수 있습니다!');
         this.flowMenu = false;
         return;

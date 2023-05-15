@@ -1,11 +1,12 @@
 package com.cnu.taleteller.backend.domain.book.dto;
 
 import com.cnu.taleteller.backend.domain.book.domain.Book;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -16,9 +17,7 @@ public class BookDto {
 
     private String bookName;
 
-    private Timestamp bookRegdate;
-
-    private String bookSize;
+    private LocalDateTime bookRegdate;
 
     private String bookDescription;
 
@@ -30,28 +29,14 @@ public class BookDto {
 
     private String bookPublic;
 
-    public Book toEntity() {
-        return Book.builder()
-                .bookId(this.bookId)
-                .bookName(this.bookName)
-                .bookRegdate(this.bookRegdate)
-                .bookSize(this.bookSize)
-                .bookDescription(this.bookDescription)
-                .bookStatus(this.bookStatus)
-                .bookCategory(this.bookCategory)
-                .bookRecommend(this.bookRecommend)
-                .bookPublic(this.bookPublic)
-                .build();
-    }
+    private Long memberId;
 
     public static BookDto fromEntity(Book book) {
         BookDto bookDto = new BookDto();
         bookDto.setBookRecommend(book.getBookRecommend());
-
         bookDto.setBookId(book.getBookId());
         bookDto.setBookName(book.getBookName());
         bookDto.setBookRegdate(book.getBookRegdate());
-        bookDto.setBookSize(book.getBookSize());
         bookDto.setBookDescription(book.getBookDescription());
         bookDto.setBookStatus(book.getBookStatus());
         bookDto.setBookCategory(book.getBookCategory());

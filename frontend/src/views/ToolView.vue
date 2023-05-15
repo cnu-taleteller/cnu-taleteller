@@ -137,6 +137,12 @@ export default {
     },
     selectScenarioMenu(arg) {
       this.toolState = arg;
+      if(arg === 'write'){
+        sessionStorage.setItem('select',true); // 임시 저장, 제출에 필요한 데이터
+      }
+      else{
+        sessionStorage.setItem('select',false);
+      }
       sessionStorage.setItem('toolState', arg);
     },
     goTool() {

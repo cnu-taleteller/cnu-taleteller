@@ -11,12 +11,4 @@ public class ToolService {
 
     private final ToolRepository toolRepository;
 
-    public void saveTool(String name, int age) {
-
-        Tool tool = new Tool();
-        tool.setName(name);
-        tool.setAge(age);
-
-        toolRepository.save(tool);
-    }
 }

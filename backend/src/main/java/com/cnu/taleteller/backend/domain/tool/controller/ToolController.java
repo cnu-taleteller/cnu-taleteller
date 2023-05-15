@@ -1,29 +1,33 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
+import com.cnu.taleteller.backend.domain.tool.domain.Scenario;
 import com.cnu.taleteller.backend.domain.tool.service.FileService;
+import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tool")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ToolController {
 
-//    private final ScenarioService scenarioService;
+    private final ScenarioService scenarioService;
 
     private final FileService fileService;
 
     private final ToolService toolService;
 
-    @GetMapping(value = "/save")
-    public void test(@RequestParam String name, @RequestParam int age) {
-        toolService.saveTool(name, age);
-        System.out.println("ok");
+    @PostMapping("/scenario/{bookId}")
+    public List<Scenario> saveScenario(@RequestBody String[] scenario, @PathVariable Long bookId){
+        List<Scenario> list = scenarioService.save(scenario, bookId);
+        return list;
     }
 
     @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

@@ -9,20 +9,26 @@ import lombok.*;
 @NoArgsConstructor
 public class ScenarioDto {
 
-    private Long scenarioId;
-
     private String scenarioContent;
 
     private String scenarioType;
 
-    private Long bookId;
+    private Book book;
+
+
+    @Builder
+    public ScenarioDto(String scenarioContent, String scenarioType, Book book) {
+        this.scenarioContent = scenarioContent;
+        this.scenarioType = scenarioType;
+        this.book = book;
+    }
 
     public Scenario toEntity() {
         return Scenario.builder()
-                .scenarioId(this.scenarioId)
                 .scenarioContent(this.scenarioContent)
                 .scenarioType(this.scenarioType)
-                .bookId(Book.builder().bookId(this.bookId).build())
+                .book(book)
                 .build();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
+import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.domain.Member;
 import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
@@ -8,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +35,7 @@ public class MemberService implements UserDetailsService {
                 .memberPhone(infoDto.getMemberPhone())
                 .memberAccount(infoDto.getMemberAccount()).build()).getMemberId();
     }
+
 //    public String login(MemberInfoDto memberDto) {
 //        Member member = memberRepository.findByMemberEmail(memberDto.getMemberEmail());
 //        if (member == null) {

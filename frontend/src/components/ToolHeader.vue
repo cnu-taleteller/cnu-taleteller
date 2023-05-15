@@ -10,7 +10,7 @@
     </div>
     <div class="header-menu" v-if="toolState!='new' && toolState !='gpt'">
       <button @click="preview()">미리보기</button>
-      <button @click="save()">임시저장</button>
+      <button @click="saveTmp()">임시저장</button>
       <button @click="saveBook()">제출</button>
     </div>
   </div>
@@ -22,9 +22,11 @@ export default {
   data() {
     return {
       isPreviewDialogVisible: false,
-      bookName: "",
+      bookName: null,
       pop: null,
       edit: false,
+      bookId: null,
+      finalScenario: []
     };
   },
   props: {
@@ -37,29 +39,96 @@ export default {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
+    if(sessionStorage.getItem('bookId')){
+      this.bookId = sessionStorage.getItem('bookId');
+    }
   },
   methods: {
     editBookName() {
       this.edit = !!!this.edit;
     },
+    // 제출
     saveBook() {
+      // 시나리오 선택되어야 진행
+      const select = sessionStorage.getItem('select');
+      console.log(select);
+      if(!select || select=='false'){
+        alert('시나리오 선택 후 진행해주세요');
+        return;
+      } 
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('scenarioKeyword');
       sessionStorage.setItem('bookName', this.bookName);
       this.$router.push('/ToolSubmit');
     },
-    save() {
-      axios.post('/api/tool/pages', this.pageList, {
-        headers: {
-          'Content-Type': 'application/json'
+    // 임시 저장
+    async saveTmp() {
+      const select = sessionStorage.getItem('select');
+      if(!select || select=='false'){
+        alert('시나리오 선택 후 진행해주세요');
+        return;
+      }
+      else {
+        // 최초 저장
+        if(this.bookId==null) {
+          await axios.post("/api/book/", {
+            bookName: this.bookName,
+            bookStatus: "temp",
+            email: sessionStorage.getItem('user')
+          })
+          .then((res)=> {
+            console.log(res.data.bookId);
+            this.bookId = res.data.bookId;
+            sessionStorage.setItem('bookId', this.bookId);
+            this.saveScenario();
+            alert('임시저장 완료');
+          })
+          .catch((err) => {
+            console.error(err);
+            alert('임시저장 실패');
+          })
         }
-      })
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => {
-          console.error(error)
-        });
+        else {
+          // 이미 bookId 있을 때
+          await axios.post("/api/book/" + this.bookId, {
+            bookName: this.bookName,
+            bookStatus: "temp",
+          })
+          .then((res) => {
+              console.log(res);
+              this.saveScenario();
+              alert('임시저장 완료');
+          })
+          .catch((error) => {
+              console.log(error);
+              alert('임시저장 실패');
+          });
+        }
+      }
+    },
+    async saveScenario(){
+      const resultScenario = sessionStorage.getItem('scenario');
+      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
+      const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
+      sections.forEach((section, index) => {
+        const scenario = resultScenario;
+        const start = scenario.indexOf(section);
+        let end;
+
+        if (index < sections.length - 1) {
+          end = scenario.indexOf(sections[index + 1]);
+        } else {
+          end = scenario.length;
+        }
+        this.finalScenario[index] = scenario.slice(start, end).replace(section, '').trim();
+      });
+      await axios.post("/api/tool/scenario/"+this.bookId, this.finalScenario)
+      .then((res) => {
+              console.log(res);
+          })
+          .catch((error) => {
+              console.log(error);
+      });
     },
     //미리보기 클릭시 새창을 띄우고 작품썸네일을 보여준다.
     preview() {

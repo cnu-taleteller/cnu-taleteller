@@ -26,12 +26,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/test")
-    public String test(@RequestBody Map<String, String> params) {
-        System.out.println("vue 통신 성공 " + params.get("data"));
-        return "ok";
-    }
-
     @GetMapping("")
     public List<UserResponseDto> getAllUsers() {
         List<User> userList = userService.findAllUsers();
@@ -39,20 +33,5 @@ public class UserController {
                 .map(UserResponseDto::new)
                 .collect(Collectors.toList());
         return userResponseDtoList;
-    }
-
-    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String addPhoto(@RequestParam("image") MultipartFile img) {
-        UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + "_" + img.getOriginalFilename();
-        String path = "D:/project/cnu-taleteller/frontend/public/images/";
-        Path imagePath = Paths.get(path + imageFileName);
-        try {
-            Files.write(imagePath, img.getBytes());
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        System.out.println(img.getOriginalFilename());
-        return imageFileName;
     }
 }

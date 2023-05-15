@@ -26,15 +26,18 @@ public class Scenario {
 
     @ManyToOne
     @JoinColumn(name = "bookId")
-    private Book bookId;
+    private Book book;
 
     @Builder
-    public Scenario(Long scenarioId, String scenarioContent, String scenarioType, Book bookId) {
+    public Scenario(Long scenarioId, String scenarioContent, String scenarioType, Book book) {
         this.scenarioId = scenarioId;
         this.scenarioContent = scenarioContent;
         this.scenarioType = scenarioType;
-        this.bookId = bookId;
+        this.book = book;
     }
 
-
+    public void update(String scenarioContent, String scenarioType) {
+        this.scenarioContent = scenarioContent;
+        this.scenarioType = scenarioType;
+    }
 }

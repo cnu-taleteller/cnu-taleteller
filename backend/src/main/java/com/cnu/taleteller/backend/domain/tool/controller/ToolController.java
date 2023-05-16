@@ -1,7 +1,6 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
 import com.cnu.taleteller.backend.domain.tool.service.FileService;
-import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ToolController {
 
-    private final ScenarioService scenarioService;
+//    private final ScenarioService scenarioService;
+
     private final FileService fileService;
 
 //    private final ScenarioService scenarioService;

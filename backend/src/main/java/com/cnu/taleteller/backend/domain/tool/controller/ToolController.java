@@ -2,7 +2,10 @@ package com.cnu.taleteller.backend.domain.tool.controller;
 
 import com.cnu.taleteller.backend.domain.tool.service.FileService;
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
+<<<<<<< HEAD
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
+=======
+>>>>>>> parent of 5b82b09 (Merge pull request #71 from dwtopzz/KJW)
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +21,7 @@ public class ToolController {
     private final ScenarioService scenarioService;
     private final FileService fileService;
 
+<<<<<<< HEAD
 //    private final ScenarioService scenarioService;
 
     private final ToolService toolService;
@@ -27,6 +31,8 @@ public class ToolController {
         toolService.saveTool(name, age);
         System.out.println("ok");
     }
+=======
+>>>>>>> parent of 5b82b09 (Merge pull request #71 from dwtopzz/KJW)
 
     @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> saveImage(@RequestParam("image") MultipartFile img, @RequestParam("menu") String menu) {

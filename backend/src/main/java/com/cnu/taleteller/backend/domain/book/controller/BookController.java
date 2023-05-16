@@ -2,37 +2,21 @@ package com.cnu.taleteller.backend.domain.book.controller;
 
 import com.cnu.taleteller.backend.domain.book.domain.Book;
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
-import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.service.BookService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/api/book")
-@RequiredArgsConstructor
 public class BookController {
 
-    private final BookService bookService;
-
-    @PostMapping("/")
-    public ResponseEntity<Book> save(@RequestBody BookTempSaveDto dto) {
-        Book book = bookService.saveBook(dto);
-        System.out.println(book);
-
-        return new ResponseEntity<>(book, HttpStatus.OK);
-    }
-
-    @PostMapping("/{bookId}")
-    public ResponseEntity<Book> update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) {
-        Book book = bookService.updateBook(dto, bookId);
-        System.out.println(book);
-
-        return new ResponseEntity<>(book, HttpStatus.OK);
-    }
+    @Autowired
+    private BookService bookService;
 
     @GetMapping("/search")
     public ResponseEntity<List<Book>> search(@RequestParam String searchType, @RequestParam String searchKeyword) {

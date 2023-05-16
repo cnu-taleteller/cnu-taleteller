@@ -34,8 +34,9 @@ export default {
     },
     // 새로 만드는 작품일 때, session에 toolState new 해줘야 시나리오 진입함
     makeNewBook(){
+      // 임시 book_id
+      sessionStorage.setItem('book_id', 1);
       sessionStorage.setItem('toolState', 'new');
-      sessionStorage.removeItem('bookId');
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('bookName');
       sessionStorage.removeItem("projectTitle");

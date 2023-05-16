@@ -1,25 +1,19 @@
 package com.cnu.taleteller.backend.domain.book.service;
 
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
-import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.domain.Book;
-import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
-import com.cnu.taleteller.backend.domain.user.domain.Member;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class BookService {
 
-    private final BookRepository bookRepository;
-    private final MemberRepository memberRepository;
+    @Autowired
+    private BookRepository bookRepository;
 
     public List<Book> searchByTitle(String keyword) {
         return bookRepository.findByBookNameContaining(keyword);
@@ -34,27 +28,11 @@ public class BookService {
     }
 
     public Book getBookByBookId(Long bookId) {
-        Book book = bookRepository.findByBookId(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("err"));
-        return book;
+        return bookRepository.findByBookId(bookId);
     }
 
-    public Book saveBook(BookTempSaveDto dto) {
-        Member member = memberRepository.findByMemberEmail(dto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("err"));
-        dto.setMember(member);
-        Book book = bookRepository.save(dto.toEntity());
-        return book;
-    }
-
-    @Transactional
-    public Book updateBook(BookTempSaveDto dto, Long bookId) {
-        Book optionalBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("err"));
-
-        Book book = optionalBook;
-        book.update(bookId, dto.getBookName(), dto.getBookStatus());
-        return bookRepository.save(book);
+    public void saveBook(Book book) {
+        bookRepository.save(book);
     }
 
     @Transactional

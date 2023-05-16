@@ -1,13 +1,11 @@
 package com.cnu.taleteller.backend.domain.book.domain;
 
-import com.cnu.taleteller.backend.domain.user.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Entity
 @Getter
@@ -22,9 +20,10 @@ public class Book {
     @Column(length = 100)
     private String bookName;
 
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime bookRegdate;
+    private Timestamp bookRegdate;
+
+    @Column(length = 10)
+    private String bookSize;
 
     @Column(columnDefinition = "TEXT")
     private String bookDescription;
@@ -40,21 +39,17 @@ public class Book {
     @Column(length = 1)
     private String bookPublic;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
-
     @Builder
-    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, Member member) {
+    public Book(Long bookId, String bookName, Timestamp bookRegdate, String bookSize, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookRegdate = bookRegdate;
+        this.bookSize = bookSize;
         this.bookDescription = bookDescription;
         this.bookStatus = bookStatus;
         this.bookCategory = bookCategory;
         this.bookRecommend = bookRecommend;
         this.bookPublic = bookPublic;
-        this.member = member;
     }
 
     public void incrementRecommend() {
@@ -63,15 +58,5 @@ public class Book {
         this.bookName = bookName;
         this.bookDescription = bookDescription;
         // 로그인 기능 되면 사용자 이름도 추가
-    }
-
-    public void update(Long bookId, String bookName, String bookStatus){
-        this.bookId = bookId;
-        this.bookName = bookName;
-        this.bookStatus = bookStatus;
-    }
-
-    public Book(Long bookId) {
-        this.bookId = bookId;
     }
 }

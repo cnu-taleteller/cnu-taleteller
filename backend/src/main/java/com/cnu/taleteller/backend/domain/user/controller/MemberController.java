@@ -1,10 +1,8 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
-import com.cnu.taleteller.backend.domain.user.domain.Member;
 import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
 import com.cnu.taleteller.backend.domain.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,6 +31,7 @@ public class MemberController {
         return null;
     }
 
+
     @PostMapping("/login")
     @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
     public Boolean login(@RequestBody Map<String, String> loginInfo, HttpSession session) {
@@ -48,7 +46,6 @@ public class MemberController {
             return false; // 해당 이메일을 가진 회원이 존재하지 않음
         }
     }
-
     @PostMapping("/checkemail")
     @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
     public Boolean checkemail(@RequestBody Map<String, String> loginInfo) {

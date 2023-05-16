@@ -1,11 +1,9 @@
 package com.cnu.taleteller.backend.domain.book.repository;
 
 import com.cnu.taleteller.backend.domain.book.domain.Book;
-import com.cnu.taleteller.backend.domain.user.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
@@ -16,7 +14,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByBookDescriptionContaining(String keyword);
 
-    Optional<Book> findByBookId(Long bookId);
+    Book findByBookId(Long bookId);
 
     Book save(Book book);
 }

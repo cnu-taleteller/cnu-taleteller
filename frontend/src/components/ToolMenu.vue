@@ -292,8 +292,7 @@ export default {
     // 최종 선택
     setScenario() {
       this.selectScenario = this.finalScenario[this.scenarioNum];
-      this.select = true; // 임시 저장, 제출에 필요한 데이터
-      sessionStorage.setItem('select',true);
+      this.select = true;
     },
     // 기승전결 흐름 파악
     checkFlow(arg){

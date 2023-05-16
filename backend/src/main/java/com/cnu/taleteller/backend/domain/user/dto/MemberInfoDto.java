@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 public class MemberInfoDto {
 //    private int id;
     private String memberEmail;

@@ -22,12 +22,15 @@ public class FileDto {
 
     private String fileOriginName;
 
+//    private Long bookId;
+
     public File toEntity(){
         return File.builder()
                 .fileId(this.fileId)
                 .fileName(this.fileName)
                 .fileSize(this.fileSize)
                 .fileOriginName(this.fileOriginName)
+//                .bookId(Book.builder().bookId(this.bookId).build())
                 .build();
     }
 }

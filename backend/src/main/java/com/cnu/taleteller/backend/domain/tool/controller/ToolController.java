@@ -1,12 +1,7 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
 import com.cnu.taleteller.backend.domain.tool.service.FileService;
-<<<<<<< HEAD
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
-=======
-import com.cnu.taleteller.backend.domain.tool.service.ToolService;
->>>>>>> parent of 547d202 (Add DB save module (scenario, book))
-=======
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,16 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ToolController {
 
-<<<<<<< HEAD
     private final ScenarioService scenarioService;
     private final FileService fileService;
 
-=======
-=======
->>>>>>> parent of 547d202 (Add DB save module (scenario, book))
 //    private final ScenarioService scenarioService;
-
-    private final FileService fileService;
 
     private final ToolService toolService;
 
@@ -38,7 +27,6 @@ public class ToolController {
         toolService.saveTool(name, age);
         System.out.println("ok");
     }
->>>>>>> parent of 547d202 (Add DB save module (scenario, book))
 
     @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> saveImage(@RequestParam("image") MultipartFile img, @RequestParam("menu") String menu) {

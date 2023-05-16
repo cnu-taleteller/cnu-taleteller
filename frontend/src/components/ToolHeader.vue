@@ -153,6 +153,8 @@ export default {
         `;
       newWindow.document.head.innerHTML = `
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap');
+        
           #button-wrapper {
             width: 100%;
             display: flex;
@@ -180,6 +182,10 @@ export default {
             background-color: #ccc;
             border:none;
           }
+
+          body {
+  font-family: 'IBM Plex Sans KR', Avenir, Helvetica, Arial, sans-serif;
+}
       
         </style>
         `;
@@ -256,8 +262,6 @@ export default {
           else {
             imageEle.style.left = image.style.left;
             imageEle.style.top = image.style.top;
-            imageEle.style.left = `calc(${image.style.left} + 50px)`;
-            imageEle.style.top = `calc(${image.style.top} + 50px)`;
             imageEle.style.width = image.style.width;
             imageEle.style.height = image.style.height;
           }
@@ -274,8 +278,6 @@ export default {
         const divEle = newWindow.document.createElement('div');
         divEle.style.left = caption.left;
         divEle.style.top = caption.top;
-        divEle.style.left = `calc(${divEle.style.left} + 50px)`;
-        divEle.style.top = `calc(${divEle.style.top} + 50px)`;
         divEle.style.width = caption.width;
         divEle.style.height = caption.height;
         divEle.style.fontWeight = "bold";

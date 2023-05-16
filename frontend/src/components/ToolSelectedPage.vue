@@ -20,10 +20,10 @@
         <div id="popupMenu"
           style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
           <ul class="file-order-form">
-            <li class="file-order"><a @click="next(thisObjId)">앞으로</a></li>
-            <li class="file-order"><a @click="back(thisObjId)">뒤로</a></li>
-            <li class="file-order"><a @click="frontmost(thisObjId)">제일 앞으로</a></li>
-            <li class="file-order"><a @click="lastBack(thisObjId)">제일 뒤로</a></li>
+            <li class="file-order"><a @click="next(thisObjId)" data-obj-type="popupMenu">앞으로</a></li>
+            <li class="file-order"><a @click="back(thisObjId)" data-obj-type="popupMenu">뒤로</a></li>
+            <li class="file-order"><a @click="frontmost(thisObjId)" data-obj-type="popupMenu">제일 앞으로</a></li>
+            <li class="file-order"><a @click="lastBack(thisObjId)" data-obj-type="popupMenu">제일 뒤로</a></li>
           </ul>
         </div>
       </div>
@@ -48,6 +48,7 @@ export default {
       fontSize: 20,
       inputValue: false,
       currentColor: '#000000',
+      result: null,
     }
   },
   mounted() {
@@ -106,6 +107,9 @@ export default {
     let moveY;
     let currentObjId = null;
     let currentObj;
+    let result;
+    let targetObj;
+    let resizableElement;
 
     this.imageEventDrop(imageArea);
     this.imageEventDragOver(imageArea);
@@ -122,44 +126,271 @@ export default {
       const targetObj = e.target.id;
       toolMenu.data = targetObj
       toolMenu.thisObjId = targetObj;
-      popupMenu.style.left = e.pageX - dragArea.offsetLeft + "px";
-      popupMenu.style.top = e.pageY - dragArea.offsetLeft + "px";
+      
+      popupMenu.style.left = e.clientX - dragArea.offsetLeft + "px";
+      popupMenu.style.top = e.clientY - dragArea.offsetLeft + "px";
       popupMenu.style.display = "block";
+
+      if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType !=='caption') {
+        e.target.style.outline = '#27BAFF solid 1px';
+          resizableElement = $(e.target).resizable({
+            handles: 'n, e, s, w, ne, se, sw, nw',
+            stop: () => {
+              let target = e.target.id;
+              let resizeTarget;
+              if(target.includes('textArea')) {
+                resizeTarget = toolMenu.currentPageList.caption;
+                resizeTarget.left = e.target.style.left;
+                resizeTarget.top = e.target.style.top;
+                resizeTarget.width = e.target.style.width;
+                resizeTarget.height = e.target.style.height;
+              } else {
+                resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
+                resizeTarget.style.left = e.target.style.left;
+                resizeTarget.style.top = e.target.style.top;
+                resizeTarget.style.width = e.target.style.width;
+                resizeTarget.style.height = e.target.style.height;
+              }
+              toolMenu.canvas();
+            }
+          });
+
+          const resizableElements = document.querySelectorAll('.ui-resizable');
+
+          resizableElements.forEach(element => {
+            if (element !== resizableElement && !element.contains(e.target)) {
+              $(element).resizable('destroy');
+              element.style.outline = '';
+            }
+          });
+
+          resizableElement.find('.ui-resizable-handle').css({
+            'position': 'absolute',
+            'width': '6px',
+            'height': '6px',
+            'background': '#5BB6F3',
+            'border': '2px solid #fff',
+            'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
+            'left': '50%',
+            'top': '100%',
+            'cursor': 's-resize',
+            'margin': '0 0 0 -5px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
+            'left': '100%',
+            'top': '0',
+            'cursor': 'ne-resize',
+            'margin': '-10px 0 0',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
+            'left': '100%',
+            'top': '100%',
+            'cursor': 'se-resize',
+            'margin': '0',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
+            'left': '0',
+            'top': '100%',
+            'cursor': 'sw-resize',
+            'margin': '0 0 0 -10px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
+            'left': '0',
+            'top': '0',
+            'cursor': 'nw-resize',
+            'margin': '-10px 0 0 -10px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
+            'left': '50%',
+            'top': '0',
+            'cursor': 'n-resize',
+            'margin': '-10px 0 0 -5px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
+            'left': '100%',
+            'top': '50%',
+            'cursor': 'e-resize',
+            'margin': '-5px 0 0',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
+            'left': '0',
+            'top': '50%',
+            'cursor': 'w-resize',
+            'margin': '-5px 0 0 -10px',
+          });
+        }
     });
 
-    document.addEventListener("click", function (e) {
-      //그림 드래그 부분 제외 버튼 클릭 시 메뉴 안보이게
-      if (e.target !== objArea && e.target !== popupMenu) {
-        popupMenu.style.display = "none";
-      }
-      //만약 자막 부분이 아니라면 드래그 할 수 있도록
+    imageArea.addEventListener("mousedown", function (e) {
+      e.stopPropagation();
       if (e.target.id != "textArea") {
         toolMenu.inputValue = false;
       }
+
+      if (e.target.dataset.objType !== "character" && e.target.dataset.objType !== "background" && e.target.dataset.objType !== "caption"
+      && e.target.dataset.objType !== 'popupMenu' ) {
+        popupMenu.style.display = "none";
+
+        if (resizableElement) {
+          if (!resizableElement.is(e.target) && resizableElement.has(e.target).length === 0) {
+            resizableElement.resizable("destroy");
+            resizableElement = null;
+          }
+        };
+
+        const elementsWithOutline = document.querySelectorAll('[style*="outline"]');
+        if (elementsWithOutline) {
+          elementsWithOutline.forEach(element => {
+            element.style.outline = "none";
+          });
+        };
+      }
     });
 
-    document.addEventListener('dblclick', function (e) {
-      if (e.target.id == "textArea") {
+    document.addEventListener("click" , function(e) {
+      if (e.target.id == "textArea" && e.button === 0) {
         toolMenu.inputValue = true;
         e.target.contentEditable = true;
         e.target.focus();
-        document.execCommand('selectAll', false, null);
+      } else {
+        popupMenu.style.display = "none";
       }
     });
 
     //드래그 시작부분(selected page)
     function dragStart(e) {
-      if (e.button === 0 && !toolMenu.inputValue) {
-        e.preventDefault();
-        e.stopPropagation();
+      e.stopPropagation();
+      if (e.target.id != "textArea") {
+        toolMenu.inputValue = false;
+      }
+
+      if (e.button === 0 && !toolMenu.inputValue && !e.target.classList.contains('ui-resizable-handle')) {
+        popupMenu.style.display = "none";
+        e.target.style.outline = '#27BAFF solid 1px';
+        const resizableElements = document.querySelectorAll('.ui-resizable');
+
+        resizableElements.forEach(element => {
+          if (element !== resizableElement && !element.contains(e.target)) {
+            // 다른 오브젝트에 resizable이 있다면 resizable을 제거
+            $(element).resizable('destroy');
+            element.style.outline = '';
+          }
+        });
+
+        targetObj = e.target.id;
+
+        if (targetObj.includes('textArea')) {
+          result = toolMenu.currentPageList.caption;
+        } else {
+          result = toolMenu.currentPageList.layerList.find(el => el.id === targetObj);
+        }
+
+        if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType ==='caption') {
+          resizableElement = $(e.target).resizable({
+            handles: 'n, e, s, w, ne, se, sw, nw',
+            stop: () => {
+              let target = e.target.id;
+              let resizeTarget;
+              if(target.includes('textArea')) {
+                resizeTarget = toolMenu.currentPageList.caption;
+                resizeTarget.left = e.target.style.left;
+                resizeTarget.top = e.target.style.top;
+                resizeTarget.width = e.target.style.width;
+                resizeTarget.height = e.target.style.height;
+              } else {
+                resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
+                resizeTarget.style.left = e.target.style.left;
+                resizeTarget.style.top = e.target.style.top;
+                resizeTarget.style.width = e.target.style.width;
+                resizeTarget.style.height = e.target.style.height;
+              }
+              toolMenu.canvas();
+            }
+          });
+
+          resizableElement.find('.ui-resizable-handle').css({
+            'position': 'absolute',
+            'width': '6px',
+            'height': '6px',
+            'background': '#5BB6F3',
+            'border': '2px solid #fff',
+            'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
+            'left': '50%',
+            'top': '100%',
+            'cursor': 's-resize',
+            'margin': '0 0 0 -5px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
+            'left': '100%',
+            'top': '0',
+            'cursor': 'ne-resize',
+            'margin': '-10px 0 0',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
+            'left': '100%',
+            'top': '100%',
+            'cursor': 'se-resize',
+            'margin': '0',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
+            'left': '0',
+            'top': '100%',
+            'cursor': 'sw-resize',
+            'margin': '0 0 0 -10px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
+            'left': '0',
+            'top': '0',
+            'cursor': 'nw-resize',
+            'margin': '-10px 0 0 -10px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
+            'left': '50%',
+            'top': '0',
+            'cursor': 'n-resize',
+            'margin': '-10px 0 0 -5px',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
+            'left': '100%',
+            'top': '50%',
+            'cursor': 'e-resize',
+            'margin': '-5px 0 0',
+          });
+
+          resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
+            'left': '0',
+            'top': '50%',
+            'cursor': 'w-resize',
+            'margin': '-5px 0 0 -10px',
+          });
+        }
         currentObjId = e.target.id;
         currentX = e.pageX - dragArea.offsetLeft;
         currentY = e.pageY - dragArea.offsetTop;
         currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
         currentYOffset = e.pageY - dragArea.offsetTop - e.offsetY;
-        document.body.style.cursor = "grabbing";
-        e.target.style.opacity = "0.5";
         currentObj = e.target;
+        currentObj.style.zIndex = '10';
+        currentObj.style.opacity = '0.5';
         active = true;
         document.addEventListener("mousemove", drag);
       }
@@ -169,8 +400,7 @@ export default {
     function drag(e) {
       e.stopPropagation();
       e.preventDefault();
-      if (active && currentObjId === currentObj.id) {
-        currentObj.style.zIndex = '10'
+      if (active && currentObjId === currentObj.id && e.target.dataset.objType == 'character' || 'background') {
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
         requestAnimationFrame(() => {
@@ -182,26 +412,22 @@ export default {
 
     //드래그 끝내는 부분 (selected page)
     function dragEnd(e) {
-      if (e.target.id.includes('textArea')) {
-        e.target.style.zIndex = '2';
-      } else {
-        e.target.style.zIndex = '1';
+      if (active) {
+        if (e.target.id.includes('textArea')) {
+          e.target.style.zIndex = '2';
+          result.left = e.target.style.left;
+          result.top = e.target.style.top;
+        } else {
+          e.target.style.zIndex = '1';
+          result.style.left = e.target.style.left;
+          result.style.top = e.target.style.top;
+        }
+        e.target.style.opacity = '1';
+
+        active = false;
+        document.removeEventListener('mousemove', drag);
+        toolMenu.canvas();
       }
-      e.target.style.opacity = '1';
-      let targetObj = e.target.id;
-      if (e.target.id.includes('textArea')) {
-        let result = toolMenu.currentPageList.caption;
-        result.left = e.target.style.left;
-        result.top = e.target.style.top;
-      } else {
-        let result = toolMenu.currentPageList.layerList.find(el => el.id === targetObj);
-        result.style.left = e.target.style.left;
-        result.style.top = e.target.style.top;
-      }
-      document.body.style.cursor = '';
-      active = false;
-      document.removeEventListener('mousemove', drag);
-      toolMenu.canvas();
     };
 
     function textInput(e) {
@@ -209,7 +435,9 @@ export default {
         toolMenu.currentPageList.caption.content = e.target.innerText;
       }
     };
+
   },
+
   watch: {
     //currentPageList => pageList[현재 선택한 페이지 인덱스] 가 변경이 일어나면 실행이 되는 부분
     currentPageList() {
@@ -225,6 +453,7 @@ export default {
       }
     },
   },
+
   methods: {
     //자막 보이게 하는 변경 값
     showTextArea() {
@@ -248,6 +477,7 @@ export default {
       const objectArea = this.$refs.pageObject;
       const addDiv = document.createElement("div");
       addDiv.setAttribute("data-text-content", true);
+      addDiv.setAttribute('data-obj-type', 'caption');
       addDiv.style.width = "400px";
       addDiv.style.height = "200px";
       addDiv.style.left = "120px";
@@ -274,36 +504,33 @@ export default {
     canvas() {
       try {
         const imageArea = this.$refs.dragImage;
-        html2canvas(imageArea, { useCORS: true }).then(canvas => {
+
+        const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
+
+        const ignoreElements = element => {
+          return resizableElements.some(resizableElement => resizableElement.contains(element));
+        };
+
+        html2canvas(imageArea, { useCORS: true, ignoreElements }).then(canvas => {
           const ctx = canvas.getContext('2d');
           const img = new Image();
-          img.crossOrigin = 'anonymous'; // CORS 허용
+          img.crossOrigin = 'anonymous';
           img.onload = () => {
-            // 이미지의 원본 크기 가져오기
             const originalWidth = img.width;
             const originalHeight = img.height;
-
-            // 이미지 크기 축소 비율
-            const reductionRatio = 0.35; // 30%로 축소
-
-            // 축소된 이미지 크기 계산
+            const reductionRatio = 0.35;
             const reducedWidth = originalWidth * reductionRatio;
             const reducedHeight = originalHeight * reductionRatio;
-
-            // 축소된 이미지 그리기
             canvas.width = reducedWidth;
             canvas.height = reducedHeight;
             ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
-
-            // 데이터 URL 생성
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.35); // JPEG 포맷, 압축률 70%
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.35);
             this.currentPageList.thumbnail = dataUrl;
-          }
+          };
 
           img.src = canvas.toDataURL();
         });
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
       }
     },
@@ -319,17 +546,21 @@ export default {
       if (this.currentPageList.layerList != null) {
         const fragment = document.createDocumentFragment();
         for (const [index, image] of Object.entries(this.currentPageList.layerList)) {
-          const imageEle = document.createElement('img');
-          imageEle.src = image.fileId;
-          imageEle.id = image.id;
-          imageEle.style.left = image.style.left;
-          imageEle.style.top = image.style.top;
-          imageEle.style.position = image.style.position;
-          imageEle.style.width = image.style.width;
-          imageEle.style.height = image.style.height;
-          imageEle.setAttribute('draggable', 'false');
-          imageEle.style.zIndex = 1;
-          fragment.appendChild(imageEle);
+          const divEle = document.createElement('div');
+          divEle.id = image.id;
+          divEle.style.left = image.style.left;
+          divEle.style.top = image.style.top;
+          divEle.style.position = image.style.position;
+          divEle.style.width = image.style.width;
+          divEle.style.height = image.style.height;
+          divEle.setAttribute('draggable', 'false');
+          divEle.setAttribute('data-obj-type', image.menu);
+          divEle.style.zIndex = 1;
+          divEle.style.backgroundImage = `url(${image.fileId})`;
+          divEle.style.backgroundRepeat = 'no-repeat';
+          if (image.menu === 'background') divEle.style.backgroundSize = 'cover';
+          else divEle.style.backgroundSize = 'contain';
+          fragment.appendChild(divEle);
         }
         objectElement.appendChild(fragment);
       }
@@ -339,6 +570,7 @@ export default {
         const divEle = document.createElement('div');
         divEle.contentEditable = true;
         divEle.setAttribute("data-text-content", true);
+        divEle.setAttribute('data-obj-type', 'caption');
         divEle.style.left = caption.left;
         divEle.style.top = caption.top;
         divEle.style.width = caption.width;
@@ -353,6 +585,7 @@ export default {
         objectElement.appendChild(divEle);
       }
     },
+
     //이미지를 가장 뒤로 보내는 메소드
     lastBack(id) {
       const objectElement = this.$refs.pageObject;
@@ -375,6 +608,7 @@ export default {
       }
       this.canvas();
     },
+
     //이미지를 가장 앞으로 보내는 메소드
     frontmost(id) {
       const objectElement = this.$refs.pageObject;
@@ -386,6 +620,7 @@ export default {
       objectElement.appendChild(elementDoc);
       this.canvas();
     },
+
     //이미지를 앞으로 보내는 메소드
     next(id) {
       const objectElement = this.$refs.pageObject;
@@ -400,6 +635,7 @@ export default {
         this.canvas();
       }
     },
+
     //이미지를 뒤로 보내는 메소드
     back(id) {
       const objectElement = this.$refs.pageObject;
@@ -417,6 +653,7 @@ export default {
         this.canvas();
       }
     },
+
     //toolmenu 부분의 dragover
     imageEventDragOver(element) {
       element.addEventListener("dragover", (e) => {
@@ -424,90 +661,100 @@ export default {
         e.stopPropagation();
       });
     },
+
     //toolmenu 에서 selectedPage 로 드롭하는 부분
     imageEventDrop(element) {
       let nextId = this.nextId;
       let toolSelectedPageDrag = this.$refs.pageForm;
+
       element.addEventListener("drop", (e) => {
         e.preventDefault();
         e.stopPropagation();
+
         let rX = e.pageX - toolSelectedPageDrag.offsetLeft;
         let rY = e.pageY - toolSelectedPageDrag.offsetTop;
+
         let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
         if (data == null || x == null || y == null) {
           return;
         }
+
         let imageElement = document.querySelector(`.menu .image-list #item #${data}`);
-        let cloneImageElement = imageElement.cloneNode();
-        cloneImageElement.setAttribute("draggable", "false");
-        cloneImageElement.id = this.selectedMenu + nextId++;
+
+        let newDiv = document.createElement('div');
+        newDiv.setAttribute("draggable", "false");
+        newDiv.setAttribute('data-obj-type', this.selectedMenu);
+        newDiv.id = this.selectedMenu + nextId++;
+        newDiv.style.position = "absolute";
+        newDiv.style.zIndex = 1;
+
         if (this.selectedMenu == 'background') {
           const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
           const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
-          cloneImageElement.style.left = "0px";
-          cloneImageElement.style.top = "0px";
-          if(dragImageWidth > 800) {
-            cloneImageElement.style.width = dragImageWidth;
-          } 
-          else {
-            cloneImageElement.style.width = "800px";
-          }
-          if(dragImageHeight > 550){
-            cloneImageElement.style.height = dragImageHeight;
-          }
-          else {
-            cloneImageElement.style.height = "550px";
-          }
-          cloneImageElement.style.position = "absolute";
-          cloneImageElement.style.zIndex = 1;
+          newDiv.style.left = "0px";
+          newDiv.style.top = "0px";
+          newDiv.style.width = dragImageWidth > 800 ? dragImageWidth : "800px";
+          newDiv.style.height = dragImageHeight > 550 ? dragImageHeight : "550px";
+
           let newImage = {
-            fileId: cloneImageElement.src,
-            id: cloneImageElement.id,
+            fileId: imageElement.src,
+            id: newDiv.id,
             menu: this.selectedMenu,
             style: {
-              left: cloneImageElement.style.left,
-              top: cloneImageElement.style.top,
-              position: cloneImageElement.style.position,
-              width: cloneImageElement.style.width,
-              height: cloneImageElement.style.height,
+              left: newDiv.style.left,
+              top: newDiv.style.top,
+              position: newDiv.style.position,
+              width: newDiv.style.width,
+              height: newDiv.style.height,
             },
           };
-          let elementToRemove = Array.from(document.querySelectorAll(`.object img`))
+
+          newDiv.style.backgroundImage = `url(${imageElement.src})`;
+          newDiv.style.backgroundRepeat = 'no-repeat';
+          newDiv.style.backgroundSize = 'cover';
+
+          let elementToRemove = Array.from(document.querySelectorAll(`.object div`))
             .find(el => el.id.includes('background'));
+
           if (elementToRemove) {
             this.currentPageList.layerList.splice(0, 1, newImage);
             elementToRemove.parentNode.removeChild(elementToRemove);
           } else {
             this.currentPageList.layerList.unshift(newImage);
           }
-          document.querySelector('.object').insertBefore(cloneImageElement, document.querySelector('.object').firstChild);
+
+          document.querySelector('.object').insertBefore(newDiv, document.querySelector('.object').firstChild);
         } else {
-          cloneImageElement.style.left = (rX - x) + "px";
-          cloneImageElement.style.top = (rY - y) + "px";
-          cloneImageElement.style.position = "absolute";
-          cloneImageElement.style.width = "100px";
-          cloneImageElement.style.height = "100px";
-          cloneImageElement.style.zIndex = 1;
+          newDiv.style.left = (rX - x) + "px";
+          newDiv.style.top = (rY - y) + "px";
+          newDiv.style.width = "100px";
+          newDiv.style.height = "100px";
+          newDiv.style.zIndex = 1;
+
           let newImage = {
-            fileId: cloneImageElement.src,
-            id: cloneImageElement.id,
+            fileId: imageElement.src,
+            id: newDiv.id,
             menu: this.selectedMenu,
             style: {
-              left: cloneImageElement.style.left,
-              top: cloneImageElement.style.top,
-              position: cloneImageElement.style.position,
-              width: cloneImageElement.style.width,
-              height: cloneImageElement.style.height,
+              left: newDiv.style.left,
+              top: newDiv.style.top,
+              position: newDiv.style.position,
+              width: newDiv.style.width,
+              height: newDiv.style.height,
             },
           };
-          document.querySelector('.object').appendChild(cloneImageElement);
+
+          newDiv.style.backgroundImage = `url(${imageElement.src})`;
+          newDiv.style.backgroundRepeat = 'no-repeat';
+          newDiv.style.backgroundSize = 'contain';
+
+          document.querySelector('.object').appendChild(newDiv);
           this.imageIndex = this.currentPageList.layerList.length;
           this.currentPageList.layerList[this.imageIndex] = newImage;
         }
         this.canvas();
       });
     },
-
   },
 }
 
@@ -611,4 +858,70 @@ textarea {
   width: 30px;
   height: 30px;
   border-radius: 3px;
-}</style>
+}
+
+.ui-resizable-handle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #5BB6F3;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+}
+
+.ui-resizable-handle.ui-resizable-s {
+  left: 50%;
+  top: 100%;
+  cursor: s-resize;
+  margin: 0 0 0 -5px;
+}
+
+.ui-resizable-handle.ui-resizable-ne {
+  left: 100%;
+  top: 0;
+  cursor: ne-resize;
+  margin: -10px 0 0;
+}
+
+.ui-resizable-handle.ui-resizable-se {
+  left: 100%;
+  top: 100%;
+  cursor: se-resize;
+  margin: 0;
+}
+
+.ui-resizable-handle.ui-resizable-sw {
+  left: 0;
+  top: 100%;
+  cursor: sw-resize;
+  margin: 0 0 0 -10px;
+}
+
+.ui-resizable-handle.ui-resizable-nw {
+  left: 0;
+  top: 0;
+  cursor: nw-resize;
+  margin: -10px 0 0 -10px;
+}
+
+.ui-resizable-handle.ui-resizable-n {
+  left: 50%;
+  top: 0;
+  cursor: n-resize;
+  margin: -10px 0 0 -5px;
+}
+
+.ui-resizable-handle.ui-resizable-e {
+  left: 100%;
+  top: 50%;
+  cursor: e-resize;
+  margin: -5px 0 0;
+}
+
+.ui-resizable-handle.ui-resizable-w {
+  left: 0;
+  top: 50%;
+  cursor: w-resize;
+  margin: -5px 0 0 -10px;
+}
+</style>

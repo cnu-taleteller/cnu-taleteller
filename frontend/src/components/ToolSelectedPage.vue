@@ -233,9 +233,8 @@ export default {
 
     imageArea.addEventListener("mousedown", function (e) {
       e.stopPropagation();
-      if (e.target.id != "textArea") {
-        toolMenu.inputValue = false;
-      }
+      toolMenu.inputValue = false;
+      e.target.contentEditable = false;
 
       if (e.target.dataset.objType !== "character" && e.target.dataset.objType !== "background" && e.target.dataset.objType !== "caption"
       && e.target.dataset.objType !== 'popupMenu' ) {
@@ -257,21 +256,26 @@ export default {
       }
     });
 
-    document.addEventListener("click" , function(e) {
+    document.addEventListener("click", function(e) {
+      popupMenu.style.display = "none";
+    })
+
+    document.addEventListener("dblclick" , function(e) {
       if (e.target.id == "textArea" && e.button === 0) {
         toolMenu.inputValue = true;
         e.target.contentEditable = true;
         e.target.focus();
-      } else {
-        popupMenu.style.display = "none";
       }
     });
 
     //드래그 시작부분(selected page)
     function dragStart(e) {
       e.stopPropagation();
+
       if (e.target.id != "textArea") {
+        console.log('not ddd');
         toolMenu.inputValue = false;
+        e.target.contentEditable = false;
       }
 
       if (e.button === 0 && !toolMenu.inputValue && !e.target.classList.contains('ui-resizable-handle')) {
@@ -757,6 +761,8 @@ export default {
     },
   },
 }
+
+//!!현재 자막 부분 문제점 자막을 다 지우면 글자크기 작아짐...!!
 
 </script>
 <style scoped>

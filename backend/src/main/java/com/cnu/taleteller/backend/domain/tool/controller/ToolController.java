@@ -2,14 +2,12 @@ package com.cnu.taleteller.backend.domain.tool.controller;
 
 import com.cnu.taleteller.backend.domain.tool.service.FileService;
 <<<<<<< HEAD
-<<<<<<< HEAD
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 =======
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 >>>>>>> parent of 547d202 (Add DB save module (scenario, book))
 =======
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
->>>>>>> parent of 547d202 (Add DB save module (scenario, book))
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ToolController {
 
-<<<<<<< HEAD
 <<<<<<< HEAD
     private final ScenarioService scenarioService;
     private final FileService fileService;

@@ -42,6 +42,7 @@ export default {
     if(sessionStorage.getItem('bookId')){
       this.bookId = sessionStorage.getItem('bookId');
     }
+
   },
   methods: {
     editBookName() {
@@ -64,8 +65,9 @@ export default {
     // 임시 저장
     async saveTmp() {
       const select = sessionStorage.getItem('select');
-      if(!select || select=='false'){
-        alert('시나리오 선택 후 진행해주세요');
+
+      if(!select || select==='false'){
+        alert('시나리오 선택 후 진행해주세요!');
         return;
       }
       else {
@@ -81,6 +83,7 @@ export default {
             this.bookId = res.data.bookId;
             sessionStorage.setItem('bookId', this.bookId);
             this.saveScenario();
+            this.saveUploadFile();
             alert('임시저장 완료');
           })
           .catch((err) => {
@@ -97,6 +100,7 @@ export default {
           .then((res) => {
               console.log(res);
               this.saveScenario();
+              this.saveUploadFile();
               alert('임시저장 완료');
           })
           .catch((error) => {
@@ -106,8 +110,50 @@ export default {
         }
       }
     },
+    async saveUploadFile(){
+      const uploadCharList = JSON.parse(sessionStorage.getItem('uploadCharList'));
+      const uploadBackList = JSON.parse(sessionStorage.getItem('uploadBackList'));
+      if(uploadBackList === null && uploadBackList === null) return;
+      
+      if(uploadBackList === null) {
+        await axios.post("/api/tool/uploadFile/"+this.bookId, {
+          uploadCharList, 
+        })
+        .then((res) => {
+                console.log(res);
+            })
+            .catch((error) => {
+                console.log(error);
+        });
+      }
+      else if(uploadCharList === null) {
+        await axios.post("/api/tool/uploadFile/"+this.bookId, {
+          uploadBackList, 
+        })
+        .then((res) => {
+                console.log(res);
+            })
+            .catch((error) => {
+                console.log(error);
+        });
+        }
+        else {
+          await axios.post("/api/tool/uploadFile/"+this.bookId, {
+          uploadBackList, uploadCharList
+        })
+        .then((res) => {
+                console.log(res);
+            })
+            .catch((error) => {
+                console.log(error);
+        });
+        }
+     
+    },
     async saveScenario(){
       const resultScenario = sessionStorage.getItem('scenario');
+      if(resultScenario === null) return;
+      
       // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
       const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
       sections.forEach((section, index) => {

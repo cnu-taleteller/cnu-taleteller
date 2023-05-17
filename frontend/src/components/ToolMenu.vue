@@ -11,10 +11,10 @@
     <div class="menu-form">
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
-          <input type="file" @change="setImage('background')" accept="image/*" id="image">
+          <input type="file" @change="uploadFile('background')" accept="image/*" id="image"  ref="file">
         </div>
         <div v-else-if="selectedMenu == 'character'">
-          <input type="file" @change="setImage('character')" max accept="image/*" id="image">
+          <input type="file" @change="uploadFile('character')" max accept="image/*" id="image"  ref="file">
         </div>
         <!-- 시나리오 -->
         <div class="scenario-form2" v-else-if="selectedMenu == 'scenario'">
@@ -88,11 +88,11 @@
       <div class="image-list">
         <div id="item">
           <div class="uploaded-image-list" v-show="selectedMenu == 'character'">
-            <img :src="item.src" :draggable="item.draggable" :id="item.id" :style="{ height: '100px', width: '100px' }"
+            <img :src="item.src" crossOrigin="anonymous" :draggable="item.draggable" :id="item.id" :style="{ height: '100px', width: '100px' }"
               v-for="item, index in charList">
           </div>
           <div class="uploaded-image-list" v-show="selectedMenu == 'background'">
-            <img :src="item.src" :draggable="item.draggable" :id="item.id" :style="{ height: '100px', width: '100px' }"
+            <img :src="item.src" crossOrigin="anonymous" :draggable="item.draggable" :id="item.id" :style="{ height: '100px', width: '100px' }"
               v-for="item, index in backList">
           </div>
         </div>
@@ -107,77 +107,60 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      selectedMenu: 'scenario',
       bookId: null,
       pageNo: 0,
-      selectedMenu: 'scenario',
-      isDisabled: true, // 시나리오 textarea 비활성화
-      isDisabled2: false, // 수정버튼 활성화
-      select: false, // 시나리오 선택여부
-      scenarioNum: 0,
-      flowMenu: false, // 시나리오 or 흐름 파악하기
-      loading: false, // gpt 일때 로딩 여부
-      flowcnt: 0,
-      flowResult: null, // gpt로 받은 흐름 파악하기
-      resultScenario: [],
-      finalScenario: [[], [], [], [], []],
-      selectScenario: [],
-      isReScenario: false,
+      nextId: 1,
+      uploadId: 0,
+      isUpload: false,
+      imageIndex: 0,
+
+      file: null,
+      s3: {
+        preSignedUrl: null,
+        encodedFileName: null,
+        uploadedUrl: null,
+      },
+      
       scenarioKeyword: {
         who: null,
         when: null,
         where: null,
         event: null
       },
-      allCaption: [],
-      //리스트 변경 해야함
-      // charList:[
-      // {
-      //     src: '/images/character/pngwing.com.png',
-      //     id: 'character13',
-      //     draggable: "true",
-      //     height: "100px",
-      //   },
-      //   {
-      //     src: '/images/character/pngwing2.com.png',
-      //     id: 'character14',
-      //     draggable: "true",
-      //     height: "100px",
-      //   },
-      //   {
-      //     src: 'https://taleteller.s3.ap-northeast-2.amazonaws.com/static/C_71f13106-6e3f-4cdc-9cec-fc923c85ef4d_47508966-5575-4f4f-8aeb-df68b9d52a86_img.jpg',
-      //     id: 'character15',
-      //     draggable: "true",
-      //     height: "100px",
-      //   },
-      // ]
-       
+      isDisabled: true, // 시나리오 textarea 비활성화
+      isDisabled2: false, // 시나리오 수정버튼 활성화
+      select: false, // 시나리오 선택 여부
+      scenarioNum: 0, // 시나리오 선택 번호
+      flowMenu: false, // 시나리오 or 흐름 파악하기
+      loading: false, // gpt 일때 로딩 여부
+      flowcnt: 0, // 흐름 파악 횟수
+      flowResult: null, // gpt로 받은 흐름 파악하기
+      allCaption: [], // 모든 자막
+      finalScenario: [[], [], [], [], []], // gpt로 받는 시나리오
+      selectScenario: [], // 선택한 시나리오
+      resultScenario: [],  // [도입], [전개] 등 다 있는 시나리오 - session 저장용
+      isReScenario: false,
+  
+      // 업로드되는 이미지 리스트
+      uploadBackList: [],
+      uploadCharList: [],
+
       // 기본적으로 있는 이미지 배열. 반복되는 부분 많아서 방식 변경
       charList: Array.from({length: 25}, (_, i) => ({
-        src: `/images/character/character${i}.png`,
+        src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/character${i}.png`,
         id: `character${i}`,
         draggable: "true",
         height: "100px",
       })),
       // 기본적으로 있는 배경 배열
-      backList: [
-      ...Array.from({ length: 18}, (_, i) => ({
-        src: `/images/background/background${i}.png`,
+      backList: Array.from({ length: 18}, (_, i) => ({
+        src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/background${i}.png`,
         id: `background${i}`,
         draggable: "true",
         height: "100px",
       })),
-      {
-        src:
-          "https://taleteller.s3.ap-northeast-2.amazonaws.com/static/C_71f13106-6e3f-4cdc-9cec-fc923c85ef4d_47508966-5575-4f4f-8aeb-df68b9d52a86_img.jpg",
-        id: "background",
-        draggable: "true",
-        height: "100px",
-      },
-    ],
-      nextId: 1,
-      uploadId: 0,
-      isUpload: false,
-      imageIndex: 0,
+      
     }
   },
   //props로 toolView에서 보낸 데이터를 받음
@@ -194,38 +177,45 @@ export default {
     this.finalScenario = this.viewFinalScenario;
   },
   methods: {
-    // 이미지 업로드
-    async setImage(menu) {
+    // S3 presigned url 받아오기
+    async uploadFile(menu) {
       const maxSize = 5 * 1024 * 1024;
       const fileSize = document.getElementById("image").files[0].size;
-      // console.log(fileSize);
-
       if (fileSize > maxSize) {
         alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
         return;
       }
+      
+      this.file = this.$refs.file.files[0];
+      await axios.get("/api/tool/s3/image", {params: {fileName: this.file.name}},)
+      .then((res) => {
+        console.log(res.data);
+        this.s3.preSignedUrl = res.data.preSignedUrl
+        this.s3.encodedFileName = res.data.encodedFileName
+        this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
+      })
+    },
+    // S3 업로드
+    async uploadImageToS3(preSignedUrl, file, menu) {
+      await axios.put(preSignedUrl, file)
+      .then((res) => {
+        this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
+        console.log(this.s3.uploadedUrl);
 
-      try {
-        let frm = new FormData();
-        let imageFile = document.getElementById("image");
-        frm.append("image", imageFile.files[0]);
-        frm.append("menu", menu);
-        frm.append("bookId", this.bookId);
-        const res = await axios.post(`/api/tool/image`, frm, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
         if (menu === 'background') {
+          this.uploadBackList.push(this.s3.uploadedUrl);
+          sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
           this.backList.push({
-            src: res.data,
+            src: this.s3.uploadedUrl,
             id: 'upload' + this.uploadId,
             draggable: "true",
             height: "100px",
           });
         } else if (menu === 'character') {
+          this.uploadCharList.push(this.s3.uploadedUrl);
+          sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
           this.charList.push({
-            src: res.data,
+            src:  this.s3.uploadedUrl,
             id: 'upload' + this.uploadId,
             draggable: "true",
             height: "100px",
@@ -234,10 +224,13 @@ export default {
         this.uploadId++;
         console.log("S3 업로드 성공");
         document.getElementById("image").value = "";
-      } catch (e) {
-        console.log(e);
-      }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
+      });
     },
+    
     setSelectedMenu(menu) {
       this.selectedMenu = menu;
       this.$emit('selectedMenu', this.selectedMenu);

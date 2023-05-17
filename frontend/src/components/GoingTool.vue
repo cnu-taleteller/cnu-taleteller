@@ -38,6 +38,8 @@ export default {
       sessionStorage.removeItem('bookId');
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('bookName');
+      sessionStorage.removeItem("uploadCharList");
+      sessionStorage.removeItem("uploadBackList");
       sessionStorage.removeItem("projectTitle");
       this.$router.push('/tool');
     }

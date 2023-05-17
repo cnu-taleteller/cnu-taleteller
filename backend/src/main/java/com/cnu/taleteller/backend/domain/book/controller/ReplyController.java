@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/book")
+@RequestMapping("/api/v1/book")
 public class ReplyController {
 
     @Autowired

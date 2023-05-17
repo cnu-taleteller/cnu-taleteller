@@ -8,7 +8,7 @@
       <input class="book-name-input" type="text" v-model="bookName" @keyup.enter="editBookName()">
       <img class="header-btn" @click="editBookName()" src="@/assets/check.png">
     </div>
-    <div class="header-menu" v-if="toolState!='new' && toolState !='gpt'">
+    <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
       <button @click="saveTmp()">임시저장</button>
       <button @click="saveBook()">제출</button>
@@ -39,7 +39,7 @@ export default {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
-    if(sessionStorage.getItem('bookId')){
+    if (sessionStorage.getItem('bookId')) {
       this.bookId = sessionStorage.getItem('bookId');
     }
 
@@ -53,10 +53,10 @@ export default {
       // 시나리오 선택되어야 진행
       const select = sessionStorage.getItem('select');
       console.log(select);
-      if(!select || select=='false'){
+      if (!select || select == 'false') {
         alert('시나리오 선택 후 진행해주세요');
         return;
-      } 
+      }
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('scenarioKeyword');
       sessionStorage.setItem('bookName', this.bookName);
@@ -66,94 +66,94 @@ export default {
     async saveTmp() {
       const select = sessionStorage.getItem('select');
 
-      if(!select || select==='false'){
+      if (!select || select === 'false') {
         alert('시나리오 선택 후 진행해주세요!');
         return;
       }
       else {
         // 최초 저장
-        if(this.bookId==null) {
-          await axios.post("/api/book/", {
+        if (this.bookId == null) {
+          await axios.post("/api/v1/book/", {
             bookName: this.bookName,
             bookStatus: "temp",
             email: sessionStorage.getItem('user')
           })
-          .then((res)=> {
-            console.log(res.data.bookId);
-            this.bookId = res.data.bookId;
-            sessionStorage.setItem('bookId', this.bookId);
-            this.saveScenario();
-            this.saveUploadFile();
-            alert('임시저장 완료');
-          })
-          .catch((err) => {
-            console.error(err);
-            alert('임시저장 실패');
-          })
+            .then((res) => {
+              console.log(res.data.bookId);
+              this.bookId = res.data.bookId;
+              sessionStorage.setItem('bookId', this.bookId);
+              this.saveScenario();
+              this.saveUploadFile();
+              alert('임시저장 완료');
+            })
+            .catch((err) => {
+              console.error(err);
+              alert('임시저장 실패');
+            })
         }
         else {
           // 이미 bookId 있을 때
-          await axios.post("/api/book/" + this.bookId, {
+          await axios.post("/api/v1/book/" + this.bookId, {
             bookName: this.bookName,
             bookStatus: "temp",
           })
-          .then((res) => {
+            .then((res) => {
               console.log(res);
               this.saveScenario();
               this.saveUploadFile();
               alert('임시저장 완료');
-          })
-          .catch((error) => {
+            })
+            .catch((error) => {
               console.log(error);
               alert('임시저장 실패');
-          });
+            });
         }
       }
     },
-    async saveUploadFile(){
+    async saveUploadFile() {
       const uploadCharList = JSON.parse(sessionStorage.getItem('uploadCharList'));
       const uploadBackList = JSON.parse(sessionStorage.getItem('uploadBackList'));
-      if(uploadBackList === null && uploadBackList === null) return;
-      
-      if(uploadBackList === null) {
-        await axios.post("/api/tool/uploadFile/"+this.bookId, {
-          uploadCharList, 
+      if (uploadBackList === null && uploadBackList === null) return;
+
+      if (uploadBackList === null) {
+        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+          uploadCharList,
         })
-        .then((res) => {
-                console.log(res);
-            })
-            .catch((error) => {
-                console.log(error);
-        });
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
-      else if(uploadCharList === null) {
-        await axios.post("/api/tool/uploadFile/"+this.bookId, {
-          uploadBackList, 
+      else if (uploadCharList === null) {
+        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+          uploadBackList,
         })
-        .then((res) => {
-                console.log(res);
-            })
-            .catch((error) => {
-                console.log(error);
-        });
-        }
-        else {
-          await axios.post("/api/tool/uploadFile/"+this.bookId, {
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      else {
+        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
           uploadBackList, uploadCharList
         })
-        .then((res) => {
-                console.log(res);
-            })
-            .catch((error) => {
-                console.log(error);
-        });
-        }
-     
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+
     },
-    async saveScenario(){
+    async saveScenario() {
       const resultScenario = sessionStorage.getItem('scenario');
-      if(resultScenario === null) return;
-      
+      if (resultScenario === null) return;
+
       // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
       const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
       sections.forEach((section, index) => {
@@ -168,18 +168,18 @@ export default {
         }
         this.finalScenario[index] = scenario.slice(start, end).replace(section, '').trim();
       });
-      await axios.post("/api/tool/scenario/"+this.bookId, this.finalScenario)
-      .then((res) => {
-              console.log(res);
-          })
-          .catch((error) => {
-              console.log(error);
-      });
+      await axios.post("/api/v1/tool/scenario/" + this.bookId, this.finalScenario)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     //미리보기 클릭시 새창을 띄우고 작품썸네일을 보여준다.
     preview() {
       let currentIndex = 0;
-     
+
       const screenWidth = window.screen.width;
       const screenHeight = window.screen.height;
       const windowWidth = 810;
@@ -398,4 +398,5 @@ button {
 button:hover {
   opacity: 0.7;
   background-color: #bce9ff;
-}</style>
+}
+</style>

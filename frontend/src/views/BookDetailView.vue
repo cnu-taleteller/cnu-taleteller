@@ -42,7 +42,7 @@ export default {
         const bookId = this.$route.params.id;
 
         axios
-            .get(`/api/book/detail/${bookId}`)
+            .get(`/api/v1/book/detail/${bookId}`)
             .then((response) => {
                 this.book = response.data;
             })
@@ -55,7 +55,7 @@ export default {
             const bookId = this.$route.params.id;
 
             axios
-                .post(`/api/book/detail/${bookId}/recommend`)
+                .post(`/api/v1/book/detail/${bookId}/recommend`)
                 .then(response => {
                     this.book = response.data;
                 })
@@ -68,7 +68,7 @@ export default {
         },
         bookPayment(Value){
             if(confirm("결제하시겠습니까?")){
-                axios.post("/api/point/bookPayment", {
+                axios.post("/api/v1/point/bookPayment", {
                     paymentPoint : Value,
                 })
                 .then((res) => {

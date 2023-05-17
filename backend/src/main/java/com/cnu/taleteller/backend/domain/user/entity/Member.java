@@ -1,4 +1,4 @@
-package com.cnu.taleteller.backend.domain.user.domain;
+package com.cnu.taleteller.backend.domain.user.entity;
 
 import lombok.AccessLevel;
 import lombok.Builder;

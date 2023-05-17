@@ -1,11 +1,10 @@
-package com.cnu.taleteller.backend.domain.user.domain;
+package com.cnu.taleteller.backend.domain.user.entity;
 // BaseTimeEntity
 // 그 외 등록자, 수정자 관련 애너테이션 지원(필요시 해당 엔티티 클래스 상속)
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;

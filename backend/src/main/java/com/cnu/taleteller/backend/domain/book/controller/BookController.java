@@ -1,6 +1,6 @@
 package com.cnu.taleteller.backend.domain.book.controller;
 
-import com.cnu.taleteller.backend.domain.book.domain.Book;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.service.BookService;

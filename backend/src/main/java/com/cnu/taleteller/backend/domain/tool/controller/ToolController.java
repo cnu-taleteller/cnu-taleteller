@@ -1,6 +1,6 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
-import com.cnu.taleteller.backend.domain.tool.domain.UploadFile;
+import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
 import com.cnu.taleteller.backend.domain.tool.dto.UploadFileRequestDto;
 import com.cnu.taleteller.backend.domain.tool.service.S3Service;
 import com.cnu.taleteller.backend.domain.tool.service.UploadFileService;

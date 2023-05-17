@@ -1,10 +1,9 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
-import com.cnu.taleteller.backend.domain.tool.domain.Scenario;
+import com.cnu.taleteller.backend.domain.tool.entity.Scenario;
 import com.cnu.taleteller.backend.domain.tool.dto.CaptionRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.KeywordRequestDto;
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
-import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

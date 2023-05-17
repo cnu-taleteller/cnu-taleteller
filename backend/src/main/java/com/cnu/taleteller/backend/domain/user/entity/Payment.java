@@ -1,9 +1,8 @@
-package com.cnu.taleteller.backend.domain.user.domain;
+package com.cnu.taleteller.backend.domain.user.entity;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment")

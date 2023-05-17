@@ -1,7 +1,7 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
 import com.cnu.taleteller.backend.domain.user.Repository.PaymentRepository;
-import com.cnu.taleteller.backend.domain.user.domain.Payment;
+import com.cnu.taleteller.backend.domain.user.entity.Payment;
 import com.cnu.taleteller.backend.domain.user.dto.KakaopayApprovalVO;
 import com.cnu.taleteller.backend.domain.user.dto.KakaopayReadyVO;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor

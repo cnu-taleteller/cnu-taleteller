@@ -1,8 +1,7 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
-import com.cnu.taleteller.backend.domain.book.domain.Book;
-import com.cnu.taleteller.backend.domain.tool.domain.Scenario;
-import com.cnu.taleteller.backend.domain.tool.domain.UploadFile;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
 import com.cnu.taleteller.backend.domain.tool.dto.UploadFileDto;
 import com.cnu.taleteller.backend.domain.tool.dto.UploadFileRequestDto;
 import com.cnu.taleteller.backend.domain.tool.repository.UploadFileRepository;

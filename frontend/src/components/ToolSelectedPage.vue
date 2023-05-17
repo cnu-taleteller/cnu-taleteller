@@ -74,19 +74,18 @@ export default {
       showInput: true,
       showInitial: true,
       change: function (color) {
-        textArea = document.getElementById('textArea');
+        textArea = document.querySelector('[data-text-content="true"]');
         if (textArea) {
           textArea.style.color = currentColor;
         }
         currentColor = color.toHexString();
-        console.log(currentColor);
         colorPreview.style.backgroundColor = currentColor;
         this.currentColor = currentColor;
         this.currentPageList.caption.fontColor = currentColor;
         this.canvas();
       }.bind(this),
       move: function (color) {
-        textArea = document.getElementById('textArea');
+        textArea = document.querySelector('[data-text-content="true"]');
         if (textArea) {
           textArea.style.color = currentColor;
         }
@@ -120,148 +119,128 @@ export default {
     //오른쪽 마우스 클릭
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      if (e.target.id.includes('background') || e.target.id.includes('textArea')) {
+      if (e.target.id.includes('background') || e.target.dataset.textContent === 'true') {
         return;
       }
       const targetObj = e.target.id;
       toolMenu.data = targetObj
       toolMenu.thisObjId = targetObj;
-      
+
       popupMenu.style.left = e.clientX - dragArea.offsetLeft + "px";
       popupMenu.style.top = e.clientY - dragArea.offsetLeft + "px";
       popupMenu.style.display = "block";
 
-      if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType !=='caption') {
+      if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType !== 'caption') {
+        toolMenu.removeResizableElement(resizableElement, e);
         e.target.style.outline = '#27BAFF solid 1px';
-          resizableElement = $(e.target).resizable({
-            handles: 'n, e, s, w, ne, se, sw, nw',
-            stop: () => {
-              let target = e.target.id;
-              let resizeTarget;
-              if(target.includes('textArea')) {
-                resizeTarget = toolMenu.currentPageList.caption;
-                resizeTarget.left = e.target.style.left;
-                resizeTarget.top = e.target.style.top;
-                resizeTarget.width = e.target.style.width;
-                resizeTarget.height = e.target.style.height;
-              } else {
-                resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
-                resizeTarget.style.left = e.target.style.left;
-                resizeTarget.style.top = e.target.style.top;
-                resizeTarget.style.width = e.target.style.width;
-                resizeTarget.style.height = e.target.style.height;
-              }
-              toolMenu.canvas();
+        resizableElement = $(e.target).resizable({
+          handles: 'n, e, s, w, ne, se, sw, nw',
+          stop: () => {
+            let target = e.target.id;
+            let resizeTarget;
+            if (target.includes('textArea')) {
+              resizeTarget = toolMenu.currentPageList.caption;
+              resizeTarget.left = e.target.style.left;
+              resizeTarget.top = e.target.style.top;
+              resizeTarget.width = e.target.style.width;
+              resizeTarget.height = e.target.style.height;
+            } else {
+              resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
+              resizeTarget.style.left = e.target.style.left;
+              resizeTarget.style.top = e.target.style.top;
+              resizeTarget.style.width = e.target.style.width;
+              resizeTarget.style.height = e.target.style.height;
             }
-          });
+            toolMenu.canvas();
+          }
+        });
 
-          const resizableElements = document.querySelectorAll('.ui-resizable');
+        resizableElement.find('.ui-resizable-handle').css({
+          'position': 'absolute',
+          'width': '6px',
+          'height': '6px',
+          'background': '#5BB6F3',
+          'border': '2px solid #fff',
+          'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
+        });
 
-          resizableElements.forEach(element => {
-            if (element !== resizableElement && !element.contains(e.target)) {
-              $(element).resizable('destroy');
-              element.style.outline = '';
-            }
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
+          'left': '50%',
+          'top': '100%',
+          'cursor': 's-resize',
+          'margin': '0 0 0 -5px',
+        });
 
-          resizableElement.find('.ui-resizable-handle').css({
-            'position': 'absolute',
-            'width': '6px',
-            'height': '6px',
-            'background': '#5BB6F3',
-            'border': '2px solid #fff',
-            'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
+          'left': '100%',
+          'top': '0',
+          'cursor': 'ne-resize',
+          'margin': '-10px 0 0',
+        });
 
-          resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
-            'left': '50%',
-            'top': '100%',
-            'cursor': 's-resize',
-            'margin': '0 0 0 -5px',
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
+          'left': '100%',
+          'top': '100%',
+          'cursor': 'se-resize',
+          'margin': '0',
+        });
 
-          resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
-            'left': '100%',
-            'top': '0',
-            'cursor': 'ne-resize',
-            'margin': '-10px 0 0',
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
+          'left': '0',
+          'top': '100%',
+          'cursor': 'sw-resize',
+          'margin': '0 0 0 -10px',
+        });
 
-          resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
-            'left': '100%',
-            'top': '100%',
-            'cursor': 'se-resize',
-            'margin': '0',
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
+          'left': '0',
+          'top': '0',
+          'cursor': 'nw-resize',
+          'margin': '-10px 0 0 -10px',
+        });
 
-          resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
-            'left': '0',
-            'top': '100%',
-            'cursor': 'sw-resize',
-            'margin': '0 0 0 -10px',
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
+          'left': '50%',
+          'top': '0',
+          'cursor': 'n-resize',
+          'margin': '-10px 0 0 -5px',
+        });
 
-          resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
-            'left': '0',
-            'top': '0',
-            'cursor': 'nw-resize',
-            'margin': '-10px 0 0 -10px',
-          });
+        resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
+          'left': '100%',
+          'top': '50%',
+          'cursor': 'e-resize',
+          'margin': '-5px 0 0',
+        });
 
-          resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
-            'left': '50%',
-            'top': '0',
-            'cursor': 'n-resize',
-            'margin': '-10px 0 0 -5px',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
-            'left': '100%',
-            'top': '50%',
-            'cursor': 'e-resize',
-            'margin': '-5px 0 0',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
-            'left': '0',
-            'top': '50%',
-            'cursor': 'w-resize',
-            'margin': '-5px 0 0 -10px',
-          });
-        }
+        resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
+          'left': '0',
+          'top': '50%',
+          'cursor': 'w-resize',
+          'margin': '-5px 0 0 -10px',
+        });
+      }
     });
 
     imageArea.addEventListener("mousedown", function (e) {
       e.stopPropagation();
       toolMenu.inputValue = false;
-      e.target.contentEditable = false;
-
-      if (e.target.dataset.objType !== "character" && e.target.dataset.objType !== "background" && e.target.dataset.objType !== "caption"
-      && e.target.dataset.objType !== 'popupMenu' ) {
+      const textDiv = document.querySelector('[data-text-content="true"]');
+      if (textDiv) {
+        textDiv.contentEditable = false;
+      }
+      if (e.target.dataset.objType !== "character" && e.target.dataset.objType !== "background" && e.target.dataset.objType !== "caption" && e.target.dataset.objType !== 'popupMenu') {
         popupMenu.style.display = "none";
-
-        if (resizableElement) {
-          if (!resizableElement.is(e.target) && resizableElement.has(e.target).length === 0) {
-            resizableElement.resizable("destroy");
-            resizableElement = null;
-          }
-        };
-
-        const elementsWithOutline = document.querySelectorAll('[style*="outline"]');
-        if (elementsWithOutline) {
-          elementsWithOutline.forEach(element => {
-            element.style.outline = "none";
-          });
-        };
+        toolMenu.removeResizableElement(resizableElement, e);
       }
     });
 
-    document.addEventListener("click", function(e) {
+    document.addEventListener("click", function (e) {
       popupMenu.style.display = "none";
     })
 
-    document.addEventListener("dblclick" , function(e) {
-      if (e.target.id == "textArea" && e.button === 0) {
+    document.addEventListener("dblclick", function (e) {
+      if (e.target.dataset.textContent == "true" && e.button === 0) {
         toolMenu.inputValue = true;
         e.target.contentEditable = true;
         e.target.focus();
@@ -271,41 +250,40 @@ export default {
     //드래그 시작부분(selected page)
     function dragStart(e) {
       e.stopPropagation();
-
-      if (e.target.id != "textArea") {
-        console.log('not ddd');
-        toolMenu.inputValue = false;
-        e.target.contentEditable = false;
+      let target = e.target;
+      let parentDiv = target.closest('#textArea');
+      const textDiv = document.querySelector('[data-text-content="true"]');
+      
+      if (parentDiv) {
+        target = parentDiv;
+      } else {
+        if(textDiv) {
+          textDiv.contentEditable = false;
+          toolMenu.inputValue = false;
+        }
       }
 
       if (e.button === 0 && !toolMenu.inputValue && !e.target.classList.contains('ui-resizable-handle')) {
+        toolMenu.removeResizableElement(resizableElement, e);
         popupMenu.style.display = "none";
-        e.target.style.outline = '#27BAFF solid 1px';
-        const resizableElements = document.querySelectorAll('.ui-resizable');
-
-        resizableElements.forEach(element => {
-          if (element !== resizableElement && !element.contains(e.target)) {
-            // 다른 오브젝트에 resizable이 있다면 resizable을 제거
-            $(element).resizable('destroy');
-            element.style.outline = '';
-          }
-        });
+        target.style.outline = '#27BAFF solid 1px';
 
         targetObj = e.target.id;
+        if (parentDiv) targetObj = parentDiv.id;
 
-        if (targetObj.includes('textArea')) {
+        if (targetObj === 'textArea') {
           result = toolMenu.currentPageList.caption;
         } else {
           result = toolMenu.currentPageList.layerList.find(el => el.id === targetObj);
         }
 
-        if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType ==='caption') {
-          resizableElement = $(e.target).resizable({
+        if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
+          resizableElement = $(target).resizable({
             handles: 'n, e, s, w, ne, se, sw, nw',
             stop: () => {
               let target = e.target.id;
               let resizeTarget;
-              if(target.includes('textArea')) {
+              if (e.target.dataset.textContent === 'true') {
                 resizeTarget = toolMenu.currentPageList.caption;
                 resizeTarget.left = e.target.style.left;
                 resizeTarget.top = e.target.style.top;
@@ -387,13 +365,13 @@ export default {
             'margin': '-5px 0 0 -10px',
           });
         }
-        currentObjId = e.target.id;
+        currentObjId = targetObj;
         currentX = e.pageX - dragArea.offsetLeft;
         currentY = e.pageY - dragArea.offsetTop;
         currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
         currentYOffset = e.pageY - dragArea.offsetTop - e.offsetY;
         currentObj = e.target;
-        currentObj.style.zIndex = '10';
+        if (parentDiv) currentObj = parentDiv;
         currentObj.style.opacity = '0.5';
         active = true;
         document.addEventListener("mousemove", drag);
@@ -404,7 +382,7 @@ export default {
     function drag(e) {
       e.stopPropagation();
       e.preventDefault();
-      if (active && currentObjId === currentObj.id && e.target.dataset.objType == 'character' || 'background') {
+      if (active && currentObjId === e.target.id && e.target.dataset.objType == 'character' || 'background') {
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
         requestAnimationFrame(() => {
@@ -417,17 +395,15 @@ export default {
     //드래그 끝내는 부분 (selected page)
     function dragEnd(e) {
       if (active) {
-        if (e.target.id.includes('textArea')) {
+        if (e.target.dataset.textContent === 'true') {
           e.target.style.zIndex = '2';
           result.left = e.target.style.left;
           result.top = e.target.style.top;
         } else {
-          e.target.style.zIndex = '1';
-          result.style.left = e.target.style.left;
-          result.style.top = e.target.style.top;
+          result.style.left = currentObj.style.left;
+          result.style.top = currentObj.style.top;
         }
-        e.target.style.opacity = '1';
-
+        currentObj.style.opacity = '1';
         active = false;
         document.removeEventListener('mousemove', drag);
         toolMenu.canvas();
@@ -450,7 +426,8 @@ export default {
       if (this.fontSize == NaN) this.fontSize = 10;
     },
     fontSize: function (newVal) {
-      const textArea = document.getElementById('textArea');
+      console.log(newVal);
+      const textArea = document.querySelector('[data-text-content="true"]');
       if (textArea) {
         textArea.style.fontSize = newVal + 'px';
         this.currentPageList.caption.fontSize = newVal;
@@ -480,19 +457,23 @@ export default {
       const caption = this.currentPageList.caption;
       const objectArea = this.$refs.pageObject;
       const addDiv = document.createElement("div");
-      addDiv.setAttribute("data-text-content", true);
+      const textDiv = document.createElement("div");
+
+      textDiv.setAttribute("data-text-content", true);
       addDiv.setAttribute('data-obj-type', 'caption');
       addDiv.style.width = "400px";
       addDiv.style.height = "200px";
       addDiv.style.left = "120px";
       addDiv.style.top = "200px"
-      addDiv.style.fontWeight = "bold";
-      addDiv.style.fontSize = this.fontSize + "px";
+      textDiv.style.height = "100%";
+      textDiv.style.fontWeight = "bold";
+      textDiv.style.fontSize = this.fontSize + "px";
+      textDiv.style.color = '#000000';
+      textDiv.innerText = "자막 내용을 입력해주세요.";
       addDiv.style.position = "absolute";
-      addDiv.style.color = '#000000';
       addDiv.id = "textArea";
-      addDiv.innerText = "자막 내용을 입력해주세요.";
       addDiv.style.zIndex = 2;
+      addDiv.appendChild(textDiv);
       objectArea.appendChild(addDiv);
       caption.content = '자막 내용을 입력해주세요.';
       caption.fontSize = addDiv.style.fontSize;
@@ -508,13 +489,10 @@ export default {
     canvas() {
       try {
         const imageArea = this.$refs.dragImage;
-
         const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
-
         const ignoreElements = element => {
           return resizableElements.some(resizableElement => resizableElement.contains(element));
         };
-
         html2canvas(imageArea, { useCORS: true, ignoreElements }).then(canvas => {
           const ctx = canvas.getContext('2d');
           const img = new Image();
@@ -531,7 +509,6 @@ export default {
             const dataUrl = canvas.toDataURL('image/jpeg', 0.35);
             this.currentPageList.thumbnail = dataUrl;
           };
-
           img.src = canvas.toDataURL();
         });
       } catch (err) {
@@ -759,10 +736,22 @@ export default {
         this.canvas();
       });
     },
+    removeResizableElement(resizableElement, e) {
+      const resizableElements = document.querySelectorAll('.ui-resizable');
+      resizableElements.forEach(element => {
+        if (element !== resizableElement && !element.contains(e.target)) {
+          console.log(element);
+          $(element).resizable('destroy');
+          element.style.outline = '';
+        };
+      });
+    },
   },
 }
 
-//!!현재 자막 부분 문제점 자막을 다 지우면 글자크기 작아짐...!!
+//1. 현재 자막 부분 문제점 자막을 다 지우면 글자크기 작아짐... 다른 div 안에 글이 들어감 새로운 div 를 추가를 해서 거기에 글을 적게 하고 드래그를 전체로 하도록 해야할듯 --해결
+//2. 썸네일 제작 부분 비동기 형식이라 만약에 canvas() 하기 전에 currentPageList가 변경이되면 해당 currentPageList의 썸네일이 변경됨... --몰라
+//3. 모듈화 해야함... --귀찮음
 
 </script>
 <style scoped>

@@ -4,17 +4,63 @@
       <button
         v-for="(tab, index) in tabList"
         :key="index"
-        @click.prevent="currentTab = tab"
+        @click.prevent="handleTabClick(tab)"
         :class="{ active: currentTab === tab }"
       >
         {{ tab.name }}
       </button>
     </div>
     <div class="tab-content">
-      <component :is="currentTab.component"></component>
+      <component :is="currentTab.component" v-if="loginState || tabHasAccess(currentTab)"></component>
     </div>
   </div>
 </template>
+
+<script>
+import GoingTool from '../components/GoingTool.vue';
+// import RecommendationSort from '../components/RecommendationSort.vue';
+import PopularitySort from '../components/PopularitySort.vue';
+
+export default {
+  name: "Tab",
+  components: {
+    GoingTool,
+    // RecommendationSort,
+    PopularitySort
+  },
+  data() {
+    return {
+      currentTab: null,
+      loginState: false,
+      tabList: [
+        { name: "🔥인기순", component: "PopularitySort", access: true },
+        { name: "🆕최신순", component: "PopularitySort", access: true },
+        { name: "🛠️만들어보기", component: "GoingTool", access: false },
+      ]
+    };
+  },
+  created() {
+    if (sessionStorage.getItem('user')) {
+      this.loginState = true;
+    }
+    // 초기 탭 설정
+    this.currentTab = this.tabList[1];
+  },
+  methods: {
+    handleTabClick(tab) {
+      if (!this.loginState && !this.tabHasAccess(tab)) {
+        alert('로그인 후 이용해주세요!');
+      } else {
+        this.currentTab = tab;
+      }
+    },
+    tabHasAccess(tab) {
+      return this.loginState || tab.access;
+    }
+  }
+};
+</script>
+
 <style scoped>
 .tab button {
   background-color: white;
@@ -45,32 +91,5 @@
 }
 </style>
 
-<script>
-import GoingTool from '../components/GoingTool.vue';
-// import RecommendationSort from '../components/RecommendationSort.vue';
-import PopularitySort from '../components/PopularitySort.vue';
 
-export default {
-  name: "Tab",
-  components: {
-    GoingTool,
-  //  RecommendationSort,
-    PopularitySort
-  },
-  data() {
-    return {
-      currentTab: null,
-      tabList: [
-        { name: "🔥인기순", component: "PopularitySort" },
-        { name: "🆕최신순", component: "PopularitySort" },
-        { name: "🛠️만들어보기", component: "GoingTool" },
-      ]
-    };
-  },
-  created() {
-    // 초기 탭 설정
-    this.currentTab = this.tabList[1];
-  },
-};
-</script>
 

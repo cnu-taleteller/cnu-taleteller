@@ -1,6 +1,6 @@
-package com.cnu.taleteller.backend.domain.book.domain;
+package com.cnu.taleteller.backend.domain.book.entity;
 
-import com.cnu.taleteller.backend.domain.user.domain.Member;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

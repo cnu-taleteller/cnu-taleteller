@@ -1,19 +1,12 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
 
-import com.cnu.taleteller.backend.domain.user.domain.User;
+import com.cnu.taleteller.backend.domain.user.entity.User;
 import com.cnu.taleteller.backend.domain.user.dto.UserResponseDto;
 import com.cnu.taleteller.backend.domain.user.service.UserService;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController

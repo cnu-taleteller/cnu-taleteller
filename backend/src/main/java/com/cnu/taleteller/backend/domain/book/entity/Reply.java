@@ -1,4 +1,4 @@
-package com.cnu.taleteller.backend.domain.book.domain;
+package com.cnu.taleteller.backend.domain.book.entity;
 
 import lombok.Builder;
 import lombok.Getter;

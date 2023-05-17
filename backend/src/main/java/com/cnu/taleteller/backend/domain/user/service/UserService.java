@@ -1,7 +1,7 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
 import com.cnu.taleteller.backend.domain.user.Repository.UserRepository;
-import com.cnu.taleteller.backend.domain.user.domain.User;
+import com.cnu.taleteller.backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

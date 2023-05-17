@@ -3,16 +3,14 @@ package com.cnu.taleteller.backend.domain.book.service;
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
-import com.cnu.taleteller.backend.domain.book.domain.Book;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
-import com.cnu.taleteller.backend.domain.user.domain.Member;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

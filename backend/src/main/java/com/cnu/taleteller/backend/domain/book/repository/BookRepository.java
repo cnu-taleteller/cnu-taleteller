@@ -1,7 +1,6 @@
 package com.cnu.taleteller.backend.domain.book.repository;
 
-import com.cnu.taleteller.backend.domain.book.domain.Book;
-import com.cnu.taleteller.backend.domain.user.domain.Member;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

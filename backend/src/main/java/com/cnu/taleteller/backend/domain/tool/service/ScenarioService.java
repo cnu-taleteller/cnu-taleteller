@@ -1,7 +1,7 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
-import com.cnu.taleteller.backend.domain.book.domain.Book;
-import com.cnu.taleteller.backend.domain.tool.domain.Scenario;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.tool.entity.Scenario;
 import com.cnu.taleteller.backend.domain.tool.dto.CaptionRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.KeywordRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.ScenarioDto;

@@ -11,10 +11,10 @@
     <div class="menu-form">
       <div class="uploadImage">
         <div v-if="selectedMenu == 'background'">
-          <input type="file" @change="uploadFile('background')" accept="image/*" id="image"  ref="file">
+          <input type="file" @change="uploadFile('background')" accept="image/*" id="image" ref="file">
         </div>
         <div v-else-if="selectedMenu == 'character'">
-          <input type="file" @change="uploadFile('character')" max accept="image/*" id="image"  ref="file">
+          <input type="file" @change="uploadFile('character')" max accept="image/*" id="image" ref="file">
         </div>
         <!-- 시나리오 -->
         <div class="scenario-form2" v-else-if="selectedMenu == 'scenario'">
@@ -30,23 +30,24 @@
           </div>
           <!-- 시나리오 선택 완료 -->
           <div class="scenario-form2" v-else-if="select == true">
-            <button class="submit-btn" :class="{ active: flowMenu == false }" @click="flowMenu=false">선택한 시나리오</button>
+            <button class="submit-btn" :class="{ active: flowMenu == false }" @click="flowMenu = false">선택한 시나리오</button>
             <button class="submit-btn" :class="{ active: flowMenu == true }" @click="checkFlow('menu')">흐름 파악하기</button>
 
             <!-- 선택한 시나리오 -->
-            <div class="scenario-form2" v-if="flowMenu==false">
+            <div class="scenario-form2" v-if="flowMenu == false">
               <p v-for="(story, index) in selectScenario" :key="index">
-              {{ setScenarioLabel(index) }} <br>
-              <textarea v-model="selectScenario[index]" class="story-input" :disabled="isDisabled">{{ story }}</textarea>
+                {{ setScenarioLabel(index) }} <br>
+                <textarea v-model="selectScenario[index]" class="story-input"
+                  :disabled="isDisabled">{{ story }}</textarea>
               </p>
               <button class="submit-btn" v-show="isDisabled" :disabled="isDisabled2"
                 @click="editScenario('edit')">수정</button>
               <button class="submit-btn" v-show="!isDisabled" @click="editScenario('save')">저장</button>
             </div>
-            
+
             <!-- 흐름 파악하기 -->
             <div v-show="flowMenu" class="scenario-form2">
-              <div v-if="flowMenu==true && loading == true">
+              <div v-if="flowMenu == true && loading == true">
                 <br>
                 <div class="spinner-border" role="status"></div>
                 <p>흐름 파악 중입니다.<br>조금만 기다려주세요!😥</p>
@@ -88,12 +89,12 @@
       <div class="image-list">
         <div id="item">
           <div class="uploaded-image-list" v-show="selectedMenu == 'character'">
-            <img :src="item.src" crossOrigin="anonymous" :draggable="item.draggable" :id="item.id" :style="{ height: '100px', width: '100px' }"
-              v-for="item, index in charList">
+            <img :src="item.src" crossOrigin="anonymous" :draggable="item.draggable" :id="item.id"
+              :style="{ height: '100px', width: '100px' }" v-for="item, index in charList">
           </div>
           <div class="uploaded-image-list" v-show="selectedMenu == 'background'">
-            <img :src="item.src" crossOrigin="anonymous" :draggable="item.draggable" :id="item.id" :style="{ height: '100px', width: '100px' }"
-              v-for="item, index in backList">
+            <img :src="item.src" crossOrigin="anonymous" :draggable="item.draggable" :id="item.id"
+              :style="{ height: '100px', width: '100px' }" v-for="item, index in backList">
           </div>
         </div>
       </div>
@@ -121,7 +122,7 @@ export default {
         encodedFileName: null,
         uploadedUrl: null,
       },
-      
+
       scenarioKeyword: {
         who: null,
         when: null,
@@ -141,26 +142,26 @@ export default {
       selectScenario: [], // 선택한 시나리오
       resultScenario: [],  // [도입], [전개] 등 다 있는 시나리오 - session 저장용
       isReScenario: false,
-  
+
       // 업로드되는 이미지 리스트
       uploadBackList: [],
       uploadCharList: [],
 
       // 기본적으로 있는 이미지 배열. 반복되는 부분 많아서 방식 변경
-      charList: Array.from({length: 25}, (_, i) => ({
+      charList: Array.from({ length: 25 }, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/character${i}.png`,
         id: `character${i}`,
         draggable: "true",
         height: "100px",
       })),
       // 기본적으로 있는 배경 배열
-      backList: Array.from({ length: 18}, (_, i) => ({
+      backList: Array.from({ length: 18 }, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/background${i}.png`,
         id: `background${i}`,
         draggable: "true",
         height: "100px",
       })),
-      
+
     }
   },
   //props로 toolView에서 보낸 데이터를 받음
@@ -185,52 +186,50 @@ export default {
         alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
         return;
       }
-      
+
       this.file = this.$refs.file.files[0];
-      await axios.get("/api/tool/s3/image", {params: {fileName: this.file.name}},)
-      .then((res) => {
-        console.log(res.data);
-        this.s3.preSignedUrl = res.data.preSignedUrl
-        this.s3.encodedFileName = res.data.encodedFileName
-        this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
-      })
+      await axios.get("/api/v1/tool/s3/image", { params: { fileName: this.file.name } },)
+        .then((res) => {
+          this.s3.preSignedUrl = res.data.preSignedUrl
+          this.s3.encodedFileName = res.data.encodedFileName
+          this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
+        })
     },
     // S3 업로드
     async uploadImageToS3(preSignedUrl, file, menu) {
       await axios.put(preSignedUrl, file)
-      .then((res) => {
-        this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
-        console.log(this.s3.uploadedUrl);
+        .then((res) => {
+          this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
 
-        if (menu === 'background') {
-          this.uploadBackList.push(this.s3.uploadedUrl);
-          sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
-          this.backList.push({
-            src: this.s3.uploadedUrl,
-            id: 'upload' + this.uploadId,
-            draggable: "true",
-            height: "100px",
-          });
-        } else if (menu === 'character') {
-          this.uploadCharList.push(this.s3.uploadedUrl);
-          sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
-          this.charList.push({
-            src:  this.s3.uploadedUrl,
-            id: 'upload' + this.uploadId,
-            draggable: "true",
-            height: "100px",
-          });
-        }
-        this.uploadId++;
-        console.log("S3 업로드 성공");
-        document.getElementById("image").value = "";
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
-      });
+          if (menu === 'background') {
+            this.uploadBackList.push(this.s3.uploadedUrl);
+            sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
+            this.backList.push({
+              src: this.s3.uploadedUrl,
+              id: 'upload' + this.uploadId,
+              draggable: "true",
+              height: "100px",
+            });
+          } else if (menu === 'character') {
+            this.uploadCharList.push(this.s3.uploadedUrl);
+            sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
+            this.charList.push({
+              src: this.s3.uploadedUrl,
+              id: 'upload' + this.uploadId,
+              draggable: "true",
+              height: "100px",
+            });
+          }
+          this.uploadId++;
+          console.log("S3 업로드 성공");
+          document.getElementById("image").value = "";
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
+        });
     },
-    
+
     setSelectedMenu(menu) {
       this.selectedMenu = menu;
       this.$emit('selectedMenu', this.selectedMenu);
@@ -286,73 +285,51 @@ export default {
     setScenario() {
       this.selectScenario = this.finalScenario[this.scenarioNum];
       this.select = true; // 임시 저장, 제출에 필요한 데이터
-      sessionStorage.setItem('select',true);
+      sessionStorage.setItem('select', true);
     },
     // 기승전결 흐름 파악
-    checkFlow(arg){
+    checkFlow(arg) {
       this.flowMenu = true;
       let len = this.pageList.length;
 
-      if(len < 3) {
+      if (len < 3) {
         alert('3페이지 이상 작업하셔야 흐름을 파악할 수 있습니다!');
         this.flowMenu = false;
         return;
       }
-      if(this.flowcnt > 4) {
+      if (this.flowcnt > 4) {
         alert('흐름 파악은 5번까지만 가능합니다!');
         return;
       }
 
-      for(let i=0; i<len; i++){
-        this.allCaption[i]=this.pageList[i].caption.content;
-        console.log(this.allCaption[i]);
+      for (let i = 0; i < len; i++) {
+        this.allCaption[i] = this.pageList[i].caption.content;
       }
 
-      if(arg === 'menu') {
+      if (arg === 'menu') {
         if (this.flowResult == null) {
           this.checkFlowGpt();
         }
       }
-    
-      else if(arg === 're') {
+
+      else if (arg === 're') {
         this.checkFlowGpt();
       }
 
     },
-    
-    checkFlowGpt(){
+
+    checkFlowGpt() {
       this.flowcnt++;
       this.loading = true;
       const story = sessionStorage.getItem('scenario');
-      const caption = this.allCaption;
-      console.log(story);
+      const captions = this.allCaption;
 
       console.log("axios 통신 요청");
-      axios.post("https://api.openai.com/v1/chat/completions",
-        {
-          "model": "gpt-3.5-turbo",
-          "messages": [{
-            "role": "user",
-            "content": `${story} 라는 내용을 가진 동화책을 만드려고 하는데,
-            초반 내용: ${caption[0]}, ${caption[1]}, ${caption[2]}, ...,
-            후반 내용: ${caption[caption.length-2]}, ${caption[caption.length-1]}...
-            까지 제작이 진행된 상황이라면,
-            현재 만들고 있는 내 동화책은
-            [도입], [전개], [위기], [결말] 중 어디까지 진행된 거고, 어떤 내용을 더 추가해야할까?
-            처음에 말한 동화책 내용이랑 내가 제작하고 있는 내용이 상관없는 얘기라면 상관없는 내용이라고 말해줘.
-            `
-          }],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.VUE_APP_API_KEY}`,
-          }
-        }
-      )
+      axios.post("/api/v1/tool/scenario/flow", {
+        story, captions
+      })
         .then((res) => {
-          console.log(res.data.choices[0].message.content);
-          this.flowResult = res.data.choices[0].message.content;
+          this.flowResult = res.data;
           this.loading = false;
         })
         .catch((err) => {
@@ -361,8 +338,8 @@ export default {
           console.log(err);
         })
     },
-     // 키워드 변경
-     reKeyword() {
+    // 키워드 변경
+    reKeyword() {
       const popupWidth = 600;
       const popupHeight = 650;
       const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
@@ -512,48 +489,26 @@ export default {
       }
       this.isReScenario = true;
       this.isDisabled2 = true;
-      console.log(this.scenarioKeyword);
       console.log("axios 통신 요청");
-      axios.post("https://api.openai.com/v1/chat/completions",
-        {
-          "model": "gpt-3.5-turbo",
-          "messages": [{
-            "role": "user",
-            "content": `누가: ${this.scenarioKeyword.who},
-                        언제: ${this.scenarioKeyword.when}, 
-                        어디서: ${this.scenarioKeyword.where},
-                        사건: ${this.scenarioKeyword.event}
-                        라는 내용을 가진 동화책을 '도입/전개/위기/결말' 로 나눠서 써줘.
-                        내용을 나눌 때 형식은 
-                        [도입] 내용
-                        [전개] 내용
-                        [위기] 내용
-                        [결말] 내용 
-                        형식으로 나눠서 700자 이내로 써줘.`
-          }],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.VUE_APP_API_KEY}`,
-          }
-        }
-      )
+      axios.post("/api/v1/tool/scenario/", {
+        who: this.scenarioKeyword.who,
+        when: this.scenarioKeyword.when,
+        where: this.scenarioKeyword.where,
+        event: this.scenarioKeyword.event
+      })
         .then((res) => {
-          // console.log(res.data.choices[0].message.content);
-          this.resultScenario = res.data.choices[0].message.content;
+          this.resultScenario = res.data;
           sessionStorage.setItem('scenario', this.resultScenario);
-          // console.log(this.finalScenario);
           this.setScenarioArr();
           this.isDisabled2 = false;
         })
         .catch((err) => {
           alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-          console.log(err);
+          console.error(err);
         })
         .finally(() => {
           this.isReScenario = false;
-        })
+        });
     },
 
     setScenarioArr() {
@@ -593,6 +548,7 @@ export default {
 button {
   border-radius: 3px;
 }
+
 .menu {
   /* height: 100%; */
   height: 90vh;
@@ -709,15 +665,17 @@ input[type=file]::file-selector-button:hover {
   width: 100%;
   height: 100%;
 }
+
 .scenario-form2 {
   width: 100%;
   /* height: 90vh; */
   height: 80vh;
 }
 
-.scenario-form2 > p {
+.scenario-form2>p {
   margin: 20px;
 }
+
 .submit-btn {
   border: none;
   padding: 5px 10px;
@@ -727,6 +685,7 @@ input[type=file]::file-selector-button:hover {
 .submit-btn:hover {
   opacity: 0.7;
 }
+
 .submit-btn.active {
   background-color: #fceb6e;
 }

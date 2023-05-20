@@ -51,7 +51,7 @@ public class BookService {
                 .orElseThrow(() -> new IllegalArgumentException("err"));
 
         Book book = optionalBook;
-        book.update(bookId, dto.getBookName(), dto.getBookStatus());
+        book.update(dto.getBookName(), dto.getBookStatus());
         return bookRepository.save(book);
     }
 

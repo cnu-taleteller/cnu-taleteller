@@ -1,6 +1,5 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
-import com.cnu.taleteller.backend.domain.tool.entity.Scenario;
 import com.cnu.taleteller.backend.domain.tool.dto.CaptionRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.KeywordRequestDto;
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
@@ -9,7 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 @RestController
 @RequestMapping("/api/v1/tool/scenario")
@@ -39,8 +39,14 @@ public class ScenarioController {
     }
 
     @PostMapping("/{bookId}")
-    public ResponseEntity saveScenario(@RequestBody String[] scenario, @PathVariable Long bookId){
-        List<Scenario> list = scenarioService.save(scenario, bookId);
+    public ResponseEntity saveScenario(@RequestBody String scenario, @PathVariable Long bookId){
+        String decodedData = null;
+        try {
+            decodedData = URLDecoder.decode(scenario, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        scenarioService.save(decodedData, bookId);
         return new ResponseEntity(HttpStatus.OK);
     }
 

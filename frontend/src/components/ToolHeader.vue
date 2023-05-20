@@ -151,24 +151,14 @@ export default {
 
     },
     async saveScenario() {
-      const resultScenario = sessionStorage.getItem('scenario');
-      if (resultScenario === null) return;
+      const scenario = sessionStorage.getItem('scenario');
+      if (scenario === null) return;
 
-      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
-      const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
-      sections.forEach((section, index) => {
-        const scenario = resultScenario;
-        const start = scenario.indexOf(section);
-        let end;
-
-        if (index < sections.length - 1) {
-          end = scenario.indexOf(sections[index + 1]);
-        } else {
-          end = scenario.length;
+      await axios.post("/api/v1/tool/scenario/" + this.bookId, JSON.stringify(scenario), {
+      headers: {
+          'Content-Type': 'application/json'
         }
-        this.finalScenario[index] = scenario.slice(start, end).replace(section, '').trim();
-      });
-      await axios.post("/api/v1/tool/scenario/" + this.bookId, this.finalScenario)
+      })
         .then((res) => {
           console.log(res);
         })

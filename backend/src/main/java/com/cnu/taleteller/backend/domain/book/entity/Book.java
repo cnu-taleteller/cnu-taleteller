@@ -40,12 +40,15 @@ public class Book {
     @Column(length = 1)
     private String bookPublic;
 
+    @Column(columnDefinition = "TEXT")
+    private String scenario;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, Member member) {
+    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic,String scenario, Member member) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookRegdate = bookRegdate;
@@ -54,6 +57,7 @@ public class Book {
         this.bookCategory = bookCategory;
         this.bookRecommend = bookRecommend;
         this.bookPublic = bookPublic;
+        this.scenario = scenario;
         this.member = member;
     }
 
@@ -65,11 +69,15 @@ public class Book {
         // 로그인 기능 되면 사용자 이름도 추가
     }
 
-    public void update(Long bookId, String bookName, String bookStatus){
-        this.bookId = bookId;
+    public void update(String bookName, String bookStatus){
         this.bookName = bookName;
         this.bookStatus = bookStatus;
     }
+
+    public void updateScenario(String scenario){
+        this.scenario = scenario;
+    }
+
 
     public Book(Long bookId) {
         this.bookId = bookId;

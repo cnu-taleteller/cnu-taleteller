@@ -6,7 +6,7 @@
         <li v-for="page, index in pageList" :key="index" class="one-page">
           <div class="page-body" @click="clickPage(index)">
             <!-- 썸네일 부분 -->
-            <img v-if="page.thumbnail != null" :src="page.thumbnail" style="width:100%; height: 100%">
+            <img v-if="page.thumbnail !== '' && page.thumbnail !== null" :src="page.thumbnail" style="width:100%; height: 100%">
           </div>
           <label>
             {{ page.pageId }}
@@ -38,16 +38,17 @@ export default {
           pageId : 1,
           pageStatus: 1,
           caption : {
-            fontSize: "20px",
-            fontColor : '#000000',
-            content: null,
-            height: null,
-            width: null,
-            left: null,
-            top: null,
+            captionState : 0,
+            fontSize: '',
+            fontColor : '',
+            content: '',
+            height: '',
+            width: '',
+            left: '',
+            top: '',
           },
-          thumbnail: null,
-          layerList: []
+          thumbnail: '',
+          layerList: [],
         }
       ],
       currentPageNo: 1,
@@ -91,8 +92,9 @@ export default {
         0,
         {
           caption: {
-            fontSize: "20px",
-            fontColor : '#000000',
+            captionState: 0,
+            fontSize: '',
+            fontColor : '',
             content: null,
             height: null,
             width: null,

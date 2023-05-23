@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class MemberInfoDto {
 //    private int id;
+    private Long memberId;
     private String memberEmail;
     private String memberPassword;
     private String memberName;

@@ -4,12 +4,17 @@ import com.cnu.taleteller.backend.domain.book.domain.Book;
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.service.BookService;
+import com.cnu.taleteller.backend.domain.tool.domain.Page;
+import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/book")
@@ -18,20 +23,26 @@ public class BookController {
 
     private final BookService bookService;
 
+    private final ToolService toolService;
+
     @PostMapping("/")
     public ResponseEntity<Book> save(@RequestBody BookTempSaveDto dto) {
-        Book book = bookService.saveBook(dto);
-        System.out.println(book);
+        String bookName = dto.getBookName();
+        String bookStatus = dto.getBookStatus();
+        String email = dto.getEmail();
+        Page[] pageList = dto.getPageList();
+
+        ObjectId objectId = toolService.saveBook(pageList);
+        Book book = bookService.saveBook(bookName, bookStatus, email, objectId.toString());
 
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @PostMapping("/{bookId}")
-    public ResponseEntity<Book> update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) {
-        Book book = bookService.updateBook(dto, bookId);
-        System.out.println(book);
+    public ResponseEntity<Book> update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
+        Book updateBook = bookService.updateBook(dto, bookId);
 
-        return new ResponseEntity<>(book, HttpStatus.OK);
+        return new ResponseEntity<>(updateBook, HttpStatus.OK);
     }
 
     @GetMapping("/search")

@@ -15,7 +15,7 @@ public class Tool {
 
     @Id
     private String id;
-
+    private String subName;
     private String name;
     private int age;
 }

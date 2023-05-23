@@ -1,7 +1,16 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
+import com.cnu.taleteller.backend.domain.tool.domain.Books;
 import com.cnu.taleteller.backend.domain.tool.domain.Scenario;
+<<<<<<< Updated upstream
 import com.cnu.taleteller.backend.domain.tool.service.FileService;
+=======
+import com.cnu.taleteller.backend.domain.tool.domain.Tool;
+import com.cnu.taleteller.backend.domain.tool.domain.UploadFile;
+import com.cnu.taleteller.backend.domain.tool.dto.UploadFileRequestDto;
+import com.cnu.taleteller.backend.domain.tool.service.UploadFileService;
+import com.cnu.taleteller.backend.domain.tool.service.S3Service;
+>>>>>>> Stashed changes
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +28,14 @@ import java.util.List;
 public class ToolController {
 
     private final ScenarioService scenarioService;
+<<<<<<< Updated upstream
 
     private final FileService fileService;
 
+=======
+    private final UploadFileService uploadFileService;
+    private final S3Service s3Service;
+>>>>>>> Stashed changes
     private final ToolService toolService;
 
     @PostMapping("/scenario/{bookId}")

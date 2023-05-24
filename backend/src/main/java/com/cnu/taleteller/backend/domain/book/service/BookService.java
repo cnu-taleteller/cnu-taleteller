@@ -4,13 +4,24 @@ import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.tool.domain.BookMongo;
+import com.cnu.taleteller.backend.domain.tool.repository.BookMongoRepository;
+import com.cnu.taleteller.backend.domain.tool.repository.ToolRepository;
+import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +29,8 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final MemberRepository memberRepository;
+    private final BookMongoRepository bookMongoRepository;
+    private final ToolService toolService;
 
     public List<Book> searchByTitle(String keyword) {
         return bookRepository.findByBookNameContaining(keyword);
@@ -37,21 +50,33 @@ public class BookService {
         return book;
     }
 
-    public Book saveBook(BookTempSaveDto dto) {
-        Member member = memberRepository.findByMemberEmail(dto.getEmail())
+    @Transactional
+    public Book saveBook(String bookName, String bookStatus, String email, String objectId) {
+
+        Member member = memberRepository.findByMemberEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("err"));
-        dto.setMember(member);
-        Book book = bookRepository.save(dto.toEntity());
-        return book;
+
+        BookMongo bookMongo = BookMongo.builder()
+                .mongoId(objectId)
+                .build();
+        bookMongoRepository.save(bookMongo);
+
+        Book bookEntity = Book.builder()
+                .bookName(bookName)
+                .bookStatus(bookStatus)
+                .member(member)
+                .bookMongo(bookMongo)
+                .build();
+        return bookRepository.save(bookEntity);
     }
 
     @Transactional
-    public Book updateBook(BookTempSaveDto dto, Long bookId) {
-        Book optionalBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("err"));
-
-        Book book = optionalBook;
+    public Book updateBook(BookTempSaveDto dto, Long bookId) throws ExecutionException, InterruptedException, RuntimeException {
+        CompletableFuture<Void> work = toolService.updateBookPages(bookId, dto.getPageList());
+        Book book = bookRepository.findById(bookId)
+        .orElseThrow(() -> new IllegalArgumentException("err"));
         book.update(dto.getBookName(), dto.getBookStatus());
+        work.get();
         return bookRepository.save(book);
     }
 

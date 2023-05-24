@@ -1,6 +1,8 @@
 package com.cnu.taleteller.backend.domain.book.entity;
 
 import com.cnu.taleteller.backend.domain.user.entity.Member;
+import com.cnu.taleteller.backend.domain.tool.domain.BookMongo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +13,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "books")
+@Table(name = "books", indexes = {@Index(name = "book_id_index",columnList = "book_id")})
 @NoArgsConstructor
 public class Book {
 
     @Id
+    @Column(name = "book_id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long bookId;
 
@@ -47,8 +50,13 @@ public class Book {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_mongo_id")
+    @JsonIgnore
+    private BookMongo bookMongo;
+
     @Builder
-    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic,String scenario, Member member) {
+    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, Member member, BookMongo bookMongo) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookRegdate = bookRegdate;
@@ -59,6 +67,7 @@ public class Book {
         this.bookPublic = bookPublic;
         this.scenario = scenario;
         this.member = member;
+        this.bookMongo = bookMongo;
     }
 
     public void incrementRecommend() {

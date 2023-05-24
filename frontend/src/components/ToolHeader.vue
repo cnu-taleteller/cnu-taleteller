@@ -11,6 +11,7 @@
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
       <button @click="saveTmp()">임시저장</button>
+      <button @click="test()">저장테스트</button>
       <button @click="saveBook()">제출</button>
     </div>
   </div>
@@ -76,7 +77,8 @@ export default {
           await axios.post("/api/v1/book/", {
             bookName: this.bookName,
             bookStatus: "temp",
-            email: sessionStorage.getItem('user')
+            email: sessionStorage.getItem('user'),
+            pageList : this.pageList,
           })
             .then((res) => {
               console.log(res.data.bookId);
@@ -96,6 +98,7 @@ export default {
           await axios.post("/api/v1/book/" + this.bookId, {
             bookName: this.bookName,
             bookStatus: "temp",
+            pageList : this.pageList,
           })
             .then((res) => {
               console.log(res);
@@ -325,6 +328,17 @@ export default {
         divEle.style.zIndex = 2;
         list.appendChild(divEle);
       }
+    },
+    test() {
+      console.log(JSON.stringify(this.pageList));
+      axios.post('/api/tool/dataTest/1', {"pageList" : this.pageList})
+        .then(res => {
+          console.log(res);
+          console.log('success');
+        }).catch(err => {
+          console.log(err);
+          console.log('fail');
+        })
     }
   },
 }

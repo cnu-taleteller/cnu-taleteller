@@ -167,12 +167,12 @@ import axios from 'axios';
 .point-wallet {
   font-weight: bold;
   width: 300px;
+  margin-top: 20px;
   /* border-bottom: 2px solid #ccc; */
 }
 
 .mypage-content {
   padding: 20px;
-  margin-top: 20px;
 }
 
 .point-button {

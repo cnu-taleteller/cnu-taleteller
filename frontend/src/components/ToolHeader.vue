@@ -10,7 +10,7 @@
     </div>
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
-      <button @click="saveTmp()">임시저장</button>
+      <button @click="save()">임시저장</button>
       <button @click="saveBook()">제출</button>
     </div>
   </div>
@@ -22,11 +22,9 @@ export default {
   data() {
     return {
       isPreviewDialogVisible: false,
-      bookName: null,
+      bookName: "",
       pop: null,
       edit: false,
-      bookId: null,
-      finalScenario: []
     };
   },
   props: {
@@ -48,7 +46,6 @@ export default {
     editBookName() {
       this.edit = !!!this.edit;
     },
-    // 제출
     saveBook() {
       // 시나리오 선택되어야 진행
       const select = sessionStorage.getItem('select');

@@ -67,9 +67,8 @@ export default {
 .point-details {
   overflow-y: scroll;
   font-size: 20px;
-
-  width: 600px;
-  height: 80%;
+  width: 70%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

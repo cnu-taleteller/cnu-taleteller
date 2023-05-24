@@ -62,7 +62,7 @@ public class Book {
     }
 
     public void incrementRecommend() {
-       this.bookRecommend = bookRecommend + 1;
+        this.bookRecommend = bookRecommend + 1;
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookDescription = bookDescription;

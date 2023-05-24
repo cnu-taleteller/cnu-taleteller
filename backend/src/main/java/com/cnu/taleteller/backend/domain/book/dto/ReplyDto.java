@@ -1,7 +1,7 @@
 package com.cnu.taleteller.backend.domain.book.dto;
 
-import com.cnu.taleteller.backend.domain.book.domain.Book;
-import com.cnu.taleteller.backend.domain.book.domain.Reply;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.book.entity.Reply;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

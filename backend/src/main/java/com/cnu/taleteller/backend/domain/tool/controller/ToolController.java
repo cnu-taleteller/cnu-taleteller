@@ -1,60 +1,37 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
-import com.cnu.taleteller.backend.domain.tool.service.FileService;
-import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
-import lombok.AllArgsConstructor;
+import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
+import com.cnu.taleteller.backend.domain.tool.dto.UploadFileRequestDto;
+import com.cnu.taleteller.backend.domain.tool.service.S3Service;
+import com.cnu.taleteller.backend.domain.tool.service.UploadFileService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/tool")
-@AllArgsConstructor
+@RequestMapping("/api/v1/tool")
+@RequiredArgsConstructor
 public class ToolController {
 
-    private final ScenarioService scenarioService;
-    private final FileService fileService;
+    private final UploadFileService uploadFileService;
+    private final S3Service s3Service;
 
 
-    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> saveImage(@RequestParam("image") MultipartFile img, @RequestParam("menu") String menu) {
-        try {
-            if (img.isEmpty()) {
-                throw new IllegalArgumentException("이미지 파일 오류");
-            }
-            if (menu == null || menu.isEmpty()) {
-                throw new IllegalArgumentException("메뉴 오류");
-            }
-            String imageFileName = fileService.uploadFiles(img, menu, "static");
-            if (imageFileName == null) {
-                return ResponseEntity.badRequest().body("파일 업로드 실패");
-            }
-            return ResponseEntity.ok(imageFileName);
-        } catch (Exception e) {
-            String msg = "사진 업로드 실패: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
-        }
+    @GetMapping("/s3/image")
+    public Map<String, Serializable> s3saveImage(@RequestParam("fileName") String fileName){
+        return s3Service.getPreSignedUrl(fileName);
     }
+
+    @PostMapping("/uploadFile/{bookId}")
+    public ResponseEntity saveUploadFile(@RequestBody UploadFileRequestDto dto, @PathVariable Long bookId){
+        List<UploadFile> list = uploadFileService.save(dto, bookId);
+        System.out.print(list.toString());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }
-//    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<String> saveImage (@RequestParam("image") MultipartFile img, @RequestParam("menu") String menu) {
-//        try {
-//            if (img.isEmpty()) {
-//                throw new IllegalArgumentException("이미지 파일 오류");
-//            }
-//            if (menu == null || menu.isEmpty()) {
-//                throw new IllegalArgumentException("메뉴 오류");
-//            }
-//            String imageFileName = fileService.saveImage(img, menu);
-//            if (imageFileName == null) {
-//                return ResponseEntity.badRequest().body("이미지 파일 업로드 실패");
-//            }
-//            return ResponseEntity.ok(imageFileName);
-//        }
-//        catch (Exception e) {
-//            String msg = "사진 업로드 실패: " + e.getMessage();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
-//        }
-//    }

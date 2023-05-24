@@ -39,6 +39,8 @@ export default {
       sessionStorage.setItem('toolState', 'new');
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('bookName');
+      sessionStorage.removeItem("uploadCharList");
+      sessionStorage.removeItem("uploadBackList");
       sessionStorage.removeItem("projectTitle");
       this.$router.push('/tool');
     }

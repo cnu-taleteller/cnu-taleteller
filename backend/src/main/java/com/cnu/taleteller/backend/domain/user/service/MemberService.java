@@ -1,17 +1,13 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
-import com.cnu.taleteller.backend.domain.user.domain.Member;
-import com.cnu.taleteller.backend.domain.user.domain.Payment;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
-import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.swing.*;
 import javax.transaction.Transactional;
 import java.util.List;
 

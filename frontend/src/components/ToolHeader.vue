@@ -8,7 +8,7 @@
       <input class="book-name-input" type="text" v-model="bookName" @keyup.enter="editBookName()">
       <img class="header-btn" @click="editBookName()" src="@/assets/check.png">
     </div>
-    <div class="header-menu" v-if="toolState!='new' && toolState !='gpt'">
+    <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
       <button @click="save()">임시저장</button>
       <button @click="saveBook()">제출</button>
@@ -37,34 +37,136 @@ export default {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
+    if (sessionStorage.getItem('bookId')) {
+      this.bookId = sessionStorage.getItem('bookId');
+    }
+
   },
   methods: {
     editBookName() {
       this.edit = !!!this.edit;
     },
     saveBook() {
+      // 시나리오 선택되어야 진행
+      const select = sessionStorage.getItem('select');
+      console.log(select);
+      if (!select || select == 'false') {
+        alert('시나리오 선택 후 진행해주세요');
+        return;
+      }
       sessionStorage.removeItem('scenario');
       sessionStorage.removeItem('scenarioKeyword');
       sessionStorage.setItem('bookName', this.bookName);
       this.$router.push('/ToolSubmit');
     },
-    save() {
-      axios.post('/api/tool/pages', this.pageList, {
-        headers: {
+    // 임시 저장
+    async saveTmp() {
+      const select = sessionStorage.getItem('select');
+
+      if (!select || select === 'false') {
+        alert('시나리오 선택 후 진행해주세요!');
+        return;
+      }
+      else {
+        // 최초 저장
+        if (this.bookId == null) {
+          await axios.post("/api/v1/book/", {
+            bookName: this.bookName,
+            bookStatus: "temp",
+            email: sessionStorage.getItem('user')
+          })
+            .then((res) => {
+              console.log(res.data.bookId);
+              this.bookId = res.data.bookId;
+              sessionStorage.setItem('bookId', this.bookId);
+              this.saveScenario();
+              this.saveUploadFile();
+              alert('임시저장 완료');
+            })
+            .catch((err) => {
+              console.error(err);
+              alert('임시저장 실패');
+            })
+        }
+        else {
+          // 이미 bookId 있을 때
+          await axios.post("/api/v1/book/" + this.bookId, {
+            bookName: this.bookName,
+            bookStatus: "temp",
+          })
+            .then((res) => {
+              console.log(res);
+              this.saveScenario();
+              this.saveUploadFile();
+              alert('임시저장 완료');
+            })
+            .catch((error) => {
+              console.log(error);
+              alert('임시저장 실패');
+            });
+        }
+      }
+    },
+    async saveUploadFile() {
+      const uploadCharList = JSON.parse(sessionStorage.getItem('uploadCharList'));
+      const uploadBackList = JSON.parse(sessionStorage.getItem('uploadBackList'));
+      if (uploadBackList === null && uploadBackList === null) return;
+
+      if (uploadBackList === null) {
+        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+          uploadCharList,
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      else if (uploadCharList === null) {
+        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+          uploadBackList,
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      else {
+        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+          uploadBackList, uploadCharList
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+
+    },
+    async saveScenario() {
+      const scenario = sessionStorage.getItem('scenario');
+      if (scenario === null) return;
+
+      await axios.post("/api/v1/tool/scenario/" + this.bookId, JSON.stringify(scenario), {
+      headers: {
           'Content-Type': 'application/json'
         }
       })
-        .then(response => {
-          console.log(response);
+        .then((res) => {
+          console.log(res);
         })
-        .catch(error => {
-          console.error(error)
+        .catch((error) => {
+          console.log(error);
         });
     },
     //미리보기 클릭시 새창을 띄우고 작품썸네일을 보여준다.
     preview() {
       let currentIndex = 0;
-     
+
       const screenWidth = window.screen.width;
       const screenHeight = window.screen.height;
       const windowWidth = 810;
@@ -84,6 +186,8 @@ export default {
         `;
       newWindow.document.head.innerHTML = `
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap');
+        
           #button-wrapper {
             width: 100%;
             display: flex;
@@ -111,6 +215,10 @@ export default {
             background-color: #ccc;
             border:none;
           }
+
+          body {
+  font-family: 'IBM Plex Sans KR', Avenir, Helvetica, Arial, sans-serif;
+}
       
         </style>
         `;
@@ -187,8 +295,6 @@ export default {
           else {
             imageEle.style.left = image.style.left;
             imageEle.style.top = image.style.top;
-            imageEle.style.left = `calc(${image.style.left} + 50px)`;
-            imageEle.style.top = `calc(${image.style.top} + 50px)`;
             imageEle.style.width = image.style.width;
             imageEle.style.height = image.style.height;
           }
@@ -205,8 +311,6 @@ export default {
         const divEle = newWindow.document.createElement('div');
         divEle.style.left = caption.left;
         divEle.style.top = caption.top;
-        divEle.style.left = `calc(${divEle.style.left} + 50px)`;
-        divEle.style.top = `calc(${divEle.style.top} + 50px)`;
         divEle.style.width = caption.width;
         divEle.style.height = caption.height;
         divEle.style.fontWeight = "bold";
@@ -281,4 +385,5 @@ button {
 button:hover {
   opacity: 0.7;
   background-color: #bce9ff;
-}</style>
+}
+</style>

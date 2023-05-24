@@ -2,7 +2,8 @@
   <div class="tool">
     <div class="tool-header">
       <!-- 전체 페이지 리스트 전달 -->
-      <ToolHeader :pageList="this.pageList" :toolState="this.toolState" :currentPageList="this.currentPageList" :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
+      <ToolHeader :pageList="this.pageList" :toolState="this.toolState" :currentPageList="this.currentPageList"
+        :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
@@ -25,16 +26,16 @@
           <br>사건은 구체적이게 적을수록 좋습니다!
         </p>
         <div class="scenario-input-form">
-        <p>1. 주인공은 누구인가요?</p>
-        <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="백설공주가">
-        <p>2. 언제 일어난 일인가요?</p>
-        <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="옛날 옛적에">
-        <p>3. 어디서 일어난 일인가요?</p> 
-        <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서">
-        <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
-        <textarea class="scenario-input" v-model="scenarioKeyword.event"
+          <p>1. 주인공은 누구인가요?</p>
+          <input type="text" class="scenario-input" v-model="scenarioKeyword.who" placeholder="백설공주가">
+          <p>2. 언제 일어난 일인가요?</p>
+          <input type="text" class="scenario-input" v-model="scenarioKeyword.when" placeholder="옛날 옛적에">
+          <p>3. 어디서 일어난 일인가요?</p>
+          <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서">
+          <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
+          <textarea class="scenario-input" v-model="scenarioKeyword.event"
             placeholder="마녀가 준 사과를 먹고 쓰러졌고, 일어나보니 인어 공주가 있어서 인어 공주랑 재밌게 논 이야기"></textarea>
-        <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
+          <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
         </div>
       </div>
       <ToolScenarioExample></ToolScenarioExample>
@@ -80,14 +81,14 @@ export default {
         event: null
       },
       resultScenario: [], // [도입][전개] 등 태그 전체 있는 배열
-      finalScenario: [[],[],[],[],[]], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
+      finalScenario: [[], [], [], [], []], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
 
       // 직접 쓸 때 기승전결 받기
       write1: null,
       write2: null,
       write3: null,
       write4: null,
-      selectedMenu : '',
+      selectedMenu: '',
       currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
       pageList: [],
       bookId: null, // 작품 번호
@@ -124,7 +125,7 @@ export default {
       if (this.isLeaveSite) return;
       event.preventDefault();
       event.returnValue = '';
-    }, 
+    },
     handleCurrentPageList(currentPageList) {
       this.currentPageList = currentPageList;
     },
@@ -137,6 +138,12 @@ export default {
     },
     selectScenarioMenu(arg) {
       this.toolState = arg;
+      if (arg === 'write') {
+        sessionStorage.setItem('select', true); // 임시 저장, 제출에 필요한 데이터
+      }
+      else {
+        sessionStorage.setItem('select', false);
+      }
       sessionStorage.setItem('toolState', arg);
     },
     goTool() {
@@ -157,34 +164,14 @@ export default {
       this.gpt = true;
       this.goTool();
       console.log("axios 통신 요청");
-      axios.post("https://api.openai.com/v1/chat/completions",
-        {
-          "model": "gpt-3.5-turbo",
-          "messages": [{
-            "role": "user",
-            "content": `누가: ${who},
-                        언제: ${when}, 
-                        어디서: ${where},
-                        사건: ${event}
-                        라는 내용을 가진 동화책을 '도입/전개/위기/결말' 로 나눠서 써줘.
-                        내용을 나눌 때 형식은 
-                        [도입] 내용
-                        [전개] 내용
-                        [위기] 내용
-                        [결말] 내용 
-                        형식으로 나눠서 700자 이내로 써줘.`
-          }],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.VUE_APP_API_KEY}`,
-          }
-        }
-      )
+      axios.post("/api/v1/tool/scenario/", {
+        who: this.scenarioKeyword.who,
+        when: this.scenarioKeyword.when,
+        where: this.scenarioKeyword.where,
+        event: this.scenarioKeyword.event
+      })
         .then((res) => {
-          // console.log(res.data.choices[0].message.content);
-          this.resultScenario = res.data.choices[0].message.content;
+          this.resultScenario = res.data;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
           console.log(this.finalScenario);
@@ -218,9 +205,12 @@ export default {
 
 </script>
 <style scoped>
-button, textarea, input[type=text] {
+button,
+textarea,
+input[type=text] {
   transition: all ease-in 0.3s;
 }
+
 .tool {
   width: 100%;
   height: 90vh;
@@ -228,7 +218,7 @@ button, textarea, input[type=text] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color:#F7F7F7;
+  background-color: #F7F7F7;
 }
 
 .tool-header {
@@ -245,7 +235,7 @@ button, textarea, input[type=text] {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color:#F7F7F7;
+  background-color: #F7F7F7;
 }
 
 .tool-left {
@@ -279,6 +269,7 @@ button, textarea, input[type=text] {
   flex-direction: row;
   width: 90%;
 }
+
 .scenario-input-form>p {
   width: 100%;
   margin-bottom: 5px;
@@ -315,7 +306,8 @@ h3 {
   color: #353535;
   border-radius: 3px;
 }
-.submit-btn:hover{
+
+.submit-btn:hover {
   opacity: 0.7;
 }
 
@@ -336,12 +328,14 @@ h3 {
   padding-top: 20px;
   background-color: #dfdfdf;
 }
+
 .scenario-btn>button>p {
   font-size: 20px;
   font-weight: bold;
   color: rgb(50, 50, 50);
   margin-top: 20px;
 }
+
 .scenario-btn>button:hover {
   opacity: 0.7;
 }
@@ -368,6 +362,4 @@ textarea::-webkit-scrollbar-track {
   background-color: white;
   border-radius: 10px;
   box-shadow: inset 0px 0px 5px white;
-}
-
-</style>
+}</style>

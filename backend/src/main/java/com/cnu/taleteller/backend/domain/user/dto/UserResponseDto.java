@@ -1,6 +1,6 @@
 package com.cnu.taleteller.backend.domain.user.dto;
 
-import com.cnu.taleteller.backend.domain.user.domain.User;
+import com.cnu.taleteller.backend.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

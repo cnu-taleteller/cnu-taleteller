@@ -1,12 +1,10 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
-import com.cnu.taleteller.backend.domain.user.domain.Payment;
+import com.cnu.taleteller.backend.domain.user.entity.Payment;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import com.cnu.taleteller.backend.domain.user.service.PaymentService;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,6 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
-import com.cnu.taleteller.backend.domain.user.domain.Member;
-import com.cnu.taleteller.backend.domain.user.domain.Payment;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
 import com.cnu.taleteller.backend.domain.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

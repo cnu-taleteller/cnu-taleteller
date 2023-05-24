@@ -1,7 +1,6 @@
-package com.cnu.taleteller.backend.domain.tool.domain;
+package com.cnu.taleteller.backend.domain.tool.entity.mongo;
 
 
-import com.mongodb.lang.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 

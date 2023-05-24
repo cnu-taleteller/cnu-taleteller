@@ -33,7 +33,7 @@ export default {
   name: 'App',
   data() {
     return {
-      bookId: 14,
+      bookId: 15,
       //현재 사용중인 데이터
       pageList: [
         {
@@ -71,7 +71,7 @@ export default {
     //기본적으로 DOM에 내용이 만들어지면 배열의 첫번째 요소를 보냄 들어오면 1번 페이지를 보여주기 위해서
     //만약 새로 만들기를 누르면 bookId 가 없으니 빈페이지고 bookId가 온다면 기존에 생성하고 저장 해 둔 작품
     if (this.bookId !== null) {
-      const selPageLists = await axios.post('api/tool/firstAccess/' + this.bookId);
+      const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
       this.pageList = selPageLists.data.pageList;
       this.$emit('currentPageList', this.pageList[0]);
       this.$emit('pageList', this.pageList);

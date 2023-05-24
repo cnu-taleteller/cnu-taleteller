@@ -4,7 +4,7 @@ import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.service.BookService;
-import com.cnu.taleteller.backend.domain.tool.domain.Page;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController

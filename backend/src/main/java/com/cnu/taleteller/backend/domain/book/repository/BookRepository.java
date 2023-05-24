@@ -1,8 +1,8 @@
 package com.cnu.taleteller.backend.domain.book.repository;
 
 import com.cnu.taleteller.backend.domain.book.entity.Book;
-import com.cnu.taleteller.backend.domain.tool.domain.BookMongo;
-import com.cnu.taleteller.backend.domain.user.domain.Member;
+import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

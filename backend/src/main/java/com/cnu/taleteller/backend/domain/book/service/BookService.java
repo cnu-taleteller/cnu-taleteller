@@ -4,7 +4,7 @@ import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.entity.Book;
-import com.cnu.taleteller.backend.domain.tool.domain.BookMongo;
+import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
 import com.cnu.taleteller.backend.domain.tool.repository.BookMongoRepository;
 import com.cnu.taleteller.backend.domain.tool.repository.ToolRepository;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;

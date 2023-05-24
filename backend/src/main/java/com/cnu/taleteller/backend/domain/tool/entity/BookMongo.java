@@ -1,11 +1,9 @@
-package com.cnu.taleteller.backend.domain.tool.domain;
+package com.cnu.taleteller.backend.domain.tool.entity;
 
-import com.cnu.taleteller.backend.domain.book.domain.Book;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import javax.persistence.*;
 import java.io.Serializable;
 

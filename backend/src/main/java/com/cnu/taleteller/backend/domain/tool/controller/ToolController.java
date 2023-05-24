@@ -2,14 +2,11 @@ package com.cnu.taleteller.backend.domain.tool.controller;
 
 import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
 import com.cnu.taleteller.backend.domain.tool.dto.UploadFileRequestDto;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
 import com.cnu.taleteller.backend.domain.tool.service.S3Service;
-import com.cnu.taleteller.backend.domain.tool.service.UploadFileService;
-import com.cnu.taleteller.backend.domain.tool.domain.Books;
-import com.cnu.taleteller.backend.domain.tool.domain.Scenario;
-import com.cnu.taleteller.backend.domain.tool.service.FileService;
-
-import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
+import com.cnu.taleteller.backend.domain.tool.service.UploadFileService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +24,7 @@ public class ToolController {
     private final UploadFileService uploadFileService;
     private final S3Service s3Service;
 
+    private final ToolService toolService;
 
     @GetMapping("/s3/image")
     public Map<String, Serializable> s3saveImage(@RequestParam("fileName") String fileName){
@@ -41,7 +39,7 @@ public class ToolController {
     }
 
     @PostMapping("/firstAccess/{bookId}")
-    public Books firstAccess(@PathVariable Long bookId) {
+    public BookData firstAccess(@PathVariable Long bookId) {
         System.out.println(bookId);
         return toolService.firstAccessData(bookId);
     }

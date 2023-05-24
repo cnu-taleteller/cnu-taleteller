@@ -1,7 +1,7 @@
 package com.cnu.taleteller.backend.domain.tool.dto;
 
-import com.cnu.taleteller.backend.domain.tool.domain.Books;
-import com.cnu.taleteller.backend.domain.tool.domain.Page;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,11 +9,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BooksDTO {
+public class BookDataDTO {
     Page[] PageList;
 
-    public Books toEntity() {
-        return Books.builder()
+    public BookData toEntity() {
+        return BookData.builder()
                 .pageList(PageList)
                 .build();
     }

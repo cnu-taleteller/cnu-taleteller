@@ -1,7 +1,7 @@
 package com.cnu.taleteller.backend.domain.book.entity;
 
 import com.cnu.taleteller.backend.domain.user.entity.Member;
-import com.cnu.taleteller.backend.domain.tool.domain.BookMongo;
+import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;

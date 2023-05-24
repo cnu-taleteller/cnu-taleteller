@@ -1,9 +1,9 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
-import com.cnu.taleteller.backend.domain.tool.domain.Books;
-import com.cnu.taleteller.backend.domain.tool.domain.Page;
-import com.cnu.taleteller.backend.domain.tool.dto.BooksDTO;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
+import com.cnu.taleteller.backend.domain.tool.dto.BookDataDTO;
 import com.cnu.taleteller.backend.domain.tool.repository.ToolRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -30,9 +30,9 @@ public class ToolService {
     //@Transactional(rollbackFor = {RuntimeException.class, Error.class}) 기본속성
     public ObjectId saveBook(Page[] pageList) {
         try {
-            BooksDTO dto = new BooksDTO();
+            BookDataDTO dto = new BookDataDTO();
             dto.setPageList(pageList);
-            Books book = toolRepository.save(dto.toEntity());
+            BookData book = toolRepository.save(dto.toEntity());
             return book.getId();
         } catch (Exception e) {
             throw new RuntimeException("RuntimeException rollback");
@@ -48,13 +48,13 @@ public class ToolService {
                 ObjectId objectId = new ObjectId(mongodbId);
 
                 Query query = new Query(Criteria.where("_id").is(objectId));
-                Books existingBook = mongoTemplate.findOne(query, Books.class);
+                BookData existingBook = mongoTemplate.findOne(query, BookData.class);
 
                 if (existingBook == null) {
                     throw new IllegalArgumentException("Book not found");
                 }
 
-                BooksDTO updatedDto = new BooksDTO();
+                BookDataDTO updatedDto = new BookDataDTO();
                 updatedDto.setPageList(updatedPages);
 
                 existingBook.setPageList(updatedDto.getPageList());
@@ -69,7 +69,7 @@ public class ToolService {
     }
 
     @Transactional(readOnly = true)
-    public Books firstAccessData(Long bookId) {
+    public BookData firstAccessData(Long bookId) {
         try {
             String mongodbId = bookRepository.findMongoIdByBookId(bookId);
             System.out.println(mongodbId);
@@ -80,7 +80,7 @@ public class ToolService {
             ObjectId objectId = new ObjectId(mongodbId);
 
             Query query = new Query(Criteria.where("_id").is(objectId));
-            Books existingBook = mongoTemplate.findOne(query, Books.class);
+            BookData existingBook = mongoTemplate.findOne(query, BookData.class);
 
             if (existingBook == null) {
                 throw new IllegalArgumentException("Book not found");

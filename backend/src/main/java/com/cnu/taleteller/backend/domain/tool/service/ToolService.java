@@ -1,24 +1,20 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
-<<<<<<< Updated upstream
-import com.cnu.taleteller.backend.domain.tool.domain.Tool;
-=======
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.tool.domain.Books;
 import com.cnu.taleteller.backend.domain.tool.domain.Page;
 import com.cnu.taleteller.backend.domain.tool.dto.BooksDTO;
->>>>>>> Stashed changes
 import com.cnu.taleteller.backend.domain.tool.repository.ToolRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -67,6 +63,30 @@ public class ToolService {
             }
 
             return CompletableFuture.completedFuture(null);
+        } catch(Exception e) {
+            throw new RuntimeException("RuntimeException rollback");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Books firstAccessData(Long bookId) {
+        try {
+            String mongodbId = bookRepository.findMongoIdByBookId(bookId);
+            System.out.println(mongodbId);
+            if(mongodbId == null) {
+                throw new NullPointerException("mongodbId is null");
+            }
+
+            ObjectId objectId = new ObjectId(mongodbId);
+
+            Query query = new Query(Criteria.where("_id").is(objectId));
+            Books existingBook = mongoTemplate.findOne(query, Books.class);
+
+            if (existingBook == null) {
+                throw new IllegalArgumentException("Book not found");
+            }
+
+            return existingBook;
         } catch(Exception e) {
             throw new RuntimeException("RuntimeException rollback");
         }

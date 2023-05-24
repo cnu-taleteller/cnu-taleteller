@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Caption {
+    private int captionState;
     private String fontSize;
     private String fontColor;
     private String content;

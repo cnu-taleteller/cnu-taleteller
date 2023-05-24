@@ -358,6 +358,7 @@ export default {
       }
     },
     updateContent() {
+      console.log('update');
       const objectElement = this.$refs.pageObject;
 
       //object div 안의 내용을 초기화
@@ -686,18 +687,14 @@ export default {
 
       if(this.currentPageList.caption.fontSize !== '') {
         this.fontSize = parseInt(this.currentPageList.caption.fontSize);
-        console.log(this.fontSize);
       } else {
         this.fontSize = 20;
-        console.log(this.fontSize);
       }
       
       if(this.currentPageList.caption.fontColor !== '') {
         this.currentColor = this.currentPageList.caption.fontColor;
-        console.log(this.currentColor);
       } else {
         this.currentColor = '#000000';
-        console.log(this.currentColor);
       }
 
       colorPreview.style.backgroundColor = this.currentColor;

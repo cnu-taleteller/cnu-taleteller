@@ -6,7 +6,8 @@
         <li v-for="page, index in pageList" :key="index" class="one-page">
           <div class="page-body" @click="clickPage(index)">
             <!-- 썸네일 부분 -->
-            <img v-if="page.thumbnail !== '' && page.thumbnail !== null" :src="page.thumbnail" style="width:100%; height: 100%">
+            <img v-if="page.thumbnail !== '' && page.thumbnail !== null" :src="page.thumbnail"
+              style="width:100%; height: 100%">
           </div>
           <label>
             {{ page.pageId }}
@@ -22,6 +23,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import draggable from 'vuedraggable';
 
 export default {
@@ -31,16 +33,16 @@ export default {
   name: 'App',
   data() {
     return {
-      book_id: null,
+      bookId: 14,
       //현재 사용중인 데이터
       pageList: [
         {
-          pageId : 1,
+          pageId: 1,
           pageStatus: 1,
-          caption : {
-            captionState : 0,
+          caption: {
+            captionState: 0,
             fontSize: '',
-            fontColor : '',
+            fontColor: '',
             content: '',
             height: '',
             width: '',
@@ -55,20 +57,29 @@ export default {
     }
   },
   watch: {
-  pageList: {
-    handler: function (newPageList) {
-      this.$emit('pageList', newPageList);
+    pageList: {
+      handler: function (newPageList) {
+        this.$emit('pageList', newPageList);
+      },
+      deep: true,
     },
-    deep: true,
   },
-},
   created() {
-    this.book_id = sessionStorage.getItem('book_id');
+    // this.bookId = sessionStorage.getItem('book_id');
   },
-  mounted() {
+  async mounted() {
     //기본적으로 DOM에 내용이 만들어지면 배열의 첫번째 요소를 보냄 들어오면 1번 페이지를 보여주기 위해서
-    this.$emit('currentPageList', this.pageList[0]);
-    this.$emit('pageList', this.pageList);
+    //만약 새로 만들기를 누르면 bookId 가 없으니 빈페이지고 bookId가 온다면 기존에 생성하고 저장 해 둔 작품
+    if (this.bookId !== null) {
+      const selPageLists = await axios.post('api/tool/firstAccess/' + this.bookId);
+      this.pageList = selPageLists.data.pageList;
+      this.$emit('currentPageList', this.pageList[0]);
+      this.$emit('pageList', this.pageList);
+    } else {
+      this.$emit('currentPageList', this.pageList[0]);
+      this.$emit('pageList', this.pageList);
+    }
+
   },
   methods: {
     defalutReset() {
@@ -94,7 +105,7 @@ export default {
           caption: {
             captionState: 0,
             fontSize: '',
-            fontColor : '',
+            fontColor: '',
             content: null,
             height: null,
             width: null,
@@ -187,4 +198,5 @@ button {
 
 button:hover {
   opacity: 0.7;
-}</style>
+}
+</style>

@@ -484,8 +484,7 @@ export default {
       caption.top = addDiv.style.top;
       this.canvas();
     },
-    // node_modules 폴더 안에 html2canvas.js 
-    // 5766번째 줄: img.src = /^data:image/.test(src) ? src : src + '?' + new Date().getTime(); 로 수정
+
     canvas() {
       try {
         const imageArea = this.$refs.dragImage;
@@ -498,15 +497,17 @@ export default {
           const img = new Image();
           img.crossOrigin = 'anonymous';
           img.onload = () => {
-            const originalWidth = img.width;
-            const originalHeight = img.height;
-            const reductionRatio = 0.35;
-            const reducedWidth = originalWidth * reductionRatio;
-            const reducedHeight = originalHeight * reductionRatio;
-            canvas.width = reducedWidth;
-            canvas.height = reducedHeight;
-            ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.35);
+            const originalWidth = 960;
+            const originalHeight = 600;
+            // const reductionRatio = 0.35;
+            // const reducedWidth = originalWidth * reductionRatio;
+            // const reducedHeight = originalHeight * reductionRatio;
+            // canvas.width = reducedWidth;
+            // canvas.height = reducedHeight;
+            canvas.width = originalWidth;
+            canvas.height = originalHeight;
+            ctx.drawImage(img, 0, 0, originalWidth, originalHeight);
+            const dataUrl = canvas.toDataURL('image/png', 1);
             this.currentPageList.thumbnail = dataUrl;
           };
           img.src = canvas.toDataURL();
@@ -765,7 +766,7 @@ export default {
 }
 
 .page-form {
-  width: 80%;
+  width: 85%;
   height: 500px;
   display: flex;
   align-items: center;
@@ -785,6 +786,7 @@ textarea {
 
 .selected-page {
   width: 100%;
+  /* width: 800px; */
   height: 500px;
 }
 
@@ -795,6 +797,7 @@ textarea {
 
 .drag-image {
   width: 100%;
+  /* width: 800px; */
   height: 500px;
   /* height: 60vh; */
   position: absolute;

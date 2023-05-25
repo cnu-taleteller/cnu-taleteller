@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -42,5 +44,10 @@ public class S3Service {
         result.put("encodedFileName", encodedFileName);
 
         return result;
+    }
+    public void uploadFile(Serializable fileName, InputStream inputStream) {
+        String objectKey = "static/" + fileName;
+
+        s3Config.amazonS3Client().putObject(bucket, objectKey, inputStream, null);
     }
 }

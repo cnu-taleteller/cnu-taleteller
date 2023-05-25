@@ -7,6 +7,8 @@
         @click="setSelectedMenu('character')">캐릭터</button>
       <button class="menu-btn" :class="{ active: selectedMenu === 'scenario' }"
         @click="setSelectedMenu('scenario')">시나리오</button>
+      <button class="menu-btn" :class="{ active: selectedMenu === 'tts' }"
+              @click="setSelectedMenu('tts')">TTS</button>
     </div>
     <div class="menu-form">
       <div class="uploadImage">
@@ -85,6 +87,14 @@
             <button class="submit-btn select-btn" :disabled="isDisabled2" @click="setScenario()">이 시나리오 선택하기</button>
           </div>
         </div>
+        <div v-else-if="selectedMenu == 'tts'">
+          <input type="radio" name="myRadio" value="male" @change="handleTtsChange">
+          <label for="maleVoice1">남성</label>
+          <input type="radio" name="myRadio" value="female" @change="handleTtsChange">
+          <label for="femaleVoice1">여성</label>
+          <button class="submit-btn" @click="addTts()">추가</button>
+<!--          <button class="submit-btn" @click="addTts()">미리 듣기</button>-->
+        </div>
       </div>
       <div class="image-list">
         <div id="item">
@@ -142,20 +152,21 @@ export default {
       selectScenario: [], // 선택한 시나리오
       resultScenario: [],  // [도입], [전개] 등 다 있는 시나리오 - session 저장용
       isReScenario: false,
+      voiceList: [], //TTS나 음성녹음 리스트
 
       // 업로드되는 이미지 리스트
       uploadBackList: [],
       uploadCharList: [],
 
       // 기본적으로 있는 이미지 배열
-      charList: Array.from({ length: 25 }, (_, i) => ({
+      charList: Array.from({length: 25}, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/character${i}.png`,
         id: `character${i}`,
         draggable: "true",
         height: "100px",
       })),
       // 기본적으로 있는 배경 배열
-      backList: Array.from({ length: 18 }, (_, i) => ({
+      backList: Array.from({length: 18}, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/background${i}.png`,
         id: `background${i}`,
         draggable: "true",
@@ -187,46 +198,46 @@ export default {
       }
 
       this.file = this.$refs.file.files[0];
-      await axios.get("/api/v1/tool/s3/image", { params: { fileName: this.file.name } },)
-        .then((res) => {
-          this.s3.preSignedUrl = res.data.preSignedUrl
-          this.s3.encodedFileName = res.data.encodedFileName
-          this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
-        })
+      await axios.get("/api/v1/tool/s3/image", {params: {fileName: this.file.name}},)
+          .then((res) => {
+            this.s3.preSignedUrl = res.data.preSignedUrl
+            this.s3.encodedFileName = res.data.encodedFileName
+            this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
+          })
     },
     // S3 업로드
     async uploadImageToS3(preSignedUrl, file, menu) {
       await axios.put(preSignedUrl, file)
-        .then((res) => {
-          this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
+          .then((res) => {
+            this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
 
-          if (menu === 'background') {
-            this.uploadBackList.push(this.s3.uploadedUrl);
-            sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
-            this.backList.push({
-              src: this.s3.uploadedUrl,
-              id: 'upload' + this.uploadId,
-              draggable: "true",
-              height: "100px",
-            });
-          } else if (menu === 'character') {
-            this.uploadCharList.push(this.s3.uploadedUrl);
-            sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
-            this.charList.push({
-              src: this.s3.uploadedUrl,
-              id: 'upload' + this.uploadId,
-              draggable: "true",
-              height: "100px",
-            });
-          }
-          this.uploadId++;
-          console.log("S3 업로드 성공");
-          document.getElementById("image").value = "";
-        })
-        .catch((err) => {
-          console.error(err);
-          alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
-        });
+            if (menu === 'background') {
+              this.uploadBackList.push(this.s3.uploadedUrl);
+              sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
+              this.backList.push({
+                src: this.s3.uploadedUrl,
+                id: 'upload' + this.uploadId,
+                draggable: "true",
+                height: "100px",
+              });
+            } else if (menu === 'character') {
+              this.uploadCharList.push(this.s3.uploadedUrl);
+              sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
+              this.charList.push({
+                src: this.s3.uploadedUrl,
+                id: 'upload' + this.uploadId,
+                draggable: "true",
+                height: "100px",
+              });
+            }
+            this.uploadId++;
+            console.log("S3 업로드 성공");
+            document.getElementById("image").value = "";
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
+          });
     },
 
     setSelectedMenu(menu) {
@@ -310,9 +321,7 @@ export default {
         if (this.flowResult == null) {
           this.checkFlowGpt();
         }
-      }
-
-      else if (arg === 're') {
+      } else if (arg === 're') {
         this.checkFlowGpt();
       }
 
@@ -328,15 +337,15 @@ export default {
       axios.post("/api/v1/tool/scenario/flow", {
         story, captions
       })
-        .then((res) => {
-          this.flowResult = res.data;
-          this.loading = false;
-        })
-        .catch((err) => {
-          // this.gpt = false;
-          alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-          console.log(err);
-        })
+          .then((res) => {
+            this.flowResult = res.data;
+            this.loading = false;
+          })
+          .catch((err) => {
+            // this.gpt = false;
+            alert('서버 오류로 시나리오 요청에 실패하였습니다.');
+            console.log(err);
+          })
     },
     // 키워드 변경
     reKeyword() {
@@ -345,23 +354,54 @@ export default {
       const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
       const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
       window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
-      }
     },
-    // 시나리오 다시 받기
-    reScenario() {
-      if (this.finalScenario[4].length > 0) {
-        alert('시나리오는 작품당 5번만 받을 수 있습니다.');
-        return;
-      }
-      this.isReScenario = true;
-      this.isDisabled2 = true;
-      console.log("axios 통신 요청");
-      axios.post("/api/v1/tool/scenario/", {
-        who: this.scenarioKeyword.who,
-        when: this.scenarioKeyword.when,
-        where: this.scenarioKeyword.where,
-        event: this.scenarioKeyword.event
+    handleTtsChange(event) {
+      const selectedValue = event.target.value;
+      this.$emit('ttsValueChange', selectedValue);
+    },
+    addTts() {
+      const text = this.currentPageList.caption.content;
+      const voice = this.currentPageList.caption.ttsVoice;
+      const language = "ko-KR";
+      console.log(text);
+
+      axios.post('/api/v1/tool/tts', {
+            text,
+            language,
+            voice
+          }
+      ).then(response => {
+        const ttsUrl = response.data.ttsUrl;
+
+        this.currentPageList.caption.ttsName = `${process.env.VUE_APP_S3_PATH}/${response.data.encodedFileName}`;
+        console.log(this.currentPageList.caption.ttsName);
+
+        this.voiceList.push(this.currentPageList.caption.ttsName);
+        sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
+        console.log(this.voiceList);
+
+        // 작은 인터넷 창을 새로 열어 TTS 음성 재생
+        //window.open(ttsUrl, '_blank');
+      }).catch(error => {
+        console.error(error);
       })
+    },
+  },
+  // 시나리오 다시 받기
+  reScenario() {
+    if (this.finalScenario[4].length > 0) {
+      alert('시나리오는 작품당 5번만 받을 수 있습니다.');
+      return;
+    }
+    this.isReScenario = true;
+    this.isDisabled2 = true;
+    console.log("axios 통신 요청");
+    axios.post("/api/v1/tool/scenario/", {
+      who: this.scenarioKeyword.who,
+      when: this.scenarioKeyword.when,
+      where: this.scenarioKeyword.where,
+      event: this.scenarioKeyword.event
+    })
         .then((res) => {
           this.resultScenario = res.data;
           sessionStorage.setItem('scenario', this.resultScenario);
@@ -375,37 +415,38 @@ export default {
         .finally(() => {
           this.isReScenario = false;
         });
-    },
+  },
 
-    setScenarioArr() {
-      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
-      const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
-      let num = 0;
-      if (this.finalScenario[0].length > 0) {
-        num = 1;
-      }
-      if (this.finalScenario[1].length > 0) {
-        num = 2;
-      }
-      if (this.finalScenario[2].length > 0) {
-        num = 3;
-      }
-      if (this.finalScenario[3].length > 0) {
-        num = 4;
-      }
-      sections.forEach((section, index) => {
-        const scenario = this.resultScenario;
-        const start = scenario.indexOf(section);
-        let end;
+  setScenarioArr() {
+    // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
+    const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
+    let num = 0;
+    if (this.finalScenario[0].length > 0) {
+      num = 1;
+    }
+    if (this.finalScenario[1].length > 0) {
+      num = 2;
+    }
+    if (this.finalScenario[2].length > 0) {
+      num = 3;
+    }
+    if (this.finalScenario[3].length > 0) {
+      num = 4;
+    }
+    sections.forEach((section, index) => {
+      const scenario = this.resultScenario;
+      const start = scenario.indexOf(section);
+      let end;
 
-        if (index < sections.length - 1) {
-          end = scenario.indexOf(sections[index + 1]);
-        } else {
-          end = scenario.length;
-        }
-        this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
-      });
-    },
+      if (index < sections.length - 1) {
+        end = scenario.indexOf(sections[index + 1]);
+      } else {
+        end = scenario.length;
+      }
+      this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
+    });
+  },
+
 }
 </script>
 <style scoped>

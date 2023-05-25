@@ -51,7 +51,7 @@
         <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList"></ToolSelectedPage>
       </div>
       <div class="tool-right">
-        <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
+        <ToolMenu @ttsValueChange="handleTtsValueChanged" @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
           :viewFinalScenario="this.finalScenario" :gpt="this.gpt" :pageList="this.pageList"></ToolMenu>
       </div>
     </div>
@@ -196,6 +196,9 @@ export default {
         }
         this.finalScenario[0][index] = scenario.slice(start, end).replace(section, '').trim();
       });
+    },
+    handleTtsValueChanged(value){
+      this.currentPageList.caption.ttsVoice=value;
     },
   },
 }

@@ -87,6 +87,7 @@ export default {
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();
+              this.saveVoice();
               this.isSave = true;
               if(status === 'temp') alert('저장 완료');
             })
@@ -106,6 +107,7 @@ export default {
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();
+              this.saveVoice();
               this.isSave = true;
               if(status === 'temp') alert('저장 완료');
             })
@@ -193,6 +195,23 @@ export default {
           .catch((error) => {
             console.log(error);
           });
+      }
+
+    },
+    async saveVoice(){
+      const voiceList = JSON.parse(sessionStorage.getItem('voiceList'));
+      if (voiceList === null){
+        return;
+      }else{
+        await axios.post("/api/v1/tool/uploadVoice/" + this.bookId, {
+          voiceList,
+        })
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
       }
 
     },

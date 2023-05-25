@@ -1,6 +1,8 @@
 package com.cnu.taleteller.backend.domain.book.dto;
 
 import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +26,10 @@ public class BookTempSaveDto {
 
     private Member member;
 
+    private BookMongo bookMongo;
+
+    private Page[] pageList;
+
     @Builder
     public BookTempSaveDto(String email, String bookName, LocalDateTime bookRegdate, String bookStatus, Member member) {
         this.email = email;
@@ -39,6 +45,7 @@ public class BookTempSaveDto {
                 .bookRegdate(bookRegdate)
                 .bookStatus(bookStatus)
                 .member(member)
+                .bookMongo(bookMongo)
                 .build();
     }
 }

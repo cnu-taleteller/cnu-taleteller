@@ -6,7 +6,7 @@
         <input type="number" min="10" max="50" class="caption-size" :value="this.fontSize"
           @input="fontSize = $event.target.value">
         <div class="caption-color" ref="contentColor">
-          <div class="color-preview sp-colorize" ref="colorPreview" :value="this.currentColor"></div>
+          <div class="color-preview sp-colorize" ref="colorPreview" :value="this.currentColor" @change="currentColor = $event.target.value"></div>
           <!-- <div class="color-picker" ref="colorPicker">▼</div> -->
         </div>
       </div>
@@ -18,7 +18,7 @@
         </div>
         <!-- 이미지 우클릭 영역 -->
         <div id="popupMenu"
-          style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 9999;">
+          style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 99;">
           <ul class="file-order-form">
             <li class="file-order"><a @click="next(thisObjId)" data-obj-type="popupMenu">앞으로</a></li>
             <li class="file-order"><a @click="back(thisObjId)" data-obj-type="popupMenu">뒤로</a></li>
@@ -38,6 +38,7 @@ export default {
   props: {
     currentPageList: Object,
     selectedMenu: String,
+    pageList : Array,
   },
   data() {
     return {
@@ -108,6 +109,8 @@ export default {
     let currentObj;
     let result;
     let targetObj;
+    let target;
+    let parentDiv;
     let resizableElement;
 
     this.imageEventDrop(imageArea);
@@ -128,97 +131,12 @@ export default {
 
       popupMenu.style.left = e.clientX - dragArea.offsetLeft + "px";
       popupMenu.style.top = e.clientY - dragArea.offsetLeft + "px";
-      popupMenu.style.display = "block";
-
+      popupMenu.style.display = "block"; 
+      
       if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType !== 'caption') {
         toolMenu.removeResizableElement(resizableElement, e);
         e.target.style.outline = '#27BAFF solid 1px';
-        resizableElement = $(e.target).resizable({
-          handles: 'n, e, s, w, ne, se, sw, nw',
-          stop: () => {
-            let target = e.target.id;
-            let resizeTarget;
-            if (target.includes('textArea')) {
-              resizeTarget = toolMenu.currentPageList.caption;
-              resizeTarget.left = e.target.style.left;
-              resizeTarget.top = e.target.style.top;
-              resizeTarget.width = e.target.style.width;
-              resizeTarget.height = e.target.style.height;
-            } else {
-              resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
-              resizeTarget.style.left = e.target.style.left;
-              resizeTarget.style.top = e.target.style.top;
-              resizeTarget.style.width = e.target.style.width;
-              resizeTarget.style.height = e.target.style.height;
-            }
-            toolMenu.canvas();
-          }
-        });
-
-        resizableElement.find('.ui-resizable-handle').css({
-          'position': 'absolute',
-          'width': '6px',
-          'height': '6px',
-          'background': '#5BB6F3',
-          'border': '2px solid #fff',
-          'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
-          'left': '50%',
-          'top': '100%',
-          'cursor': 's-resize',
-          'margin': '0 0 0 -5px',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
-          'left': '100%',
-          'top': '0',
-          'cursor': 'ne-resize',
-          'margin': '-10px 0 0',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
-          'left': '100%',
-          'top': '100%',
-          'cursor': 'se-resize',
-          'margin': '0',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
-          'left': '0',
-          'top': '100%',
-          'cursor': 'sw-resize',
-          'margin': '0 0 0 -10px',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
-          'left': '0',
-          'top': '0',
-          'cursor': 'nw-resize',
-          'margin': '-10px 0 0 -10px',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
-          'left': '50%',
-          'top': '0',
-          'cursor': 'n-resize',
-          'margin': '-10px 0 0 -5px',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
-          'left': '100%',
-          'top': '50%',
-          'cursor': 'e-resize',
-          'margin': '-5px 0 0',
-        });
-
-        resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
-          'left': '0',
-          'top': '50%',
-          'cursor': 'w-resize',
-          'margin': '-5px 0 0 -10px',
-        });
+        toolMenu.resizableElement(resizableElement, e, e.target);
       }
     });
 
@@ -250,8 +168,8 @@ export default {
     //드래그 시작부분(selected page)
     function dragStart(e) {
       e.stopPropagation();
-      let target = e.target;
-      let parentDiv = target.closest('#textArea');
+      target = e.target;
+      parentDiv = target.closest('#textArea');
       const textDiv = document.querySelector('[data-text-content="true"]');
       
       if (parentDiv) {
@@ -278,92 +196,7 @@ export default {
         }
 
         if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
-          resizableElement = $(target).resizable({
-            handles: 'n, e, s, w, ne, se, sw, nw',
-            stop: () => {
-              let target = e.target.id;
-              let resizeTarget;
-              if (e.target.dataset.textContent === 'true') {
-                resizeTarget = toolMenu.currentPageList.caption;
-                resizeTarget.left = e.target.style.left;
-                resizeTarget.top = e.target.style.top;
-                resizeTarget.width = e.target.style.width;
-                resizeTarget.height = e.target.style.height;
-              } else {
-                resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
-                resizeTarget.style.left = e.target.style.left;
-                resizeTarget.style.top = e.target.style.top;
-                resizeTarget.style.width = e.target.style.width;
-                resizeTarget.style.height = e.target.style.height;
-              }
-              toolMenu.canvas();
-            }
-          });
-
-          resizableElement.find('.ui-resizable-handle').css({
-            'position': 'absolute',
-            'width': '6px',
-            'height': '6px',
-            'background': '#5BB6F3',
-            'border': '2px solid #fff',
-            'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
-            'left': '50%',
-            'top': '100%',
-            'cursor': 's-resize',
-            'margin': '0 0 0 -5px',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
-            'left': '100%',
-            'top': '0',
-            'cursor': 'ne-resize',
-            'margin': '-10px 0 0',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
-            'left': '100%',
-            'top': '100%',
-            'cursor': 'se-resize',
-            'margin': '0',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
-            'left': '0',
-            'top': '100%',
-            'cursor': 'sw-resize',
-            'margin': '0 0 0 -10px',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
-            'left': '0',
-            'top': '0',
-            'cursor': 'nw-resize',
-            'margin': '-10px 0 0 -10px',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
-            'left': '50%',
-            'top': '0',
-            'cursor': 'n-resize',
-            'margin': '-10px 0 0 -5px',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
-            'left': '100%',
-            'top': '50%',
-            'cursor': 'e-resize',
-            'margin': '-5px 0 0',
-          });
-
-          resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
-            'left': '0',
-            'top': '50%',
-            'cursor': 'w-resize',
-            'margin': '-5px 0 0 -10px',
-          });
+          toolMenu.resizableElement(resizableElement, e, target);
         }
         currentObjId = targetObj;
         currentX = e.pageX - dragArea.offsetLeft;
@@ -396,9 +229,9 @@ export default {
     function dragEnd(e) {
       if (active) {
         if (e.target.dataset.textContent === 'true') {
-          e.target.style.zIndex = '2';
-          result.left = e.target.style.left;
-          result.top = e.target.style.top;
+          parentDiv.style.zIndex = '2';
+          result.left = parentDiv.style.left;
+          result.top = parentDiv.style.top;
         } else {
           result.style.left = currentObj.style.left;
           result.style.top = currentObj.style.top;
@@ -411,8 +244,12 @@ export default {
     };
 
     function textInput(e) {
-      if (e.target.id == "textArea") {
-        toolMenu.currentPageList.caption.content = e.target.innerText;
+      let target = e.target;
+      let parentDiv = target.closest('#textArea');
+      if(parentDiv) {
+        if (parentDiv.id == "textArea") {
+        toolMenu.currentPageList.caption.content = target.innerText;
+      }
       }
     };
 
@@ -421,18 +258,18 @@ export default {
   watch: {
     //currentPageList => pageList[현재 선택한 페이지 인덱스] 가 변경이 일어나면 실행이 되는 부분
     currentPageList() {
-      this.updateContent();
-      this.fontSize = parseInt(this.currentPageList.caption.fontSize);
-      if (this.fontSize == NaN) this.fontSize = 10;
+        this.updateContent();
+        this.changeCaptionElement();
     },
+
     fontSize: function (newVal) {
-      console.log(newVal);
+      this.fontSize = newVal;
       const textArea = document.querySelector('[data-text-content="true"]');
       if (textArea) {
         textArea.style.fontSize = newVal + 'px';
         this.currentPageList.caption.fontSize = newVal;
       }
-    },
+    },    
   },
 
   methods: {
@@ -443,6 +280,7 @@ export default {
     },
     setFontSize() {
       const textarea = document.querySelector('textarea');
+      console.log(textarea);
       textarea.style.fontSize = this.fontSize + "px";
     },
     setFontColor() {
@@ -450,15 +288,16 @@ export default {
       textarea.style.color = this.fontColor;
     },
     addContent() {
-      if (this.currentPageList.caption.content !== null) {
+      if (this.currentPageList.caption.captionState === 1) {
         alert('한 페이지당 하나의 자막만 넣을 수 있습니다.');
         return;
       };
+
       const caption = this.currentPageList.caption;
       const objectArea = this.$refs.pageObject;
       const addDiv = document.createElement("div");
       const textDiv = document.createElement("div");
-
+      
       textDiv.setAttribute("data-text-content", true);
       addDiv.setAttribute('data-obj-type', 'caption');
       addDiv.style.width = "400px";
@@ -468,7 +307,7 @@ export default {
       textDiv.style.height = "100%";
       textDiv.style.fontWeight = "bold";
       textDiv.style.fontSize = this.fontSize + "px";
-      textDiv.style.color = '#000000';
+      textDiv.style.color = this.currentColor;
       textDiv.innerText = "자막 내용을 입력해주세요.";
       addDiv.style.position = "absolute";
       addDiv.id = "textArea";
@@ -476,18 +315,20 @@ export default {
       addDiv.appendChild(textDiv);
       objectArea.appendChild(addDiv);
       caption.content = '자막 내용을 입력해주세요.';
-      caption.fontSize = addDiv.style.fontSize;
-      caption.fontColor = addDiv.style.color;
+      caption.fontSize = textDiv.style.fontSize;
+      caption.fontColor = textDiv.style.color;
       caption.width = addDiv.style.width;
       caption.height = addDiv.style.height;
       caption.left = addDiv.style.left;
       caption.top = addDiv.style.top;
+      this.currentPageList.caption.captionState = 1;
       this.canvas();
     },
-
+    
     canvas() {
       try {
         const imageArea = this.$refs.dragImage;
+        const currentPage = this.currentPageList;
         const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
         const ignoreElements = element => {
           return resizableElements.some(resizableElement => resizableElement.contains(element));
@@ -497,6 +338,7 @@ export default {
           const img = new Image();
           img.crossOrigin = 'anonymous';
           img.onload = () => {
+
             const originalWidth = 960;
             const originalHeight = 600;
             // const reductionRatio = 0.35;
@@ -517,6 +359,7 @@ export default {
       }
     },
     updateContent() {
+      console.log('update');
       const objectElement = this.$refs.pageObject;
 
       //object div 안의 내용을 초기화
@@ -546,25 +389,30 @@ export default {
         }
         objectElement.appendChild(fragment);
       }
-
-      if (this.currentPageList.caption.content !== null) {
+      
+      if (this.currentPageList.caption.captionState !== 0) {
+        
         const caption = this.currentPageList.caption;
-        const divEle = document.createElement('div');
-        divEle.contentEditable = true;
-        divEle.setAttribute("data-text-content", true);
-        divEle.setAttribute('data-obj-type', 'caption');
-        divEle.style.left = caption.left;
-        divEle.style.top = caption.top;
-        divEle.style.width = caption.width;
-        divEle.style.height = caption.height;
-        divEle.style.fontWeight = "bold";
-        divEle.style.fontSize = caption.fontSize;
-        divEle.style.position = "absolute";
-        divEle.style.zIndex = 2;
-        divEle.style.color = caption.fontColor;
-        divEle.id = "textArea";
-        divEle.innerText = caption.content;
-        objectElement.appendChild(divEle);
+
+        const addDiv = document.createElement('div');
+        const textDiv = document.createElement("div");
+
+        textDiv.setAttribute("data-text-content", true);
+        addDiv.setAttribute('data-obj-type', 'caption');
+        addDiv.style.width = caption.width;
+        addDiv.style.height = caption.height;
+        addDiv.style.left = caption.left;
+        addDiv.style.top = caption.top;
+        textDiv.style.height = "100%";
+        textDiv.style.fontWeight = "bold";
+        textDiv.style.fontSize = caption.fontSize;
+        textDiv.style.color = caption.fontColor;
+        textDiv.innerText = caption.content;
+        addDiv.style.position = "absolute";
+        addDiv.id = "textArea";
+        addDiv.style.zIndex = 2;
+        addDiv.appendChild(textDiv);
+        objectElement.appendChild(addDiv);
       }
     },
 
@@ -741,18 +589,125 @@ export default {
       const resizableElements = document.querySelectorAll('.ui-resizable');
       resizableElements.forEach(element => {
         if (element !== resizableElement && !element.contains(e.target)) {
-          console.log(element);
           $(element).resizable('destroy');
           element.style.outline = '';
         };
       });
     },
+    resizableElement(resizableElement, e, target) {
+      let toolMenu = this;
+      resizableElement = $(target).resizable({
+          handles: 'n, e, s, w, ne, se, sw, nw',
+          stop: () => {
+            let target = e.target.id;
+            let resizeTarget;
+            if (target.includes('textArea')) {
+              resizeTarget = toolMenu.currentPageList.caption;
+              resizeTarget.left = e.target.style.left;
+              resizeTarget.top = e.target.style.top;
+              resizeTarget.width = e.target.style.width;
+              resizeTarget.height = e.target.style.height;
+            } else {
+              resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
+              resizeTarget.style.left = e.target.style.left;
+              resizeTarget.style.top = e.target.style.top;
+              resizeTarget.style.width = e.target.style.width;
+              resizeTarget.style.height = e.target.style.height;
+            }
+            toolMenu.canvas();
+          }
+        });
+
+        resizableElement.find('.ui-resizable-handle').css({
+          'position': 'absolute',
+          'width': '6px',
+          'height': '6px',
+          'background': '#5BB6F3',
+          'border': '2px solid #fff',
+          'box-shadow': '0 1px 1px rgba(0,0,0,.3)',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-s').css({
+          'left': '50%',
+          'top': '100%',
+          'cursor': 's-resize',
+          'margin': '0 0 0 -5px',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-ne').css({
+          'left': '100%',
+          'top': '0',
+          'cursor': 'ne-resize',
+          'margin': '-10px 0 0',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-se').css({
+          'left': '100%',
+          'top': '100%',
+          'cursor': 'se-resize',
+          'margin': '0',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-sw').css({
+          'left': '0',
+          'top': '100%',
+          'cursor': 'sw-resize',
+          'margin': '0 0 0 -10px',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-nw').css({
+          'left': '0',
+          'top': '0',
+          'cursor': 'nw-resize',
+          'margin': '-10px 0 0 -10px',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-n').css({
+          'left': '50%',
+          'top': '0',
+          'cursor': 'n-resize',
+          'margin': '-10px 0 0 -5px',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-e').css({
+          'left': '100%',
+          'top': '50%',
+          'cursor': 'e-resize',
+          'margin': '-5px 0 0',
+        });
+
+        resizableElement.find('.ui-resizable-handle.ui-resizable-w').css({
+          'left': '0',
+          'top': '50%',
+          'cursor': 'w-resize',
+          'margin': '-5px 0 0 -10px',
+        });
+    },
+    changeCaptionElement() {
+      const colorPreview = this.$refs.colorPreview;
+
+      if(this.currentPageList.caption.fontSize !== '') {
+        this.fontSize = parseInt(this.currentPageList.caption.fontSize);
+      } else {
+        this.fontSize = 20;
+      }
+      
+      if(this.currentPageList.caption.fontColor !== '') {
+        this.currentColor = this.currentPageList.caption.fontColor;
+      } else {
+        this.currentColor = '#000000';
+      }
+
+      colorPreview.style.backgroundColor = this.currentColor;
+    }
   },
 }
 
 //1. 현재 자막 부분 문제점 자막을 다 지우면 글자크기 작아짐... 다른 div 안에 글이 들어감 새로운 div 를 추가를 해서 거기에 글을 적게 하고 드래그를 전체로 하도록 해야할듯 --해결
-//2. 썸네일 제작 부분 비동기 형식이라 만약에 canvas() 하기 전에 currentPageList가 변경이되면 해당 currentPageList의 썸네일이 변경됨... --몰라
-//3. 모듈화 해야함... --귀찮음
+//2. 썸네일 제작 부분 비동기 형식이라 만약에 canvas() 하기 전에 currentPageList가 변경이되면 해당 currentPageList의 썸네일이 변경됨... --해결
+//3. 모듈화 해야함... resizable 모듈화 --해결
+//4. 썸네일 크기가 다름
+//5. 자막 더블클릭했을 때 마지막이면 글이 입력이 안됌
 
 </script>
 <style scoped>

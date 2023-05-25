@@ -11,6 +11,7 @@
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
       <button @click="saveTmp()">임시저장</button>
+      <button @click="test()">저장테스트</button>
       <button @click="saveBook()">제출</button>
     </div>
   </div>
@@ -85,7 +86,8 @@ export default {
           await axios.post("/api/v1/book/", {
             bookName: this.bookName,
             bookStatus: "temp",
-            email: sessionStorage.getItem('user')
+            email: sessionStorage.getItem('user'),
+            pageList : this.pageList,
           })
             .then((res) => {
               console.log(res.data.bookId);
@@ -106,6 +108,7 @@ export default {
           await axios.post("/api/v1/book/" + this.bookId, {
             bookName: this.bookName,
             bookStatus: "temp",
+            pageList : this.pageList,
           })
             .then((res) => {
               console.log(res);
@@ -236,6 +239,119 @@ export default {
 
       window.open('/', 'previewWindow', `width=${windowWidth}, height=${windowHeight}, left=${left}, top=${top}`);
       
+        </style>
+        `;
+      const list = newWindow.document.getElementById('list');
+      this.layerList(list, currentIndex, newWindow);
+      this.captionList(list, currentIndex, newWindow);
+
+      if (currentIndex == 0) {
+        newWindow.document.querySelector('#prev').disabled = true;
+      }
+
+      if (currentIndex == this.pageList.length || currentIndex == this.pageList.length - 1) {
+        newWindow.document.querySelector('#next').disabled = true;
+      }
+
+      newWindow.prev = () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+        }
+
+        while (list.firstChild) {
+          list.removeChild(list.firstChild);
+        }
+
+        this.layerList(list, currentIndex, newWindow);
+        this.captionList(list, currentIndex, newWindow);
+
+        if (currentIndex == 0) {
+          newWindow.document.querySelector('#prev').disabled = true;
+        }
+
+        if (currentIndex < this.pageList.length - 1) {
+          newWindow.document.querySelector('#next').disabled = false;
+        } else {
+          newWindow.document.querySelector('#next').disabled = true;
+        }
+      };
+
+      newWindow.next = () => {
+        if (currentIndex < this.pageList.length - 1) {
+          currentIndex++;
+        }
+
+        if (currentIndex == this.pageList.length - 1) {
+          newWindow.document.querySelector('#next').disabled = true;
+        }
+
+        while (list.firstChild) {
+          list.removeChild(list.firstChild);
+        }
+
+        this.layerList(list, currentIndex, newWindow);
+        this.captionList(list, currentIndex, newWindow);
+
+        if (currentIndex > 0) {
+          newWindow.document.querySelector('#prev').disabled = false;
+        } else {
+          newWindow.document.querySelector('#prev').disabled = true;
+        }
+      };
+    },
+    layerList(list, currentIndex, newWindow) {
+      if (this.pageList[currentIndex].layerList != null) {
+        for (const [index, image] of Object.entries(this.pageList[currentIndex].layerList)) {
+          const imageEle = newWindow.document.createElement('img');
+          imageEle.src = image.fileId;
+          imageEle.id = image.id;
+          if (image.id.includes("background")) {
+            imageEle.style.left = 0;
+            imageEle.style.top = 0;
+            imageEle.style.width = '100%';
+            imageEle.style.height = '100%';
+          }
+          else {
+            imageEle.style.left = image.style.left;
+            imageEle.style.top = image.style.top;
+            imageEle.style.width = image.style.width;
+            imageEle.style.height = image.style.height;
+          }
+          imageEle.style.position = image.style.position;
+          imageEle.setAttribute('draggable', 'false');
+          imageEle.style.zIndex = 1;
+          list.appendChild(imageEle);
+        };
+      };
+    },
+    captionList(list, currentIndex, newWindow) {
+      if (this.pageList[currentIndex].caption.content !== null) {
+        const caption = this.pageList[currentIndex].caption;
+        const divEle = newWindow.document.createElement('div');
+        divEle.style.left = caption.left;
+        divEle.style.top = caption.top;
+        divEle.style.width = caption.width;
+        divEle.style.height = caption.height;
+        divEle.style.fontWeight = "bold";
+        divEle.style.fontSize = caption.fontSize;
+        divEle.style.position = "absolute";
+        divEle.style.textAlign = "center";
+        divEle.style.color = caption.fontColor;
+        divEle.innerText = caption.content;
+        divEle.style.zIndex = 2;
+        list.appendChild(divEle);
+      }
+    },
+    test() {
+      console.log(JSON.stringify(this.pageList));
+      axios.post('/api/tool/dataTest/1', {"pageList" : this.pageList})
+        .then(res => {
+          console.log(res);
+          console.log('success');
+        }).catch(err => {
+          console.log(err);
+          console.log('fail');
+        })
     }
   },
 }

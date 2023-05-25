@@ -1,9 +1,8 @@
 package com.cnu.taleteller.backend.domain.user.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
+import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name="members")
 @Getter
+@Setter
 @DynamicInsert
 public class Member implements UserDetails {
 
@@ -44,7 +44,15 @@ public class Member implements UserDetails {
     @Column(name = "member_account", nullable = false)
     private String memberAccount;
 
-
+    public static Member toMember(MemberInfoDto memberInfoDto) {
+        Member member = new Member();
+        member.setMemberId(memberInfoDto.getMemberId());
+        member.setMemberAuth(memberInfoDto.getMemberAuth());
+        member.setMemberPassword(memberInfoDto.getMemberPassword());
+        member.setMemberPhone(memberInfoDto.getMemberPhone());
+        member.setMemberAccount(memberInfoDto.getMemberAccount());
+        return member;
+    }
 
     @Builder
     public Member(String memberEmail, String memberPassword, String memberAuth, String memberName, String memberPhone, String memberAccount) {
@@ -52,6 +60,16 @@ public class Member implements UserDetails {
         this.memberPassword = memberPassword;
         this.memberAuth = memberAuth;
         this.memberName = memberName;
+        this.memberPhone = memberPhone;
+        this.memberAccount = memberAccount;
+    }
+
+    public void dropUpdate(String memberAuth) {
+        this.memberAuth = memberAuth;
+    }
+
+    public void modifyUpdate(String memberPassword, String memberPhone, String memberAccount) {
+        this.memberPassword = memberPassword;
         this.memberPhone = memberPhone;
         this.memberAccount = memberAccount;
     }

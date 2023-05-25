@@ -43,7 +43,6 @@ export default {
 
 <style scoped>
 .preview-form {
-  /* width: 1000px; */
   height: 700px;
   display: flex;
   flex-direction: column;
@@ -62,7 +61,6 @@ export default {
 }
 .menu-btn {
   padding: 5px 10px;
-  /* border-radius: 50%; */
   background-color: white;
   border: none;
   border-radius: 3px;

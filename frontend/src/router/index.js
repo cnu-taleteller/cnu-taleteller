@@ -14,6 +14,7 @@ import DummyDetailView from "../views/DummyDetailView.vue";
 import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
 import Preview from '../views/Preview.vue'
+import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
 
 Vue.use(VueRouter)
 
@@ -32,6 +33,11 @@ const routes = [
     path: "/toolSubmit",
     name: "ToolSubmit",
     component: ToolSubmitView
+  },
+  {
+    path: "/keyword",
+    name: "ChangeKeyword",
+    component: ChangeKeyword
   },
   {
     path: "/preview",

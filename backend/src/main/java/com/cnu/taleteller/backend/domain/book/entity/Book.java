@@ -56,7 +56,7 @@ public class Book {
     private BookMongo bookMongo;
 
     @Builder
-    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, Member member, BookMongo bookMongo) {
+    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, String scenario, Member member, BookMongo bookMongo) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookRegdate = bookRegdate;
@@ -81,6 +81,14 @@ public class Book {
     public void update(String bookName, String bookStatus){
         this.bookName = bookName;
         this.bookStatus = bookStatus;
+    }
+
+    public void updateSubmit(String bookName, String bookDescription, String bookStatus, String bookCategory, String bookPublic) {
+        this.bookName = bookName;
+        this.bookDescription = bookDescription;
+        this.bookStatus = bookStatus;
+        this.bookCategory = bookCategory;
+        this.bookPublic = bookPublic;
     }
 
     public void updateScenario(String scenario){

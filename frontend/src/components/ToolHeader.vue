@@ -10,9 +10,9 @@
     </div>
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
-      <button @click="saveTmp()">임시저장</button>
-      <button @click="test()">저장테스트</button>
+      <button @click="saveTmp('temp')">임시저장</button>
       <button @click="saveBook()">제출</button>
+      <button @click="saveUploadFile">테스트</button>
     </div>
   </div>
 </template>
@@ -27,9 +27,9 @@ export default {
         encodedFileName: null,
         uploadedUrl: null,
       },
+      isSave: false,
       isPreviewDialogVisible: false,
-      bookName: null,
-      pop: null,
+      bookName: "",
       edit: false,
       bookId: null,
       finalScenario: []
@@ -55,55 +55,51 @@ export default {
       this.edit = !!!this.edit;
     },
     // 제출
-    saveBook() {
-      // 시나리오 선택되어야 진행
+    async saveBook() {
       const select = sessionStorage.getItem('select');
-      console.log(select);
       if (!select || select == 'false') {
         alert('시나리오 선택 후 진행해주세요');
         return;
       }
-      sessionStorage.removeItem('scenario');
-      sessionStorage.removeItem('scenarioKeyword');
+      await this.saveTmp('submit');
       sessionStorage.setItem('bookName', this.bookName);
       this.$router.push('/ToolSubmit');
     },
     // 임시 저장
-    async saveTmp() {
+    async saveTmp(status) {
       const select = sessionStorage.getItem('select');
 
-      if (!select || select === 'false') {
-        alert('시나리오 선택 후 진행해주세요!');
+      if (!select || select == 'false') {
+        alert('시나리오 선택 후 진행해주세요');
         return;
       }
       else {
-        // 최초 저장
-        if (this.bookId == null) {
-          await axios.post("/api/v1/book/", {
+        if (this.isSave == false) {
+          await axios.post("/api/v1/book/tmp", {
             bookName: this.bookName,
-            bookStatus: "temp",
+            bookStatus: 'temp',
             email: sessionStorage.getItem('user'),
             pageList : this.pageList,
           })
             .then((res) => {
-              console.log(res.data.bookId);
-              this.bookId = res.data.bookId;
+              console.log(res.data);
+              this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();
-              alert('임시저장 완료');
+              this.isSave = true;
+              if(status === 'temp') alert('저장 완료');
             })
             .catch((err) => {
               console.error(err);
-              alert('임시저장 실패');
+              alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
             })
         }
         else {
-          // 이미 bookId 있을 때
           await axios.post("/api/v1/book/" + this.bookId, {
             bookName: this.bookName,
-            bookStatus: "temp",
+            bookStatus: 'temp',
             pageList : this.pageList,
           })
             .then((res) => {
@@ -111,11 +107,12 @@ export default {
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();
-              alert('임시저장 완료');
+              this.isSave = true;
+              if(status === 'temp') alert('저장 완료');
             })
             .catch((error) => {
               console.log(error);
-              alert('임시저장 실패');
+              alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
             });
         }
       }
@@ -123,6 +120,7 @@ export default {
     async saveThumbnail() {
       for (let i = 0; i < this.pageList.length; i++) {
         const dataUrl = this.pageList[i].thumbnail;
+        if(dataUrl==="") return;
         const base64Data = dataUrl.split(',')[1];
         const fileName = `${this.bookId}_${i}_thumbnail.png`;
         try {
@@ -145,7 +143,6 @@ export default {
         }
         catch (err) {
           console.error(`Thumbnail ${i} 처리 실패:`, err);
-          alert('서버 문제로 파일 처리에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️');
         }
       }
     },
@@ -157,17 +154,15 @@ export default {
       for (let i = 0; i < binaryString.length; i++) {
           view[i] = binaryString.charCodeAt(i) & 0xff;
       }
-
       return new Blob([arraybuffer], { type: contentType });
     },
-
     async saveUploadFile() {
       const uploadCharList = JSON.parse(sessionStorage.getItem('uploadCharList'));
       const uploadBackList = JSON.parse(sessionStorage.getItem('uploadBackList'));
 
-      if (uploadBackList === null && uploadBackList === null) return;
+      if (uploadBackList === null && uploadCharList === null) return;
 
-      if (uploadBackList === null) {
+      else if (uploadBackList === null) {
         await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
           uploadCharList,
         })
@@ -219,27 +214,27 @@ export default {
         });
     },
     preview() {
-      const screenWidth = window.screen.width;
-      const screenHeight = window.screen.height;
-      const windowWidth = 1000;
-      const windowHeight = 700;
-      const left = (screenWidth - windowWidth) / 2;
-      const top = (screenHeight - windowHeight) / 2;
+      const chk = confirm('임시저장 후 이용하실 수 있습니다. 저장하시겠습니까?');
+      if(!chk) return;
+      try {
+        this.saveTmp('temp');
+      } catch {
+        alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
+        return;
+      }
+  
+      setTimeout(() => {
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        const windowWidth = 1000;
+        const windowHeight = 700;
+        const left = (screenWidth - windowWidth) / 2;
+        const top = (screenHeight - windowHeight) / 2;
 
-      const queryString = `pageList=${encodeURIComponent(JSON.stringify(this.pageList))}`;
-      window.open(`/preview?${queryString}`, 'previewWindow', `width=${windowWidth}, height=${windowHeight}, left=${left}, top=${top}`);
+        const queryString = `pageList=${encodeURIComponent(JSON.stringify(this.pageList))}`;
+        window.open(`/preview?${queryString}`, 'previewWindow', `width=${windowWidth}, height=${windowHeight}, left=${left}, top=${top}`);
+        }, 2000);
     },
-    test() {
-      console.log(JSON.stringify(this.pageList));
-      axios.post('/api/tool/dataTest/1', {"pageList" : this.pageList})
-        .then(res => {
-          console.log(res);
-          console.log('success');
-        }).catch(err => {
-          console.log(err);
-          console.log('fail');
-        })
-    }
   },
 }
 </script>

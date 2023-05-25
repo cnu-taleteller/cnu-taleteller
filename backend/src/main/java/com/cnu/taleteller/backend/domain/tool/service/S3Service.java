@@ -25,7 +25,7 @@ public class S3Service {
 
 
     public Map<String, Serializable> getPreSignedUrl(String fileName) {
-        String encodedFileName = fileName + "_" + LocalDateTime.now();
+        String encodedFileName = LocalDateTime.now() + "_" + fileName;
         String objectKey = "static/" + encodedFileName;
 
         Date expiration = new Date();

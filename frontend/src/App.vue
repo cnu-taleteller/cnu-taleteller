@@ -1,11 +1,10 @@
 <template>
   <div id="app">
-    <Header></Header>
+    <Header v-if="ShowHeader"></Header>
     <SearchHeader v-if="ShowSearchHeader"></SearchHeader>
     <router-view/>
   </div>
 </template>
-
 
 <script>
 import Header from './components/Header.vue';
@@ -19,7 +18,10 @@ export default {
   },
   computed: {
     ShowSearchHeader() {
-      return this.$route.path != '/tool';
+      return this.$route.path != '/tool' &&  this.$route.path !== '/preview';
+    },
+    ShowHeader() {
+      return this.$route.path !== '/preview';
     }
   }
 }

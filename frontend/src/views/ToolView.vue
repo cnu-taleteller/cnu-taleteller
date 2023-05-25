@@ -63,7 +63,6 @@ import axios from 'axios';
 import toolHeader from '@/components/ToolHeader.vue';
 import toolPageList from '@/components/ToolPageList.vue';
 import toolSelectedPage from '@/components/ToolSelectedPage.vue';
-import toolLayer from '@/components/ToolLayer.vue';
 import toolMenu from '@/components/ToolMenu.vue';
 import toolScenarioExample from '@/components/ToolScenarioExample.vue'
 
@@ -115,7 +114,6 @@ export default {
     ToolHeader: toolHeader,
     ToolPageList: toolPageList,
     ToolSelectedPage: toolSelectedPage,
-    ToolLayer: toolLayer,
     ToolMenu: toolMenu,
     ToolScenarioExample: toolScenarioExample,
   },

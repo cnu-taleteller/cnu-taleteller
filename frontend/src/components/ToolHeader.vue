@@ -12,7 +12,6 @@
       <button @click="preview()">미리보기</button>
       <button @click="saveTmp('temp')">임시저장</button>
       <button @click="saveBook()">제출</button>
-      <button @click="saveUploadFile">테스트</button>
     </div>
   </div>
 </template>

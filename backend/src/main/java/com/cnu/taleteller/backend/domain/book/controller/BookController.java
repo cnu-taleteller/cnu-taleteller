@@ -24,24 +24,31 @@ public class BookController {
 
     private final ToolService toolService;
 
-    @PostMapping("/")
-    public ResponseEntity<Book> save(@RequestBody BookTempSaveDto dto) {
+    @PostMapping
+    public ResponseEntity<?> saveSubmit(@RequestBody BookDto dto) {
+        System.out.println("ㅎㅇ");
+        bookService.submitBook(dto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/tmp")
+    public Long saveTmp(@RequestBody BookTempSaveDto dto) {
         String bookName = dto.getBookName();
         String bookStatus = dto.getBookStatus();
         String email = dto.getEmail();
         Page[] pageList = dto.getPageList();
 
         ObjectId objectId = toolService.saveBook(pageList);
-        Book book = bookService.saveBook(bookName, bookStatus, email, objectId.toString());
+        Long bookId = bookService.saveBook(bookName, bookStatus, email, objectId.toString());
 
-        return new ResponseEntity<>(book, HttpStatus.OK);
+        return bookId;
     }
 
     @PostMapping("/{bookId}")
-    public ResponseEntity update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
-        Book updateBook = bookService.updateBook(dto, bookId);
+    public Long update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
+        Long id = bookService.updateBook(dto, bookId);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return id;
     }
 
     @GetMapping("/search")

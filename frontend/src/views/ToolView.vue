@@ -22,7 +22,7 @@
     <div v-else-if="toolState === 'gpt'" class="tool-content tool-scenario">
       <div class="scenario-form">
         <h3>시나리오 추천 받기</h3>
-        <p>키워드를 입력하세요 ✏️
+        <p class="form-ment">키워드를 입력하세요 ✏️
           <br>사건은 구체적이게 적을수록 좋습니다!
         </p>
         <div class="scenario-input-form">
@@ -34,7 +34,7 @@
           <input type="text" class="scenario-input" v-model="scenarioKeyword.where" placeholder="숲에서">
           <p>4. 이 동화책의 주요 사건은 무엇인가요?</p>
           <textarea class="scenario-input" v-model="scenarioKeyword.event"
-            placeholder="마녀가 준 사과를 먹고 쓰러졌고, 일어나보니 인어 공주가 있어서 인어 공주랑 재밌게 논 이야기"></textarea>
+            placeholder="외계인을 만나 당황했지만 재밌게 놀았던 이야기"></textarea>
           <button class="submit-btn" @click="setGptScenario()">시나리오 받아보기</button>
         </div>
       </div>
@@ -281,6 +281,10 @@ h3 {
   font-weight: bold;
   color: #2f66ff;
   text-shadow: 2px 2px 2px #d3d3d3;
+}
+.form-ment {
+  font-weight: bold;
+  color: gray;
 }
 
 .scenario-input {

@@ -6,20 +6,15 @@ import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
 import com.cnu.taleteller.backend.domain.tool.repository.BookMongoRepository;
-import com.cnu.taleteller.backend.domain.tool.repository.ToolRepository;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
-import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -51,7 +46,7 @@ public class BookService {
     }
 
     @Transactional
-    public Book saveBook(String bookName, String bookStatus, String email, String objectId) {
+    public Long saveBook(String bookName, String bookStatus, String email, String objectId) {
 
         Member member = memberRepository.findByMemberEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("err"));
@@ -67,17 +62,34 @@ public class BookService {
                 .member(member)
                 .bookMongo(bookMongo)
                 .build();
-        return bookRepository.save(bookEntity);
+        Book savedBook = bookRepository.save(bookEntity);
+
+        return savedBook.getBookId();
     }
 
     @Transactional
-    public Book updateBook(BookTempSaveDto dto, Long bookId) throws ExecutionException, InterruptedException, RuntimeException {
+    public Book submitBook(BookDto dto) {
+        Book book = bookRepository.findById(dto.getBookId())
+                .orElseThrow(() -> new IllegalArgumentException("err"));
+        book.updateSubmit(dto.getBookName(),
+                dto.getBookDescription(),
+                dto.getBookStatus(),
+                dto.getBookCategory(),
+                dto.getBookPublic());
+        return bookRepository.save(book);
+    }
+
+
+    @Transactional
+    public Long updateBook(BookTempSaveDto dto, Long bookId) throws ExecutionException, InterruptedException, RuntimeException {
         CompletableFuture<Void> work = toolService.updateBookPages(bookId, dto.getPageList());
         Book book = bookRepository.findById(bookId)
         .orElseThrow(() -> new IllegalArgumentException("err"));
         book.update(dto.getBookName(), dto.getBookStatus());
         work.get();
-        return bookRepository.save(book);
+
+        Book savedBook = bookRepository.save(book);
+        return savedBook.getBookId();
     }
 
     @Transactional

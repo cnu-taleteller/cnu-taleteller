@@ -63,7 +63,6 @@ export default {
     let textArea;
     let currentColor;
 
-    //디폴트 값으로 검은색
     colorPreview.style.backgroundColor = this.currentColor;
 
     // 컬러 선택 창 열기

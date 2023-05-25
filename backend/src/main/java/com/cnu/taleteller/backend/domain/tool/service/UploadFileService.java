@@ -20,30 +20,32 @@ public class UploadFileService {
 
     @Transactional
     public List<UploadFile> save(UploadFileRequestDto dto, Long bookId) {
-        List<String> uploadCharList = dto.getUploadCharList();
-        List<String> uploadBackList = dto.getUploadBackList();
         List<UploadFile> uploadFiles = new ArrayList<>();
 
-        for (String uploadChar : uploadCharList) {
-            UploadFileDto uploadCharDto = UploadFileDto.builder()
-                    .uploadFileName(uploadChar)
-                    .uploadFileType("character")
-                    .book(new Book(bookId))
-                    .build();
+        if(dto.getUploadCharList()!=null) {
+            List<String> uploadCharList = dto.getUploadCharList();
+            for (String uploadChar : uploadCharList) {
+                UploadFileDto uploadCharDto = UploadFileDto.builder()
+                        .uploadFileName(uploadChar)
+                        .uploadFileType("character")
+                        .book(new Book(bookId))
+                        .build();
 
-            uploadFiles.add(uploadCharDto.toEntity());
+                uploadFiles.add(uploadCharDto.toEntity());
+            }
         }
+       if(dto.getUploadBackList()!=null) {
+           List<String> uploadBackList = dto.getUploadBackList();
+           for (String uploadBack : uploadBackList) {
+               UploadFileDto uploadBackDto = UploadFileDto.builder()
+                       .uploadFileName(uploadBack)
+                       .uploadFileType("background")
+                       .book(new Book(bookId))
+                       .build();
 
-        for (String uploadBack : uploadBackList) {
-            UploadFileDto uploadBackDto = UploadFileDto.builder()
-                    .uploadFileName(uploadBack)
-                    .uploadFileType("background")
-                    .book(new Book(bookId))
-                    .build();
-
-            uploadFiles.add(uploadBackDto.toEntity());
-        }
-
+               uploadFiles.add(uploadBackDto.toEntity());
+           }
+       }
         
         List<UploadFile> list = fileRepository.saveAll(uploadFiles);
 

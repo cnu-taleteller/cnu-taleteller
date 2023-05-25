@@ -18,10 +18,10 @@ export default {
   },
   computed: {
     ShowSearchHeader() {
-      return this.$route.path != '/tool' &&  this.$route.path !== '/preview';
+      return this.$route.path != '/tool' &&  this.$route.path !== '/preview' && this.$route.path !== '/keyword';
     },
     ShowHeader() {
-      return this.$route.path !== '/preview';
+      return this.$route.path !== '/preview' && this.$route.path !== '/keyword';
     }
   }
 }

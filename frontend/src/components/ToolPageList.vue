@@ -33,7 +33,7 @@ export default {
   name: 'App',
   data() {
     return {
-      bookId: 15,
+      bookId: null,
       //현재 사용중인 데이터
       pageList: [
         {

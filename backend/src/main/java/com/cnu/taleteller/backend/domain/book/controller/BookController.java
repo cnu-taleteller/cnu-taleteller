@@ -38,10 +38,10 @@ public class BookController {
     }
 
     @PostMapping("/{bookId}")
-    public ResponseEntity<Book> update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
+    public ResponseEntity update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
         Book updateBook = bookService.updateBook(dto, bookId);
 
-        return new ResponseEntity<>(updateBook, HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/search")

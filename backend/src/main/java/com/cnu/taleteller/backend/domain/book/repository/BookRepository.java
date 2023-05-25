@@ -23,5 +23,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT bm.mongoId FROM Book b RIGHT JOIN b.bookMongo bm WHERE b.bookId = :bookId")
     String findMongoIdByBookId(@Param("bookId") Long bookId);
 
+    @Query("SELECT b.bookId FROM Book b LEFT JOIN b.member m WHERE m.memberEmail = :userEmail")
+    List<Long> findMyBookList(@Param("userEmail") String userEmail);
+
     Book save(Book book);
 }

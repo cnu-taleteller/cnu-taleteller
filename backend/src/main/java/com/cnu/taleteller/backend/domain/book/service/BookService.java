@@ -18,6 +18,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -89,5 +91,11 @@ public class BookService {
             return BookDto.fromEntity(book);
         }
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findUserBookList(String userEmail) {
+        List<Long> bookList = bookRepository.findMyBookList(userEmail);
+        return bookList != null ? bookList : Collections.emptyList();
     }
 }

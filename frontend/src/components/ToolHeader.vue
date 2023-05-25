@@ -40,10 +40,7 @@ export default {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
-    if (sessionStorage.getItem('bookId')) {
-      this.bookId = sessionStorage.getItem('bookId');
-    }
-
+    this.bookId = this.$store.getters.getBookId;
   },
   methods: {
     editBookName() {
@@ -65,8 +62,9 @@ export default {
     },
     // 임시 저장
     async saveTmp() {
+      console.log(this.bookId);
       const select = sessionStorage.getItem('select');
-
+      
       if (!select || select === 'false') {
         alert('시나리오 선택 후 진행해주세요!');
         return;
@@ -82,8 +80,7 @@ export default {
           })
             .then((res) => {
               console.log(res.data.bookId);
-              this.bookId = res.data.bookId;
-              sessionStorage.setItem('bookId', this.bookId);
+              this.$store.commit('setBookId', res.data.bookId);
               this.saveScenario();
               this.saveUploadFile();
               alert('임시저장 완료');

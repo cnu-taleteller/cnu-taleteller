@@ -104,6 +104,7 @@ export default {
       this.resultScenario = sessionStorage.getItem('scenario');
       this.setScenarioArr();
     }
+    
   },
   mounted() {
     window.addEventListener('beforeunload', this.unLoadEvent);

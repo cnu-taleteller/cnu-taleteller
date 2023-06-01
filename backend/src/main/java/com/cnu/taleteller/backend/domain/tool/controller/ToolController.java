@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +59,18 @@ public class ToolController {
         String encodedFileName = ttsService.getEncodedFileName();
         TTSResponse response = new TTSResponse(ttsUrl, encodedFileName);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/audio")
+    public ResponseEntity<String> handleRecordingUpload(@RequestBody byte[] audioBytes) {
+        try {
+            String fileName = LocalDateTime.now() + "_"+"recording.wav"; // 업로드할 파일 이름 설정
+
+            s3Service.uploadFile(fileName, new ByteArrayInputStream(audioBytes));
+            return ResponseEntity.ok("음성 녹음 업로드가 완료되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("음성 녹음 업로드 중 오류가 발생했습니다.");
+        }
     }
 
     @PostMapping("/firstAccess/{bookId}")

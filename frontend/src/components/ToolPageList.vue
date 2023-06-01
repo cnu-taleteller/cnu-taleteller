@@ -50,7 +50,7 @@ export default {
             top: '',
             ttsVoice:null,
             ttsName:null,
-            voiceName:null,
+            recordedChunks: [],
           },
           thumbnail: '',
           layerList: [],

@@ -9,6 +9,8 @@
         @click="setSelectedMenu('scenario')">시나리오</button>
       <button class="menu-btn" :class="{ active: selectedMenu === 'tts' }"
               @click="setSelectedMenu('tts')">TTS</button>
+      <button class="menu-btn" :class="{ active: selectedMenu === 'recode' }"
+              @click="setSelectedMenu('recode')">음성녹음</button>
     </div>
     <div class="menu-form">
       <div class="uploadImage">
@@ -94,6 +96,10 @@
           <label for="femaleVoice1">여성</label>
           <button class="submit-btn" @click="addTts()">추가</button>
 <!--          <button class="submit-btn" @click="addTts()">미리 듣기</button>-->
+        </div>
+        <div v-else-if="selectedMenu == 'recode'">
+            <button @click="startRecording">녹음 시작</button>
+            <button @click="stopRecording">멈춤</button>
         </div>
       </div>
       <div class="image-list">
@@ -385,6 +391,49 @@ export default {
       }).catch(error => {
         console.error(error);
       })
+    },
+    startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                this.currentPageList.caption.ttsVoice = new MediaRecorder(stream);
+                this.currentPageList.caption.ttsVoice.addEventListener('dataavailable', event => {
+                    if (event.data.size > 0) {
+                        this.recordedChunks.push(event.data);
+                    }
+                });
+                this.currentPageList.caption.ttsVoice.start();
+            })
+            .catch(error => {
+                console.error('녹음을 시작할 수 없습니다:', error);
+            });
+    },
+    stopRecording() {
+        if (this.currentPageList.caption.ttsVoice && this.currentPageList.caption.ttsVoice.state === 'recording') {
+            this.currentPageList.caption.ttsVoice.addEventListener('stop', () => {
+                const audioBlob = new Blob(this.currentPageList.caption.recordedChunks, { type: 'audio/wav' });
+                this.sendRecording(audioBlob);
+                this.recordedChunks = [];
+            });
+            this.currentPageList.caption.ttsVoice.stop();
+        }
+    },
+    sendRecording(audioBlob) {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.wav');
+
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+       };
+
+       axios.post('/api/v1/tool/audio', formData, config)
+           .then(response => {
+               console.log('음성 녹음이 S3 서버로 전송되었습니다.');
+           })
+            .catch(error => {
+               console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);
+           });
     },
   },
   // 시나리오 다시 받기

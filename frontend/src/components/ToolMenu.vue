@@ -98,8 +98,22 @@
 <!--          <button class="submit-btn" @click="addTts()">미리 듣기</button>-->
         </div>
         <div v-else-if="selectedMenu == 'recode'">
+          <div v-if="!recordingStarted">
             <button @click="startRecording">녹음 시작</button>
+          </div>
+          <div v-else>
+            <div>{{ timerDisplay }}</div>
             <button @click="stopRecording">멈춤</button>
+          </div>
+          <div>
+            <div v-for="(audioUrl, index) in this.voiceList" :key="index">
+              <audio :src="audioUrl" controls></audio>
+              <label>
+                <input type="radio" :value="audioUrl" v-model="selectedAudio">선택하기
+              </label>
+            </div>
+            <button @click="saveSelectedAudio">저장</button>
+          </div>
         </div>
       </div>
       <div class="image-list">
@@ -178,6 +192,10 @@ export default {
         draggable: "true",
         height: "100px",
       })),
+      recordingStarted: false,
+      timer: null,
+      elapsedTime: 0,
+      selectedAudio: null,
 
     }
   },
@@ -192,6 +210,14 @@ export default {
     this.imageEventDragStart();
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
     this.finalScenario = this.viewFinalScenario;
+  },
+  computed: {
+    timerDisplay() {
+      // 타이머를 분:초 형식으로 표시하기 위한 계산
+      const minutes = Math.floor(this.elapsedTime / 60);
+      const seconds = this.elapsedTime % 60;
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    },
   },
   methods: {
     // S3 presigned url 받아오기
@@ -361,6 +387,7 @@ export default {
       const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
       window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
     },
+
     handleTtsChange(event) {
       const selectedValue = event.target.value;
       this.$emit('ttsValueChange', selectedValue);
@@ -395,10 +422,14 @@ export default {
     startRecording() {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
+              this.recordingStarted = true;
+              this.timer = setInterval(() => {
+                this.elapsedTime++;
+              }, 1000);
                 this.currentPageList.caption.ttsVoice = new MediaRecorder(stream);
                 this.currentPageList.caption.ttsVoice.addEventListener('dataavailable', event => {
                     if (event.data.size > 0) {
-                        this.recordedChunks.push(event.data);
+                        this.currentPageList.caption.recordedChunks.push(event.data);
                     }
                 });
                 this.currentPageList.caption.ttsVoice.start();
@@ -412,7 +443,10 @@ export default {
             this.currentPageList.caption.ttsVoice.addEventListener('stop', () => {
                 const audioBlob = new Blob(this.currentPageList.caption.recordedChunks, { type: 'audio/wav' });
                 this.sendRecording(audioBlob);
-                this.recordedChunks = [];
+                this.currentPageList.caption.recordedChunks = [];
+              this.recordingStarted = false;
+              clearInterval(this.timer);
+              this.elapsedTime = 0;
             });
             this.currentPageList.caption.ttsVoice.stop();
         }
@@ -429,12 +463,24 @@ export default {
 
        axios.post('/api/v1/tool/audio', formData, config)
            .then(response => {
+             const fileName = `${process.env.VUE_APP_S3_PATH}/`+response.data;
+             this.currentPageList.caption.ttsName=fileName;
                console.log('음성 녹음이 S3 서버로 전송되었습니다.');
+               console.log(this.currentPageList.caption.ttsName);
+             this.voiceList.push(this.currentPageList.caption.ttsName);
            })
             .catch(error => {
                console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);
            });
     },
+
+    saveSelectedAudio() {
+      if (this.selectedAudio !== null) {
+        this.currentPageList.caption.ttsName = this.selectedAudio;
+        console.log(this.currentPageList.caption.ttsName);
+      }
+    },
+
   },
   // 시나리오 다시 받기
   reScenario() {

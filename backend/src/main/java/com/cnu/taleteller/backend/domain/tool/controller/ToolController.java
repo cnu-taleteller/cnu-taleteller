@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -62,12 +63,12 @@ public class ToolController {
     }
 
     @PostMapping("/audio")
-    public ResponseEntity<String> handleRecordingUpload(@RequestBody byte[] audioBytes) {
+    public ResponseEntity<String> handleRecordingUpload(@RequestParam("audio") MultipartFile audioFile) {
         try {
             String fileName = LocalDateTime.now() + "_"+"recording.wav"; // 업로드할 파일 이름 설정
-
+            byte[] audioBytes = audioFile.getBytes();
             s3Service.uploadFile(fileName, new ByteArrayInputStream(audioBytes));
-            return ResponseEntity.ok("음성 녹음 업로드가 완료되었습니다.");
+            return ResponseEntity.ok(fileName);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("음성 녹음 업로드 중 오류가 발생했습니다.");
         }

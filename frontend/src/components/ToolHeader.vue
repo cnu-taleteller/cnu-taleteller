@@ -135,7 +135,6 @@ export default {
         this.$store.commit('setSaveState', false);
       }
     },
-
     async saveThumbnail() {
       for (let i = 0; i < this.pageList.length; i++) {
         const dataUrl = this.pageList[i].thumbnail;

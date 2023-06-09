@@ -18,8 +18,8 @@
     <div>
       <button @click="addPage()"><img src="@/assets/icon.png" width="40"></button>
       <button @click="deletePage()"><img src="@/assets/trash.png" width="35" style="opacity: 0.8;"></button>
-      <!-- <button @click="statusTestPre()">상태 테스트(previus)</button>
-      <button @click="statusTestNxt()">상태 테스트(next)</button> -->
+      <button @click="statusTestPre()">상태 테스트(previus)</button>
+      <button @click="statusTestNxt()">상태 테스트(next)</button>
     </div>
   </div>
 </template>
@@ -37,27 +37,7 @@ export default {
     return {
       bookId: null,
       //현재 사용중인 데이터
-      pageList: [
-        {
-          pageId: 1,
-          pageStatus: 1,
-          caption: {
-            captionState: 0,
-            fontSize: '',
-            fontColor: '',
-            content: '',
-            height: '',
-            width: '',
-            left: '',
-            top: '',
-            ttsVoice:'',
-            ttsName:'',
-            recordedChunks: [],
-          },
-          thumbnail: '',
-          layerList: [],
-        }
-      ],
+      pageList: null,
       currentPageIndexNo: 0,
       stackStatus : [],
       stackIndex: 0,
@@ -65,25 +45,26 @@ export default {
       isStackPrev: false,
       isPrev: false,
       mostRecentWorkPage: 0,
+      isAddPage : false,
     }
   },
   computed: {
-    allPageList() {
-      return JSON.parse(JSON.stringify(this.pageList));
+    computedPageList() {
+      if(this.pageList) { return JSON.parse(JSON.stringify(this.pageList)); } 
     }
   },
   watch: {
-    allPageList: {
+    computedPageList: {
       handler: function (newPageList, oldPageList) {
-
         //ctrl + z 한건 스택에 추가 안함.
-        if(!this.isStackPrev) {
-          
+        if(!this.isStackPrev && oldPageList) {
           //맵 형식으로 해당 요소의 페이지 번호를 추적함.
           const pageListMap = {
             value : oldPageList,
             pageNo : this.currentPageIndexNo, //페이지 리스트의 인덱스
           }
+
+          if(this.isAddPage) {  this.currentPageIndexNo += 1; this.isAddPage = false };
 
           console.log(pageListMap);
 
@@ -122,6 +103,27 @@ export default {
       this.$emit('currentPageList', this.pageList[0]);
       this.$emit('pageList', this.pageList);
     } else {
+      this.pageList =  [
+        {
+          pageId: 1,
+          pageStatus: 1,
+          caption: {
+            captionState: 0,
+            fontSize: '',
+            fontColor: '',
+            content: '',
+            height: '',
+            width: '',
+            left: '',
+            top: '',
+            ttsVoice:'',
+            ttsName:'',
+            recordedChunks: [],
+          },
+          thumbnail: '',
+          layerList: [],
+        }
+      ];
       this.$emit('currentPageList', this.pageList[0]);
       this.$emit('pageList', this.pageList);
     }
@@ -168,7 +170,7 @@ export default {
         }
       );
       this.$emit('currentPageList', this.pageList[current + 1]);
-      this.currentPageIndexNo = current + 1;
+      this.isAddPage = true;
       this.saveSession();
     },
     saveSession() {
@@ -196,13 +198,10 @@ export default {
 
         this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
         this.isPrev = true;
-
         return;
 
       } else if(stack.length == 0){
-
         this.isStackPrev = false;
-        
         return;
 
       }

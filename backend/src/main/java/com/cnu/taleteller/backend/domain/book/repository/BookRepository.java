@@ -24,4 +24,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     String findMongoIdByBookId(@Param("bookId") Long bookId);
 
     Book save(Book book);
+
+    @Query("SELECT b FROM Book b WHERE b.member.memberId = :memberId")
+    List<Book> findAllMyWork(Long memberId);
+
+    //3개 테이블 left join(books, bookmarks, members) : 해당 회원이 즐겨찾기한 작품
+    @Query("SELECT b FROM Book b LEFT JOIN BookMark bm ON b.bookId = bm.book.bookId " +
+            "LEFT JOIN Member m ON b.member.memberId = m.memberId WHERE bm.member.memberId = :memberId")
+    List<Book> findAllMyBookmark(Long memberId);
 }

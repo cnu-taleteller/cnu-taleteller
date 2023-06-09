@@ -12,7 +12,7 @@
         </form>
       </div>
       <div v-if="this.searchCheck == false" class="mypage-content">
-        <div v-for="result in myWorkResult" :key="result.bookId" class="thumbnail">
+        <div v-for="result in bookMarkResult" :key="result.bookId" class="thumbnail">
             <table @click="goToDetail(1)">
                 <thead>
                     <tr>
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div v-else-if="this.searchCheck == true" class="mypage-content">
-        <div v-for="result in myWorkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
+        <div v-for="result in bookMarkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
             <table @click="goToDetail(1)">
                 <thead>
                     <tr>
@@ -72,7 +72,7 @@ export default {
         { content: '엽전 관리', link: '/mypage/pointmanage' },
         { content: '즐겨찾기', link: '/mypage/bookmark' }
       ],
-      myWorkResult: [],
+      bookMarkResult: [],
       searchKeyword: "",
       searchCheck: false,
     }
@@ -83,12 +83,12 @@ export default {
         return workname;
       },
 
-      getWorkInfo() {
+      getBookMark() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get(`/api/v1/book/mywork/${this.memberEmail}`)
+      axios.get(`/api/v1/book/mybookmark/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
-          this.myWorkResult = res.data;
+          this.bookMarkResult = res.data;
         })
         .catch((err) => {
           console.log(err);
@@ -108,9 +108,10 @@ export default {
             this.searchCheck = true;
           }
       },
+
     },
   created() {
-    this.getWorkInfo()
+    this.getBookMark()
   },
   components: {
     SideMenu: sideMenu,
@@ -141,7 +142,7 @@ export default {
   background-color: #c3f0ff;
 }
 
-.mypage-side li:nth-child(3) {
+.mypage-side li:nth-child(5) {
   background-color: #c3f0ff;
 }
 
@@ -168,7 +169,6 @@ export default {
   display: flex;
   margin: 5px 10px 10px 0;
   border-radius: 15px;
-  
 }
 
 .search-bar {

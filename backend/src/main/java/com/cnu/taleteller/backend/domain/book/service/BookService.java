@@ -90,4 +90,18 @@ public class BookService {
         }
         return null;
     }
+
+    public List<Book> findAllMyWork(String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
+        return bookRepository.findAllMyWork(memId);
+    }
+
+    public List<Book> findAllMyBookmark(String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
+        return bookRepository.findAllMyBookmark(memId);
+    }
 }

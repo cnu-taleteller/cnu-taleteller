@@ -1,14 +1,6 @@
 <template>
   <div class="mypage-all">
-      <div class='mypage-side'>
-        <ul>
-          <li v-for='list in linklist'>
-            <router-link class="side-link" :to='list.link' >
-              {{ list.content }}
-            </router-link>
-          </li>
-        </ul>      
-      </div>
+      <SideMenu></SideMenu>
       <div class="mypage-main">
           <div v-if="checkState === 'no'" class="mypage-content">
             <div class="passwrod-check-all">
@@ -39,9 +31,8 @@
       </template>
       
     <script>
-    
     import axios from 'axios';
-    
+    import sideMenu from '@/components/MyPage/SideMenu.vue';
       export default {
         data () {
           
@@ -127,7 +118,9 @@
         created () {
           
         },
-        
+        components: {
+          SideMenu: sideMenu,
+        },
       }
     </script>
     

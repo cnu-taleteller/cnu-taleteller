@@ -24,6 +24,8 @@ public class BookTempSaveDto {
 
     private String bookStatus;
 
+    private String bookThumbnail;
+
     private Member member;
 
     private BookMongo bookMongo;
@@ -31,11 +33,12 @@ public class BookTempSaveDto {
     private Page[] pageList;
 
     @Builder
-    public BookTempSaveDto(String email, String bookName, LocalDateTime bookRegdate, String bookStatus, Member member) {
+    public BookTempSaveDto(String email, String bookName, LocalDateTime bookRegdate, String bookThumbnail, String bookStatus, Member member) {
         this.email = email;
         this.bookName = bookName;
         this.bookRegdate = bookRegdate;
         this.bookStatus = bookStatus;
+        this.bookThumbnail = bookThumbnail;
         this.member = member;
     }
 
@@ -44,6 +47,7 @@ public class BookTempSaveDto {
                 .bookName(bookName)
                 .bookRegdate(bookRegdate)
                 .bookStatus(bookStatus)
+                .bookThumbnail(bookThumbnail)
                 .member(member)
                 .bookMongo(bookMongo)
                 .build();

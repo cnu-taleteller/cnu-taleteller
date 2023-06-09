@@ -1,5 +1,6 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
+import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
@@ -91,5 +92,16 @@ public class ToolService {
             throw new RuntimeException("RuntimeException rollback");
         }
     }
+
+    @Transactional
+    public Book saveScenario(String scenario, Long bookId) {
+        Book optionalBook = bookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("err"));
+
+        Book book = optionalBook;
+        book.updateScenario(scenario);
+        return bookRepository.save(book);
+    }
+
 
 }

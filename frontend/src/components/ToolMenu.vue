@@ -72,7 +72,7 @@
             <!-- 다시 작성 -->
             <div v-show="isReScenario">
               <div class="spinner-border" role="status"></div>
-              <p>새로운 내용으로 작성중입니다.<br>조금만 기다려주세요!ㅠㅠ</p>
+              <p>새로운 내용으로 작성중입니다.<br>조금만 기다려주세요!</p>
             </div>
             <p v-for="(story, index) in finalScenario[scenarioNum]" :key="index">
               {{ setScenarioLabel(index) }} <br>
@@ -131,30 +131,27 @@ export default {
       },
       isDisabled: true, // 시나리오 textarea 비활성화
       isDisabled2: false, // 시나리오 수정버튼 활성화
-      select: false, // 시나리오 선택 여부
-      scenarioNum: 0, // 시나리오 선택 번호
-      flowMenu: false, // 시나리오 or 흐름 파악하기
-      loading: false, // gpt 일때 로딩 여부
-      flowcnt: 0, // 흐름 파악 횟수
-      flowResult: null, // gpt로 받은 흐름 파악하기
-      allCaption: [], // 모든 자막
+      select: false,
+      scenarioNum: 0,
+      flowMenu: false,
+      loading: false,
+      flowcnt: 0,
+      flowResult: null,
+      allCaption: [],
       finalScenario: [[], [], [], [], []], // gpt로 받는 시나리오
       selectScenario: [], // 선택한 시나리오
       resultScenario: [],  // [도입], [전개] 등 다 있는 시나리오 - session 저장용
       isReScenario: false,
 
-      // 업로드되는 이미지 리스트
       uploadBackList: [],
       uploadCharList: [],
 
-      // 기본적으로 있는 이미지 배열
       charList: Array.from({ length: 25 }, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/character${i}.png`,
         id: `character${i}`,
         draggable: "true",
         height: "100px",
       })),
-      // 기본적으로 있는 배경 배열
       backList: Array.from({ length: 18 }, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/background${i}.png`,
         id: `background${i}`,
@@ -177,7 +174,6 @@ export default {
     this.finalScenario = this.viewFinalScenario;
   },
   methods: {
-    // S3 presigned url 받아오기
     async uploadFile(menu) {
       const maxSize = 5 * 1024 * 1024;
       const fileSize = document.getElementById("image").files[0].size;
@@ -194,7 +190,6 @@ export default {
           this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
         })
     },
-    // S3 업로드
     async uploadImageToS3(preSignedUrl, file, menu) {
       await axios.put(preSignedUrl, file)
         .then((res) => {
@@ -234,18 +229,15 @@ export default {
       this.$emit('selectedMenu', this.selectedMenu);
     },
 
-    //기존 이미지 배열에 있는 이미지들에게 drag이벤트 추가
     imageEventDragStart() {
       document.querySelectorAll(".menu .image-list #item").forEach((element) => {
         element.addEventListener("dragstart", (e) => {
           const x = e.offsetX;
           const y = e.offsetY;
-          //기본적으로 e.target.id -> img<id> 클릭했을 때 해당이미지의 x 좌표 y 좌표를 setData해줌
           e.dataTransfer.setData("text/plain", `${e.target.id}, ${x}, ${y}`);
         });
       });
     },
-    // 시나리오 label 나누는 함수
     setScenarioLabel(index) {
       switch (index) {
         case 0:
@@ -260,7 +252,6 @@ export default {
           return '';
       }
     },
-    // 시나리오 직접 작성
     addScenario() {
       this.select = true;
       for (let i = 0; i < 4; i++) {
@@ -268,8 +259,6 @@ export default {
       }
       this.editScenario('edit');
     },
-
-    // 시나리오 수정
     editScenario(arg) {
       this.isDisabled = !!!this.isDisabled;
       this.resultScenario = '[도입]' + this.selectScenario[0] + '[전개]' + this.selectScenario[1] + '[위기]' + this.selectScenario[2] + '[결말]' + this.selectScenario[3];
@@ -280,14 +269,12 @@ export default {
     setNum(num) {
       this.scenarioNum = num;
     },
-    // 최종 선택
     setScenario() {
       this.selectScenario = this.finalScenario[this.scenarioNum];
       this.select = true; // 임시 저장, 제출에 필요한 데이터
       sessionStorage.setItem('select', true);
       sessionStorage.removeItem('scenarioKeyword');
     },
-    // 기승전결 흐름 파악
     checkFlow(arg) {
       this.flowMenu = true;
       let len = this.pageList.length;
@@ -317,7 +304,6 @@ export default {
       }
 
     },
-
     checkFlowGpt() {
       this.flowcnt++;
       this.loading = true;
@@ -338,16 +324,13 @@ export default {
           console.log(err);
         })
     },
-    // 키워드 변경
     reKeyword() {
       const popupWidth = 550;
       const popupHeight = 650;
       const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
       const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
       window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
-      }
     },
-    // 시나리오 다시 받기
     reScenario() {
       if (this.finalScenario[4].length > 0) {
         alert('시나리오는 작품당 5번만 받을 수 있습니다.');
@@ -355,8 +338,7 @@ export default {
       }
       this.isReScenario = true;
       this.isDisabled2 = true;
-      console.log("axios 통신 요청");
-      axios.post("/api/v1/tool/scenario/", {
+      axios.post("/api/v1/tool/scenario", {
         who: this.scenarioKeyword.who,
         when: this.scenarioKeyword.when,
         where: this.scenarioKeyword.where,
@@ -366,19 +348,20 @@ export default {
           this.resultScenario = res.data;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
-          this.isDisabled2 = false;
         })
         .catch((err) => {
+
           alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-          console.error(err);
+          console.log(err);
         })
         .finally(() => {
+          this.gpt = false;
+          this.isDisabled2 = false;
           this.isReScenario = false;
         });
     },
 
     setScenarioArr() {
-      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
       const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
       let num = 0;
       if (this.finalScenario[0].length > 0) {
@@ -406,6 +389,7 @@ export default {
         this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
       });
     },
+  }
 }
 </script>
 <style scoped>
@@ -414,7 +398,6 @@ button {
 }
 
 .menu {
-  /* height: 100%; */
   height: 90vh;
   background-color: white;
   border-left: 1px solid #dfdfdf;

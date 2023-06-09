@@ -241,8 +241,6 @@ export default {
 .header {
   width: 100%;
   height: 5vh;
-  /* height: 100%; */
-  /* background-color: #6CC4F0;  */
   background-color: #bce9ff;
   border: 1px solid rgb(231, 231, 231);
   display: flex;

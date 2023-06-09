@@ -7,7 +7,6 @@
           @input="fontSize = $event.target.value">
         <div class="caption-color" ref="contentColor">
           <div class="color-preview sp-colorize" ref="colorPreview" :value="this.currentColor" @change="currentColor = $event.target.value"></div>
-          <!-- <div class="color-picker" ref="colorPicker">▼</div> -->
         </div>
       </div>
     </div>
@@ -34,7 +33,6 @@
 import html2canvas from 'html2canvas';
 
 export default {
-  //props로 toolView에서 보낸 데이터를 받음
   props: {
     currentPageList: Object,
     selectedMenu: String,
@@ -255,7 +253,6 @@ export default {
   },
 
   watch: {
-    //currentPageList => pageList[현재 선택한 페이지 인덱스] 가 변경이 일어나면 실행이 되는 부분
     currentPageList() {
         this.updateContent();
         this.changeCaptionElement();
@@ -272,7 +269,6 @@ export default {
   },
 
   methods: {
-    //자막 보이게 하는 변경 값
     showTextArea() {
       console.log(this.currentPageList);
       this.$emit('change', true);
@@ -355,12 +351,10 @@ export default {
       console.log('update');
       const objectElement = this.$refs.pageObject;
 
-      //object div 안의 내용을 초기화
       while (objectElement.firstChild) {
         objectElement.removeChild(objectElement.firstChild);
       }
 
-      //currentPageList를 기반으로 이미지를 새롭게 그림
       if (this.currentPageList.layerList != null) {
         const fragment = document.createDocumentFragment();
         for (const [index, image] of Object.entries(this.currentPageList.layerList)) {
@@ -409,7 +403,6 @@ export default {
       }
     },
 
-    //이미지를 가장 뒤로 보내는 메소드
     lastBack(id) {
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${this.data}`);
@@ -432,7 +425,6 @@ export default {
       this.canvas();
     },
 
-    //이미지를 가장 앞으로 보내는 메소드
     frontmost(id) {
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${this.data}`);
@@ -444,7 +436,6 @@ export default {
       this.canvas();
     },
 
-    //이미지를 앞으로 보내는 메소드
     next(id) {
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${this.data}`);
@@ -459,7 +450,6 @@ export default {
       }
     },
 
-    //이미지를 뒤로 보내는 메소드
     back(id) {
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${this.data}`);
@@ -477,7 +467,6 @@ export default {
       }
     },
 
-    //toolmenu 부분의 dragover
     imageEventDragOver(element) {
       element.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -485,7 +474,6 @@ export default {
       });
     },
 
-    //toolmenu 에서 selectedPage 로 드롭하는 부분
     imageEventDrop(element) {
       let nextId = this.nextId;
       let toolSelectedPageDrag = this.$refs.pageForm;

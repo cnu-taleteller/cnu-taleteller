@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -22,14 +24,8 @@ import java.util.Map;
 public class ToolController {
 
     private final UploadFileService uploadFileService;
-    private final S3Service s3Service;
 
     private final ToolService toolService;
-
-    @GetMapping("/s3/image")
-    public Map<String, Serializable> s3saveImage(@RequestParam("fileName") String fileName){
-        return s3Service.getPreSignedUrl(fileName);
-    }
 
     @PostMapping("/uploadFile/{bookId}")
     public ResponseEntity saveUploadFile(@RequestBody UploadFileRequestDto dto, @PathVariable Long bookId){
@@ -43,4 +39,17 @@ public class ToolController {
         System.out.println(bookId);
         return toolService.firstAccessData(bookId);
     }
+
+    @PostMapping("/scenario/{bookId}")
+    public ResponseEntity saveScenario(@RequestBody String scenario, @PathVariable Long bookId){
+        String decodedData = null;
+        try {
+            decodedData = URLDecoder.decode(scenario, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        toolService.saveScenario(decodedData, bookId);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }

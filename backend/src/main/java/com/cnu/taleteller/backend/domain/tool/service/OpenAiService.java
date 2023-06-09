@@ -15,7 +15,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class ScenarioService {
+public class OpenAiService {
 
     private final BookRepository bookRepository;
     @Value("${OPENAI_API_KEY}")
@@ -90,14 +90,5 @@ public class ScenarioService {
         return null;
     }
 
-    @Transactional
-    public Book save(String scenario, Long bookId) {
-        Book optionalBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("err"));
-
-        Book book = optionalBook;
-        book.updateScenario(scenario);
-        return bookRepository.save(book);
-    }
 
 }

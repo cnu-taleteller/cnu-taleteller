@@ -1,11 +1,10 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-      <!-- 전체 페이지 리스트 전달 -->
       <ToolHeader :pageList="this.pageList" :toolState="this.toolState" :currentPageList="this.currentPageList"
         :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
     </div>
-    <!-- 새로 만드는 작품일 때만 -->
+    <!-- 새로 만드는 작품일 때 -->
     <div v-if="toolState === 'new'" class="tool-content">
       <div class="scenario-btn">
         <button @click="selectScenarioMenu('gpt')">
@@ -43,12 +42,11 @@
     <!-- 툴 -->
     <div v-else class="tool-content">
       <div class="tool-left">
-        <!-- currentPageList 에 handlePageList 메서드로 툴 페이지리스트 컴포넌트에서 $emit으로 받은 pageList(index) 를 넣음, pageList 변경시 -> 썸네일 변경시 새로운 데이터를 전달 -->
         <ToolPageList @currentPageList="handleCurrentPageList" @pageList="handlePageList"></ToolPageList>
       </div>
       <div class="tool-center">
-        <!-- toolSelectedPage에 값을 전달해줌 -->
-        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList"></ToolSelectedPage>
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu"
+          :pageList="this.pageList"></ToolSelectedPage>
       </div>
       <div class="tool-right">
         <ToolMenu @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
@@ -70,27 +68,25 @@ export default {
   data() {
     return {
       toolState: null,
-      gpt: false, // gpt로 시나리오 받을건지.. 받을거면 true
+      gpt: false,
 
-      // gpt로 받을 시나리오 키워드
       scenarioKeyword: {
         who: null,
         when: null,
         where: null,
         event: null
       },
-      resultScenario: [], // [도입][전개] 등 태그 전체 있는 배열
-      finalScenario: [[], [], [], [], []], // props로 전달할 [도입][전개] 등 태그 없는 순수 텍스트 배열
+      resultScenario: [],
+      finalScenario: [[], [], [], [], []],
 
-      // 직접 쓸 때 기승전결 받기
       write1: null,
       write2: null,
       write3: null,
       write4: null,
       selectedMenu: '',
-      currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
+      currentPageList: {},
       pageList: [],
-      bookId: null, // 작품 번호
+      bookId: null,
     }
   },
   created() {
@@ -118,7 +114,6 @@ export default {
     ToolScenarioExample: toolScenarioExample,
   },
   methods: {
-    // 새로고침 방지
     unLoadEvent(event) {
       if (this.isLeaveSite) return;
       event.preventDefault();
@@ -130,7 +125,6 @@ export default {
     handlePageList(pageList) {
       this.pageList = pageList;
     },
-    //매개변수로 selectedMenu (ex) background, character 를 받아서 data에 있는 this.selectedMenu에 넣어주눈 부분
     handleSelectedMenu(selectedMenu) {
       this.selectedMenu = selectedMenu;
     },
@@ -161,18 +155,13 @@ export default {
       sessionStorage.setItem('scenarioKeyword', JSON.stringify(this.scenarioKeyword));
       this.gpt = true;
       this.goTool();
-      console.log("axios 통신 요청");
-      axios.post("/api/v1/tool/scenario/", {
-        who: this.scenarioKeyword.who,
-        when: this.scenarioKeyword.when,
-        where: this.scenarioKeyword.where,
-        event: this.scenarioKeyword.event
+      axios.post("/api/v1/tool/scenario", {
+        who, when, where, event
       })
         .then((res) => {
           this.resultScenario = res.data;
           sessionStorage.setItem('scenario', this.resultScenario);
           this.setScenarioArr();
-          console.log(this.finalScenario);
           this.gpt = false;
         })
         .catch((err) => {
@@ -182,7 +171,6 @@ export default {
         })
     },
     setScenarioArr() {
-      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
       const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
       sections.forEach((section, index) => {
         const scenario = this.resultScenario;
@@ -280,6 +268,7 @@ h3 {
   color: #2f66ff;
   text-shadow: 2px 2px 2px #d3d3d3;
 }
+
 .form-ment {
   font-weight: bold;
   color: gray;

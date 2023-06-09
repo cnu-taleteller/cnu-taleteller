@@ -6,6 +6,7 @@ import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.service.BookService;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -89,6 +90,20 @@ public class BookController {
             return ResponseEntity.ok(recommendBook);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/mywork/{email}")
+    public ResponseEntity<List<Book>> myworkSearch(@PathVariable String email) {
+        System.out.println("작품관리 : "+email);
+        List<Book> myworkSearch = bookService.findAllMyWork(email);
+        return ResponseEntity.ok(myworkSearch);
+    }
+
+    @GetMapping("/mybookmark/{email}")
+    public ResponseEntity<List<Book>> mybookmarkSearch(@PathVariable String email) {
+        System.out.println("즐겨찾기 : "+email);
+        List<Book> mybookmarkSearch = bookService.findAllMyBookmark(email);
+        return ResponseEntity.ok(mybookmarkSearch);
     }
 
 }

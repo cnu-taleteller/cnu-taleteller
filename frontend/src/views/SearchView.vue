@@ -30,7 +30,7 @@ export default {
         .get("/api/book/search", {
           params: {
             searchType: searchType,
-              searchKeyword: searchKeyword,
+            searchKeyword: searchKeyword,
           },
         })
         .then((response) => {

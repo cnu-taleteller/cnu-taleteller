@@ -1,15 +1,7 @@
 <template>
 <div class="mypage-all">
   <div class="mypage-body">
-      <div class='mypage-side'>
-          <ul>
-            <li v-for='list in linklist'>
-            <router-link class="side-link" :to='list.link' >
-              {{ list.content }}
-            </router-link>
-            </li>
-          </ul>
-      </div>
+    <SideMenu></SideMenu>
     <div class="mypage-main">
       <div class="mypage-wallet">
         <div class="point-wallet">
@@ -35,12 +27,12 @@
   </div>
   
 </div>
-  </template>
+</template>
   
 <script>
 
 import axios from 'axios';
-
+import sideMenu from '@/components/MyPage/SideMenu.vue';
   export default {
     data () {
       
@@ -105,13 +97,15 @@ import axios from 'axios';
           });  
         }
       },
-
       
-    },
+  },
     created () {
       this.getDetails()
       //alert(window.location.search)
       //history.replaceState({}, null, location.pathname);
+    },
+    components: {
+      SideMenu: sideMenu,
     },
     
   }

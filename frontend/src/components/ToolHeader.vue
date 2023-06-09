@@ -45,8 +45,8 @@ export default {
       this.bookName = sessionStorage.getItem('bookName');
     }
     this.bookId = this.$store.getters.getBookId;
-    
-    if(this.bookId) {
+
+    if (this.bookId) {
       this.isSave = true;
     }
   },
@@ -57,7 +57,7 @@ export default {
     // 제출
     async saveBook() {
       const select = sessionStorage.getItem('select');
-      
+
       if (!select || select == 'false') {
         alert('시나리오 선택 후 진행해주세요');
         return;
@@ -74,8 +74,8 @@ export default {
       const isCanvasRunning = this.$store.getters.getCanvasCompleted;
 
       if (!isCanvasRunning) {
-          await this.waitForCanvas();
-        }
+        await this.waitForCanvas();
+      }
 
       const saveState = this.$store.getters.getSaveState;
       const select = sessionStorage.getItem('select');
@@ -85,24 +85,25 @@ export default {
         return;
       }
       else {
-        if (this.isSave == false) {
+        if (this.isSave == false && saveState) {
           await axios.post("/api/v1/book/tmp", {
             bookName: this.bookName,
             bookStatus: 'temp',
             email: sessionStorage.getItem('user'),
-            pageList : this.pageList,
+            pageList: this.pageList,
           })
             .then((res) => {
               console.log(res.data);
               this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
+              this.$store.commit('setBookId', this.bookId);
               console.log(this.bookId);
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();
               this.saveVoice();
               this.isSave = true;
-              if(status === 'temp') alert('저장 완료');
+              if (status === 'temp') alert('저장 완료');
             })
             .catch((err) => {
               console.error(err);
@@ -110,33 +111,35 @@ export default {
             })
         }
         else {
-          await axios.post("/api/v1/book/" + this.bookId, {
-            bookName: this.bookName,
-            bookStatus: 'temp',
-            pageList : this.pageList,
-          })
-            .then((res) => {
-              console.log(res);
-              this.saveScenario();
-              this.saveUploadFile();
-              this.saveThumbnail();
-              this.saveVoice();
-              this.isSave = true;
-              if(status === 'temp') alert('저장 완료');
+          if (saveState) {
+            await axios.post("/api/v1/book/" + this.bookId, {
+              bookName: this.bookName,
+              bookStatus: 'temp',
+              pageList: this.pageList,
             })
-            .catch((error) => {
-              console.log(error);
-              alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
-            });
+              .then((res) => {
+                console.log(res);
+                this.saveScenario();
+                this.saveUploadFile();
+                this.saveThumbnail();
+                this.saveVoice();
+                this.isSave = true;
+                if (status === 'temp') alert('저장 완료');
+              })
+              .catch((error) => {
+                console.log(error);
+                alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
+              });
           }
-          this.$store.commit('setSaveState', false);
         }
-      },
-            
+        this.$store.commit('setSaveState', false);
+      }
+    },
+
     async saveThumbnail() {
       for (let i = 0; i < this.pageList.length; i++) {
         const dataUrl = this.pageList[i].thumbnail;
-        if(dataUrl==="") return;
+        if (dataUrl === "") return;
         const base64Data = dataUrl.split(',')[1];
         const fileName = `${this.bookId}_${i}_thumbnail.png`;
         try {
@@ -169,7 +172,7 @@ export default {
       const view = new Uint8Array(arraybuffer);
 
       for (let i = 0; i < binaryString.length; i++) {
-          view[i] = binaryString.charCodeAt(i) & 0xff;
+        view[i] = binaryString.charCodeAt(i) & 0xff;
       }
       return new Blob([arraybuffer], { type: contentType });
     },
@@ -177,7 +180,7 @@ export default {
     async waitForCanvas() {
       let timeout = 0;
       const reconfirm = 200;
-      
+
       return new Promise((resolve, reject) => {
         const checkCanvas = () => {
           if (this.$store.getters.getCanvasCompleted) {
@@ -187,7 +190,7 @@ export default {
           } else {
             setTimeout(checkCanvas, reconfirm);
             timeout += reconfirm;
-          } 
+          }
         };
         checkCanvas();
       });
@@ -234,20 +237,20 @@ export default {
       }
 
     },
-    async saveVoice(){
+    async saveVoice() {
       const voiceList = JSON.parse(sessionStorage.getItem('voiceList'));
-      if (voiceList === null){
+      if (voiceList === null) {
         return;
-      }else{
+      } else {
         await axios.post("/api/v1/tool/uploadVoice/" + this.bookId, {
           voiceList,
         })
-            .then((res) => {
-              console.log(res);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
 
     },
@@ -256,7 +259,7 @@ export default {
       if (scenario === null) return;
 
       await axios.post("/api/v1/tool/scenario/" + this.bookId, JSON.stringify(scenario), {
-      headers: {
+        headers: {
           'Content-Type': 'application/json'
         }
       })
@@ -269,14 +272,14 @@ export default {
     },
     preview() {
       const chk = confirm('임시저장 후 이용하실 수 있습니다. 저장하시겠습니까?');
-      if(!chk) return;
+      if (!chk) return;
       try {
         this.saveTmp('temp');
       } catch {
         alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
         return;
       }
-  
+
       setTimeout(() => {
         const screenWidth = window.screen.width;
         const screenHeight = window.screen.height;
@@ -287,7 +290,7 @@ export default {
 
         const queryString = `pageList=${encodeURIComponent(JSON.stringify(this.pageList))}`;
         window.open(`/preview?${queryString}`, 'previewWindow', `width=${windowWidth}, height=${windowHeight}, left=${left}, top=${top}`);
-        }, 2000);
+      }, 2000);
     },
   },
 }

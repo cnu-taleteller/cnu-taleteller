@@ -45,7 +45,7 @@ export default {
       this.bookName = sessionStorage.getItem('bookName');
     }
     this.bookId = this.$store.getters.getBookId;
-    
+
     if(this.bookId) {
       this.isSave = true;
     }
@@ -74,8 +74,8 @@ export default {
       const isCanvasRunning = this.$store.getters.getCanvasCompleted;
 
       if (!isCanvasRunning) {
-          await this.waitForCanvas();
-        }
+        await this.waitForCanvas();
+      }
 
       const saveState = this.$store.getters.getSaveState;
       const select = sessionStorage.getItem('select');
@@ -85,24 +85,25 @@ export default {
         return;
       }
       else {
-        if (this.isSave == false) {
+        if (this.isSave == false && saveState) {
           await axios.post("/api/v1/book/tmp", {
             bookName: this.bookName,
             bookStatus: 'temp',
             email: sessionStorage.getItem('user'),
-            pageList : this.pageList,
+            pageList: this.pageList,
           })
             .then((res) => {
               console.log(res.data);
               this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
+              this.$store.commit('setBookId', this.bookId);
               console.log(this.bookId);
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();
               this.saveVoice();
               this.isSave = true;
-              if(status === 'temp') alert('저장 완료');
+              if (status === 'temp') alert('저장 완료');
             })
             .catch((err) => {
               console.error(err);
@@ -110,28 +111,30 @@ export default {
             })
         }
         else {
-          await axios.post("/api/v1/book/" + this.bookId, {
-            bookName: this.bookName,
-            bookStatus: 'temp',
-            pageList : this.pageList,
-          })
-            .then((res) => {
-              console.log(res);
-              this.saveScenario();
-              this.saveUploadFile();
-              this.saveThumbnail();
-              this.saveVoice();
-              this.isSave = true;
-              if(status === 'temp') alert('저장 완료');
+          if (saveState) {
+            await axios.post("/api/v1/book/" + this.bookId, {
+              bookName: this.bookName,
+              bookStatus: 'temp',
+              pageList: this.pageList,
             })
-            .catch((error) => {
-              console.log(error);
-              alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
-            });
+              .then((res) => {
+                console.log(res);
+                this.saveScenario();
+                this.saveUploadFile();
+                this.saveThumbnail();
+                this.saveVoice();
+                this.isSave = true;
+                if (status === 'temp') alert('저장 완료');
+              })
+              .catch((error) => {
+                console.log(error);
+                alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
+              });
           }
-          this.$store.commit('setSaveState', false);
         }
-      },
+        this.$store.commit('setSaveState', false);
+      }
+    },
             
     async saveThumbnail() {
       for (let i = 0; i < this.pageList.length; i++) {

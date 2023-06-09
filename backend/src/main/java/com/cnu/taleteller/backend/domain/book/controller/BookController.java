@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -104,6 +106,13 @@ public class BookController {
         System.out.println("즐겨찾기 : "+email);
         List<Book> mybookmarkSearch = bookService.findAllMyBookmark(email);
         return ResponseEntity.ok(mybookmarkSearch);
+    }
+        
+    @PostMapping("/userBookList")
+    public List<Long> userBookList(@RequestBody String userEmail) throws UnsupportedEncodingException {
+        String decodedEmail = URLDecoder.decode(userEmail, "UTF-8").replace("=", "");
+        System.out.println(decodedEmail);
+        return bookService.findUserBookList(decodedEmail);
     }
 
 }

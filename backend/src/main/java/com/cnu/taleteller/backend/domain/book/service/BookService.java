@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -115,5 +117,11 @@ public class BookService {
         Long memId = findMember.getMemberId();
 
         return bookRepository.findAllMyBookmark(memId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findUserBookList(String userEmail) {
+        List<Long> bookList = bookRepository.findMyBookList(userEmail);
+        return bookList != null ? bookList : Collections.emptyList();
     }
 }

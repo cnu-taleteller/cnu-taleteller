@@ -20,10 +20,11 @@
         <div id="popupMenu"
           style="display: none; position: absolute; background-color: white; border: 1px solid gray; z-index: 99;">
           <ul class="file-order-form">
-            <li class="file-order"><a @click="next(thisObjId)" data-obj-type="popupMenu">앞으로</a></li>
-            <li class="file-order"><a @click="back(thisObjId)" data-obj-type="popupMenu">뒤로</a></li>
-            <li class="file-order"><a @click="frontmost(thisObjId)" data-obj-type="popupMenu">제일 앞으로</a></li>
-            <li class="file-order"><a @click="lastBack(thisObjId)" data-obj-type="popupMenu">제일 뒤로</a></li>
+            <li class="file-order"><button class="btn positionBtn" @click="next(thisObjId)" data-obj-type="popupMenu" :disabled="isDisabled">앞으로</button></li>
+            <li class="file-order"><button class="btn positionBtn" @click="back(thisObjId)" data-obj-type="popupMenu" :disabled="isDisabled">뒤로</button></li>
+            <li class="file-order"><button class="btn positionBtn" @click="frontmost(thisObjId)" data-obj-type="popupMenu" :disabled="isDisabled">제일 앞으로</button></li>
+            <li class="file-order"><button class="btn positionBtn" @click="lastBack(thisObjId)" data-obj-type="popupMenu" :disabled="isDisabled">제일 뒤로</button></li>
+            <li class="file-order"><button class="btn positionBtn" @click="elementRemove(thisObjId)" data-obj-type="popupMenu">삭제</button></li>
           </ul>
         </div>
       </div>
@@ -42,14 +43,15 @@ export default {
   },
   data() {
     return {
-      thisObjId: '',
+      thisObjId: null,
+      thisTarget: null,
       imageIndex: 0,
       nextId: 1,
-      data: null,
       fontSize: 20,
       inputValue: false,
       currentColor: '#000000',
       result: null,
+      isDisabled: true,
     }
   },
   mounted() {
@@ -121,21 +123,36 @@ export default {
     //오른쪽 마우스 클릭
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      if (e.target.id.includes('background') || e.target.dataset.textContent === 'true') {
-        return;
+      target = e.target;
+      
+      if (target.id.includes('background') || target.dataset.textContent === 'true') {
+        toolMenu.isDisabled = true;
+      } else {
+        toolMenu.isDisabled = false;
       }
-      const targetObj = e.target.id;
-      toolMenu.data = targetObj
-      toolMenu.thisObjId = targetObj;
+      
+      if(target.dataset.textContent === 'true') {
+        parentDiv = target.closest('#textArea');
+        if(parentDiv) {
+          target = parentDiv;
+          const targetObj = parentDiv.id;
+          toolMenu.thisObjId = targetObj;
+          toolMenu.thisTarget = parentDiv;
+        }
+      } else {
+        const targetObj = e.target.id;
+        toolMenu.thisObjId = targetObj;
+        toolMenu.thisTarget = target;
+      }
 
       popupMenu.style.left = e.clientX - dragArea.offsetLeft + "px";
       popupMenu.style.top = e.clientY - dragArea.offsetLeft + "px";
       popupMenu.style.display = "block"; 
       
-      if (e.target.dataset.objType === 'character' || e.target.dataset.objType === 'background' || e.target.dataset.objType !== 'caption') {
+      if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
         toolMenu.removeResizableElement(resizableElement, e);
-        e.target.style.outline = '#27BAFF solid 1px';
-        toolMenu.resizableElement(resizableElement, e, e.target);
+        target.style.outline = '#27BAFF solid 1px';
+        toolMenu.resizableElement(resizableElement, target);
       }
     });
 
@@ -185,7 +202,7 @@ export default {
         popupMenu.style.display = "none";
         target.style.outline = '#27BAFF solid 1px';
 
-        targetObj = e.target.id;
+        targetObj = target.id;
         if (parentDiv) targetObj = parentDiv.id;
 
         if (targetObj === 'textArea') {
@@ -193,16 +210,16 @@ export default {
         } else {
           result = toolMenu.currentPageList.layerList.find(el => el.id === targetObj);
         }
-
+        
         if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
-          toolMenu.resizableElement(resizableElement, e, target);
+          toolMenu.resizableElement(resizableElement, target);
         }
         currentObjId = targetObj;
+        currentObj = target;
         currentX = e.pageX - dragArea.offsetLeft;
         currentY = e.pageY - dragArea.offsetTop;
         currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
         currentYOffset = e.pageY - dragArea.offsetTop - e.offsetY;
-        currentObj = e.target;
         if (parentDiv) currentObj = parentDiv;
         currentObj.style.opacity = '0.5';
         active = true;
@@ -227,19 +244,18 @@ export default {
     //드래그 끝내는 부분 (selected page)
     function dragEnd(e) {
       if (active) {
-        if (e.target.dataset.textContent === 'true') {
-          parentDiv.style.zIndex = '2';
-          result.left = parentDiv.style.left;
-          result.top = parentDiv.style.top;
-        } else {
+        if(targetObj === 'textArea') {
+          result.left = currentObj.style.left;
+          result.top = currentObj.style.top;
+        }else {
           result.style.left = currentObj.style.left;
           result.style.top = currentObj.style.top;
         }
         currentObj.style.opacity = '1';
-        active = false;
         document.removeEventListener('mousemove', drag);
-        toolMenu.canvas();
       }
+      active = false;
+      toolMenu.canvas();
     };
 
     function textInput(e) {
@@ -325,34 +341,39 @@ export default {
     },
 
     canvas() {
-      try {
-        const imageArea = this.$refs.dragImage;
-        const currentPage = this.currentPageList;
-        const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
-        const ignoreElements = element => {
-          return resizableElements.some(resizableElement => resizableElement.contains(element));
-        };
-        html2canvas(imageArea, { useCORS: true, ignoreElements }).then(canvas => {
-          const ctx = canvas.getContext('2d');
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            const originalWidth = 800;
-            const originalHeight = 600;
-            canvas.width = originalWidth;
-            canvas.height = originalHeight;
-            ctx.drawImage(img, 0, 0, originalWidth, originalHeight);
-            const dataUrl = canvas.toDataURL('image/png', 1);
-            currentPage.thumbnail = dataUrl;
+        try {
+          this.$store.commit('setCanvasCompleted', false);
+          const imageArea = this.$refs.dragImage;
+          const currentPage = this.currentPageList;
+          const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
+          const ignoreElements = element => {
+            return resizableElements.some(resizableElement => resizableElement.contains(element));
           };
-          img.src = canvas.toDataURL();
-        });
-      } catch (err) {
-        console.log(err);
-      }
+          html2canvas(imageArea, { useCORS: true, ignoreElements }).then(canvas => {
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              const originalWidth = img.width;
+              const originalHeight = img.height;
+              const reductionRatio = 0.35;
+              const reducedWidth = originalWidth * reductionRatio;
+              const reducedHeight = originalHeight * reductionRatio;
+              canvas.width = reducedWidth;
+              canvas.height = reducedHeight;
+              ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.35);
+              currentPage.thumbnail = dataUrl;
+            };
+            img.src = canvas.toDataURL();
+            this.$store.commit('setCanvasCompleted', true);
+          });
+        } catch (err) {
+          this.$store.commit('setCanvasCompleted', true);
+          console.log(err);
+        }
     },
     updateContent() {
-      console.log('update');
       const objectElement = this.$refs.pageObject;
 
       //object div 안의 내용을 초기화
@@ -412,7 +433,7 @@ export default {
     //이미지를 가장 뒤로 보내는 메소드
     lastBack(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#${this.data}`);
+      const elementDoc = objectElement.querySelector(`#${id}`);
       let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
       const secondChild = objectElement.children[1];
       if (objectElement.firstChild.id.includes('background')) {
@@ -435,7 +456,7 @@ export default {
     //이미지를 가장 앞으로 보내는 메소드
     frontmost(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#${this.data}`);
+      const elementDoc = objectElement.querySelector(`#${id}`);
       let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
       const item = this.currentPageList.layerList[indexOfElement];
       this.currentPageList.layerList.splice(indexOfElement, 1);
@@ -447,7 +468,7 @@ export default {
     //이미지를 앞으로 보내는 메소드
     next(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#${this.data}`);
+      const elementDoc = objectElement.querySelector(`#${id}`);
       const nextImage = elementDoc.nextElementSibling;
       if (nextImage) {
         let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
@@ -462,7 +483,7 @@ export default {
     //이미지를 뒤로 보내는 메소드
     back(id) {
       const objectElement = this.$refs.pageObject;
-      const elementDoc = objectElement.querySelector(`#${this.data}`);
+      const elementDoc = objectElement.querySelector(`#${id}`);
       const previusImage = elementDoc.previousElementSibling;
       if (previusImage && previusImage.id.includes('background')) {
         return;
@@ -473,6 +494,29 @@ export default {
         this.currentPageList.layerList.splice(indexOfElement, 1);
         this.currentPageList.layerList.splice(indexOfElement - 1, 0, item);
         objectElement.insertBefore(elementDoc, elementDoc.previousElementSibling);
+        this.canvas();
+      }
+    },
+
+    //요소 삭제하는 메서드
+    elementRemove(id) {
+      const objectElement = this.$refs.pageObject;
+      const elementDoc = objectElement.querySelector(`#${id}`);
+      if(elementDoc) {
+        elementDoc.remove();
+        if(id.includes('background') || id.includes('character')) {
+          let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
+          this.currentPageList.layerList.splice(indexOfElement, 1);
+        } else if(id.includes('textArea')) {
+          this.currentPageList.caption.captionState = 0;
+          this.currentPageList.caption.fontColor = '';
+          this.currentPageList.caption.fontSize = '';
+          this.currentPageList.caption.content = '';
+          this.currentPageList.caption.height = '';
+          this.currentPageList.caption.width = '';
+          this.currentPageList.caption.left = '';
+          this.currentPageList.caption.top = '';
+        }
         this.canvas();
       }
     },
@@ -545,7 +589,6 @@ export default {
           } else {
             this.currentPageList.layerList.unshift(newImage);
           }
-
           document.querySelector('.object').insertBefore(newDiv, document.querySelector('.object').firstChild);
         } else {
           newDiv.style.left = (rX - x) + "px";
@@ -587,25 +630,25 @@ export default {
         };
       });
     },
-    resizableElement(resizableElement, e, target) {
+    resizableElement(resizableElement, target) {
       let toolMenu = this;
       resizableElement = $(target).resizable({
           handles: 'n, e, s, w, ne, se, sw, nw',
           stop: () => {
-            let target = e.target.id;
+            let targetId = target.id;
             let resizeTarget;
-            if (target.includes('textArea')) {
+            if (targetId === 'textArea') {
               resizeTarget = toolMenu.currentPageList.caption;
-              resizeTarget.left = e.target.style.left;
-              resizeTarget.top = e.target.style.top;
-              resizeTarget.width = e.target.style.width;
-              resizeTarget.height = e.target.style.height;
+              resizeTarget.left = target.style.left;
+              resizeTarget.top = target.style.top;
+              resizeTarget.width = target.style.width;
+              resizeTarget.height = target.style.height;
             } else {
-              resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === target);
-              resizeTarget.style.left = e.target.style.left;
-              resizeTarget.style.top = e.target.style.top;
-              resizeTarget.style.width = e.target.style.width;
-              resizeTarget.style.height = e.target.style.height;
+              resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === targetId);
+              resizeTarget.style.left = target.style.left;
+              resizeTarget.style.top = target.style.top;
+              resizeTarget.style.width = target.style.width;
+              resizeTarget.style.height = target.style.height;
             }
             toolMenu.canvas();
           }
@@ -867,5 +910,12 @@ textarea {
   top: 50%;
   cursor: w-resize;
   margin: -5px 0 0 -10px;
+}
+
+.positionBtn {
+  display: inline-block;
+  background: none;
+  border: none;
+  outline: 0;
 }
 </style>

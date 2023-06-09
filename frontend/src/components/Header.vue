@@ -29,6 +29,7 @@ export default {
       this.isLoggedIn = sessionStorage.getItem("user") !== null;
     },
     logout() {
+      this.$store.commit('setBookId', null);
       sessionStorage.removeItem("user");
       this.isLoggedIn = false;
       window.location.href = "/";

@@ -48,7 +48,7 @@
       </div>
       <div class="tool-center">
         <!-- toolSelectedPage에 값을 전달해줌 -->
-        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList"></ToolSelectedPage>
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList" ref="toolSelectedPage"></ToolSelectedPage>
       </div>
       <div class="tool-right">
         <ToolMenu @ttsValueChange="handleTtsValueChanged" @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
@@ -103,6 +103,7 @@ export default {
       this.resultScenario = sessionStorage.getItem('scenario');
       this.setScenarioArr();
     }
+    
   },
   mounted() {
     window.addEventListener('beforeunload', this.unLoadEvent);

@@ -30,7 +30,6 @@ public class ToolController {
     private final UploadVoiceService uploadVoiceService;
     private final S3Service s3Service;
     private final TTSService ttsService;
-
     private final ToolService toolService;
 
     @GetMapping("/s3/image")

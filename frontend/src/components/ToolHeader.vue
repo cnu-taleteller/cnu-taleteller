@@ -44,10 +44,7 @@ export default {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
-    if (sessionStorage.getItem('bookId')) {
-      this.bookId = sessionStorage.getItem('bookId');
-    }
-
+    this.bookId = this.$store.getters.getBookId;
   },
   methods: {
     editBookName() {
@@ -56,6 +53,7 @@ export default {
     // 제출
     async saveBook() {
       const select = sessionStorage.getItem('select');
+      
       if (!select || select == 'false') {
         alert('시나리오 선택 후 진행해주세요');
         return;
@@ -64,8 +62,18 @@ export default {
       sessionStorage.setItem('bookName', this.bookName);
       this.$router.push('/ToolSubmit');
     },
+    async setCanvasCompleted() {
+      await this.$store.dispatch('setCanvasCompleted', true)
+    },
     // 임시 저장
     async saveTmp(status) {
+      const isCanvasRunning = this.$store.getters.getCanvasCompleted;
+
+      if (!isCanvasRunning) {
+          await this.waitForCanvas();
+        }
+
+      const saveState = this.$store.getters.getSaveState;
       const select = sessionStorage.getItem('select');
 
       if (!select || select == 'false') {
@@ -115,9 +123,11 @@ export default {
               console.log(error);
               alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
             });
+          }
+          this.$store.commit('setSaveState', false);
         }
-      }
-    },
+      },
+            
     async saveThumbnail() {
       for (let i = 0; i < this.pageList.length; i++) {
         const dataUrl = this.pageList[i].thumbnail;
@@ -147,6 +157,7 @@ export default {
         }
       }
     },
+
     base64ToBlob(base64Data, contentType = '') {
       const binaryString = window.atob(base64Data);
       const arraybuffer = new ArrayBuffer(binaryString.length);
@@ -157,6 +168,26 @@ export default {
       }
       return new Blob([arraybuffer], { type: contentType });
     },
+
+    async waitForCanvas() {
+      let timeout = 0;
+      const reconfirm = 200;
+      
+      return new Promise((resolve, reject) => {
+        const checkCanvas = () => {
+          if (this.$store.getters.getCanvasCompleted) {
+            resolve();
+          } else if (timeout >= 5000) {
+            reject(new Error('Timeout'));
+          } else {
+            setTimeout(checkCanvas, reconfirm);
+            timeout += reconfirm;
+          } 
+        };
+        checkCanvas();
+      });
+    },
+
     async saveUploadFile() {
       const uploadCharList = JSON.parse(sessionStorage.getItem('uploadCharList'));
       const uploadBackList = JSON.parse(sessionStorage.getItem('uploadBackList'));

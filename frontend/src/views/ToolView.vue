@@ -48,7 +48,11 @@
       </div>
       <div class="tool-center">
         <!-- toolSelectedPage에 값을 전달해줌 -->
+<<<<<<< HEAD
         <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList" ref="toolSelectedPage"></ToolSelectedPage>
+=======
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList"></ToolSelectedPage>
+>>>>>>> parent of c49d01c3 (Add openai controller)
       </div>
       <div class="tool-right">
         <ToolMenu @ttsValueChange="handleTtsValueChanged" @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"

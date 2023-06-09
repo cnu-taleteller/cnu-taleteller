@@ -498,6 +498,7 @@ export default {
       }
     },
 
+<<<<<<< HEAD
     //요소 삭제하는 메서드
     elementRemove(id) {
       const objectElement = this.$refs.pageObject;
@@ -521,6 +522,8 @@ export default {
       }
     },
 
+=======
+>>>>>>> parent of c49d01c3 (Add openai controller)
     //toolmenu 부분의 dragover
     imageEventDragOver(element) {
       element.addEventListener("dragover", (e) => {

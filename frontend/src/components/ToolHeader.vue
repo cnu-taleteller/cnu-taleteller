@@ -45,6 +45,10 @@ export default {
       this.bookName = sessionStorage.getItem('bookName');
     }
     this.bookId = this.$store.getters.getBookId;
+    
+    if(this.bookId) {
+      this.isSave = true;
+    }
   },
   methods: {
     editBookName() {
@@ -92,6 +96,7 @@ export default {
               console.log(res.data);
               this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
+              console.log(this.bookId);
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();

@@ -429,6 +429,7 @@ export default {
                 this.currentPageList.caption.ttsVoice = new MediaRecorder(stream);
                 this.currentPageList.caption.ttsVoice.addEventListener('dataavailable', event => {
                     if (event.data.size > 0) {
+                      console.log(this.currentPageList);
                         this.currentPageList.caption.recordedChunks.push(event.data);
                     }
                 });

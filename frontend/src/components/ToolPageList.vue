@@ -26,6 +26,7 @@
 
 <script>
 import draggable from 'vuedraggable';
+import axios from 'axios';
 
 export default {
   components: {
@@ -156,6 +157,9 @@ export default {
             width: '',
             left: '',
             top: '',
+            ttsVoice:'',
+            ttsName:'',
+            recordedChunks: [],
           },
           thumbnail: '',
           pageId: newNo,
@@ -231,6 +235,9 @@ export default {
                 width: '',
                 left: '',
                 top: '',
+                ttsVoice:'',
+                ttsName:'',
+                recordedChunks: [],
               },
               thumbnail: '',
               pageId: newNo,

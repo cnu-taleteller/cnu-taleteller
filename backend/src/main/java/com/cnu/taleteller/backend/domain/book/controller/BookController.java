@@ -42,16 +42,14 @@ public class BookController {
         Page[] pageList = dto.getPageList();
 
         ObjectId objectId = toolService.saveBook(pageList);
-        Long bookId = bookService.saveBook(bookName, bookStatus, email, objectId.toString());
 
-        return bookId;
+        return bookService.saveBook(bookName, bookStatus, email, objectId.toString());
     }
 
     @PostMapping("/{bookId}")
     public Long update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
-        Long id = bookService.updateBook(dto, bookId);
 
-        return id;
+        return bookService.updateBook(dto, bookId);
     }
 
     @GetMapping("/search")

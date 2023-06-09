@@ -9,6 +9,7 @@ export const store = new Vuex.Store({
     bookId: null, // 작품 번호
     pageList: [], // 작품 페이지 리스트
     saveState : false,
+    canvasCompleted: false,
   },
   getters: {
     getBookId(state) {
@@ -19,6 +20,9 @@ export const store = new Vuex.Store({
     },
     getSaveState(state) {
       return state.saveState;
+    },
+    getCanvasCompleted(state) {
+      return state.canvasCompleted;
     }
   },
   mutations: {
@@ -31,6 +35,12 @@ export const store = new Vuex.Store({
     setSaveState(state, newSaveState) {
       state.saveState = newSaveState;
     },
+    setCanvasCompleted(state, canvasCompleted) {
+      state.canvasCompleted = canvasCompleted;
+    },
+  },
+  actions: {
+    
   },
   plugins: [
     createPersistedState({

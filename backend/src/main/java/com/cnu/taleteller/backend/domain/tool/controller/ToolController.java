@@ -23,7 +23,6 @@ public class ToolController {
 
     private final UploadFileService uploadFileService;
     private final S3Service s3Service;
-
     private final ToolService toolService;
 
     @GetMapping("/s3/image")

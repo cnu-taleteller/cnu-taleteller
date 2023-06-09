@@ -17,13 +17,14 @@
     </div>
     <div>
       <button @click="addPage()"><img src="@/assets/icon.png" width="40"></button>
-      <button><img src="@/assets/trash.png" width="35" style="opacity: 0.8;"></button>
+      <button @click="deletePage()"><img src="@/assets/trash.png" width="35" style="opacity: 0.8;"></button>
+      <!-- <button @click="statusTestPre()">상태 테스트(previus)</button>
+      <button @click="statusTestNxt()">상태 테스트(next)</button> -->
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
 import draggable from 'vuedraggable';
 
 export default {
@@ -53,20 +54,64 @@ export default {
           layerList: [],
         }
       ],
-      currentPageNo: 1,
+      currentPageIndexNo: 0,
+      stackStatus : [],
+      stackIndex: 0,
+      prevSaveStackIndex: null,
+      isStackPrev: false,
+      isPrev: false,
+      mostRecentWorkPage: 0,
+    }
+  },
+  computed: {
+    allPageList() {
+      return JSON.parse(JSON.stringify(this.pageList));
     }
   },
   watch: {
-    pageList: {
-      handler: function (newPageList) {
+    allPageList: {
+      handler: function (newPageList, oldPageList) {
+
+        //ctrl + z 한건 스택에 추가 안함.
+        if(!this.isStackPrev) {
+          
+          //맵 형식으로 해당 요소의 페이지 번호를 추적함.
+          const pageListMap = {
+            value : oldPageList,
+            pageNo : this.currentPageIndexNo, //페이지 리스트의 인덱스
+          }
+
+          console.log(pageListMap);
+
+          this.stackStatus.push(JSON.parse(JSON.stringify(pageListMap)));
+          
+          const stack = JSON.parse(JSON.stringify(this.stackStatus));
+          this.stackIndex = stack.length - 1;
+
+          //prev 돌린 인덱스 사잇값 ~ 추가한 값 사이의 요소들을 삭제함.
+          if (this.stackIndex - this.prevSaveStackIndex >= 2 && this.isPrev) {
+            this.stackStatus.splice(this.prevSaveStackIndex + 1, this.stackIndex - this.prevSaveStackIndex - 1);
+          } 
+
+          this.stackIndex = this.stackStatus.length - 1;
+          this.isPrev = false;
+
+          if(!this.isPrev) {
+            this.prevSaveStackIndex = this.stackIndex;
+          }
+
+          this.isStackPrev = false;
+        }
+
         this.$emit('pageList', newPageList);
+        this.$store.commit('setSaveState', true);
+        this.isStackPrev = false;
       },
-      deep: true,
+      deep : true,
     },
   },
   async created() {
     this.bookId = this.$store.getters.getBookId;
-    console.log(this.bookId);
     if (this.bookId !== null) {
       const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
       this.pageList = selPageLists.data.pageList;
@@ -77,57 +122,131 @@ export default {
       this.$emit('pageList', this.pageList);
     }
   },
-  async mounted() {
-    //기본적으로 DOM에 내용이 만들어지면 배열의 첫번째 요소를 보냄 들어오면 1번 페이지를 보여주기 위해서
-    //만약 새로 만들기를 누르면 bookId 가 없으니 빈페이지고 bookId가 온다면 기존에 생성하고 저장 해 둔 작품
-  },
   methods: {
     defalutReset() {
-      this.currentPageNo = items.length - 1;
+      this.currentPageIndexNo = items.length - 1;
     },
     //페이지 변경 시 그 페이지의 내용들을 보냄
     clickPage(index) {
-      this.currentPageNo = index;
+      this.currentPageIndexNo = index;
       this.$emit('currentPageList', this.pageList[index]);
+      console.log(this.currentPageIndexNo);
     },
     //페이지 추가부분
     addPage() {
-      let currnet = this.currentPageNo;
-      var self = this;
-      var newNo = 1;
+      let current = this.currentPageIndexNo;
+      let self = this;
+      let newNo = 1;
       if (self.pageList.concat().length > 0) {
         newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageId; })) + 1;
       }
       this.pageList.splice(
-        currnet + 1,
+        current + 1,
         0,
         {
           caption: {
             captionState: 0,
             fontSize: '',
             fontColor: '',
-            content: null,
-            height: null,
-            width: null,
-            left: null,
-            top: null,
+            content: '',
+            height: '',
+            width: '',
+            left: '',
+            top: '',
           },
-          thumbnail: null,
+          thumbnail: '',
           pageId: newNo,
           pageStatus: 1,
           layerList: [],
         }
       );
-      this.currentPageNo += 1;
+      this.$emit('currentPageList', this.pageList[current + 1]);
+      this.currentPageIndexNo = current + 1;
       this.saveSession();
     },
     saveSession() {
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageList));
-      // this.$emit('pageList', this.pageList);
-    }
-    // deletePage(item, index) {
-    //   this.items.splice(index, 1);
-    // },
+    },
+    statusTestPre() {
+      //이전 으로 돌리는 작업을 실행중인가.
+      this.isStackPrev = true;
+      const stack = JSON.parse(JSON.stringify(this.stackStatus));
+
+      //뒤로 되돌릴 작업이 있을 때
+      if(this.prevSaveStackIndex >= 0 && stack.length >= 1) {
+
+        this.pageList = stack[this.prevSaveStackIndex].value;
+        this.mostRecentWorkPage = stack[this.prevSaveStackIndex].pageNo;
+        
+        console.log(this.mostRecentWorkPage);
+        this.currentPageIndexNo = this.mostRecentWorkPage;
+
+        if(this.prevSaveStackIndex === 0) {
+          this.prevSaveStackIndex = 0;
+        } else {
+          this.prevSaveStackIndex -= 1;
+        }
+
+        this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+        this.isPrev = true;
+
+        return;
+
+      } else if(stack.length == 0){
+
+        this.isStackPrev = false;
+        
+        return;
+
+      }
+    },
+    statusTestNxt() {
+
+    },
+    deletePage() {
+      //리스트에 전 후 값이 있나 확인 다음이 있으면 다음으로 넘김 아니면 전으로 만약에 페이지가 1개뿐이다 이러면 삭제되고 바로 빈리스트 추가 //this.pageList[]
+      if(this.pageList[this.currentPageIndexNo + 1] === undefined) {
+        console.log('not have next page');
+        this.pageList.splice(this.currentPageIndexNo, 1);
+        if(this.pageList.length === 0) {
+          console.log('not found page');
+          let self = this;
+          let newNo = 1;
+          if (self.pageList.concat().length > 0) {
+            newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageId; })) + 1;
+          }
+          this.pageList.splice(
+            this.currentPageIndexNo + 1,
+            0,
+            {
+              caption: {
+                captionState: 0,
+                fontSize: '',
+                fontColor: '',
+                content: '',
+                height: '',
+                width: '',
+                left: '',
+                top: '',
+              },
+              thumbnail: '',
+              pageId: newNo,
+              pageStatus: 1,
+              layerList: [],
+            }
+          );
+          this.currentPageIndexNo = 0;
+          this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
+          return;
+        }
+        this.currentPageIndexNo -= 1;
+        this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
+      } else if(this.pageList[this.currentPageIndexNo + 1] !== undefined) {
+        this.pageList.splice(this.currentPageIndexNo, 1);
+        console.log('have next page');
+        this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
+      }
+    },
   },
 }
 </script>

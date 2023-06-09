@@ -11,7 +11,6 @@
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
       <button @click="saveTmp()">임시저장</button>
-      <button @click="test()">저장테스트</button>
       <button @click="saveBook()">제출</button>
     </div>
   </div>
@@ -50,7 +49,7 @@ export default {
     saveBook() {
       // 시나리오 선택되어야 진행
       const select = sessionStorage.getItem('select');
-      console.log(select);
+      
       if (!select || select == 'false') {
         alert('시나리오 선택 후 진행해주세요');
         return;
@@ -60,56 +59,91 @@ export default {
       sessionStorage.setItem('bookName', this.bookName);
       this.$router.push('/ToolSubmit');
     },
+    async setCanvasCompleted() {
+      await this.$store.dispatch('setCanvasCompleted', true)
+    },
     // 임시 저장
     async saveTmp() {
-      console.log(this.bookId);
-      const select = sessionStorage.getItem('select');
-      
-      if (!select || select === 'false') {
-        alert('시나리오 선택 후 진행해주세요!');
-        return;
-      }
-      else {
-        // 최초 저장
-        if (this.bookId == null) {
-          await axios.post("/api/v1/book/", {
-            bookName: this.bookName,
-            bookStatus: "temp",
-            email: sessionStorage.getItem('user'),
-            pageList : this.pageList,
-          })
-            .then((res) => {
-              console.log(res.data.bookId);
-              this.$store.commit('setBookId', res.data.bookId);
-              this.saveScenario();
-              this.saveUploadFile();
-              alert('임시저장 완료');
-            })
-            .catch((err) => {
-              console.error(err);
-              alert('임시저장 실패');
-            })
+      try {
+        const isCanvasRunning = this.$store.getters.getCanvasCompleted;
+
+        if (!isCanvasRunning) {
+          await this.waitForCanvas();
         }
-        else {
-          // 이미 bookId 있을 때
-          await axios.post("/api/v1/book/" + this.bookId, {
-            bookName: this.bookName,
-            bookStatus: "temp",
-            pageList : this.pageList,
-          })
-            .then((res) => {
-              console.log(res);
-              this.saveScenario();
-              this.saveUploadFile();
-              alert('임시저장 완료');
-            })
-            .catch((error) => {
-              console.log(error);
-              alert('임시저장 실패');
-            });
+
+        const saveState = this.$store.getters.getSaveState;
+        const select = sessionStorage.getItem('select');
+
+        if (saveState) {
+          if (select != null) {
+            alert('시나리오 선택 후 진행해주세요!');
+            return;
+          } else {
+            // 최초 저장
+            if (this.bookId == null) {
+              await axios.post("/api/v1/book/", {
+                bookName: this.bookName,
+                bookStatus: "temp",
+                email: sessionStorage.getItem('user'),
+                pageList: this.pageList,
+              })
+                .then((res) => {
+                  console.log(res.data.bookId);
+                  this.$store.commit('setBookId', res.data.bookId);
+                  this.saveScenario();
+                  this.saveUploadFile();
+                  alert('임시저장 완료');
+                })
+                .catch((err) => {
+                  console.error(err);
+                  alert('임시저장 실패');
+                })
+            }
+            else {
+              // 이미 bookId 있을 때
+              await axios.post("/api/v1/book/" + this.bookId, {
+                bookName: this.bookName,
+                bookStatus: "temp",
+                pageList: this.pageList,
+              })
+                .then((res) => {
+                  console.log(res);
+                  this.saveScenario();
+                  this.saveUploadFile();
+                  alert('임시저장 완료');
+                })
+                .catch((error) => {
+                  console.log(error);
+                  alert('임시저장 실패');
+                });
+            }
+          }
+          this.$store.commit('setSaveState', false);
         }
+      } catch (err) {
+        console.error(err);
       }
     },
+
+    async waitForCanvas() {
+      let timeout = 0;
+      const reconfirm = 200;
+      
+      return new Promise((resolve, reject) => {
+        const checkCanvas = () => {
+          if (this.$store.getters.getCanvasCompleted) {
+            resolve();
+          } else if (timeout >= 5000) {
+            reject(new Error('Timeout'));
+          } else {
+            setTimeout(checkCanvas, reconfirm);
+            timeout += reconfirm;
+          } 
+        };
+        checkCanvas();
+      });
+    },
+
     async saveUploadFile() {
       const uploadCharList = JSON.parse(sessionStorage.getItem('uploadCharList'));
       const uploadBackList = JSON.parse(sessionStorage.getItem('uploadBackList'));
@@ -326,17 +360,6 @@ export default {
         list.appendChild(divEle);
       }
     },
-    test() {
-      console.log(JSON.stringify(this.pageList));
-      axios.post('/api/tool/dataTest/1', {"pageList" : this.pageList})
-        .then(res => {
-          console.log(res);
-          console.log('success');
-        }).catch(err => {
-          console.log(err);
-          console.log('fail');
-        })
-    }
   },
 }
 </script>

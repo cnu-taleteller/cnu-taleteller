@@ -354,15 +354,12 @@ export default {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = () => {
-              const originalWidth = img.width;
-              const originalHeight = img.height;
-              const reductionRatio = 0.35;
-              const reducedWidth = originalWidth * reductionRatio;
-              const reducedHeight = originalHeight * reductionRatio;
-              canvas.width = reducedWidth;
-              canvas.height = reducedHeight;
-              ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
-              const dataUrl = canvas.toDataURL('image/jpeg', 0.35);
+              const originalWidth = 800;
+              const originalHeight = 600;
+              canvas.width = originalWidth;
+              canvas.height = originalHeight;
+              ctx.drawImage(img, 0, 0, originalWidth, originalHeight);
+              const dataUrl = canvas.toDataURL('image/png', 1);
               currentPage.thumbnail = dataUrl;
             };
             img.src = canvas.toDataURL();

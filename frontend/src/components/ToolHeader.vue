@@ -135,11 +135,9 @@ export default {
         this.$store.commit('setSaveState', false);
       }
     },
-
     async saveThumbnail() {
       for (let i = 0; i < this.pageList.length; i++) {
         const dataUrl = this.pageList[i].thumbnail;
-        if (dataUrl === "") return;
         const base64Data = dataUrl.split(',')[1];
         const fileName = `${this.bookId}_${i}_thumbnail.png`;
         try {
@@ -159,20 +157,23 @@ export default {
             console.error(error);
           }
           console.log(`Thumbnail ${i} 처리 완료`);
+          await axios.post('/api/v1/book/thumbnail', {
+            bookId: this.bookId,
+            bookThumbnail: this.pageList[0].thumbnail,
+          })
         }
         catch (err) {
           console.error(`Thumbnail ${i} 처리 실패:`, err);
+          alert('서버 문제로 파일 처리에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️');
         }
       }
     },
-
     base64ToBlob(base64Data, contentType = '') {
       const binaryString = window.atob(base64Data);
       const arraybuffer = new ArrayBuffer(binaryString.length);
       const view = new Uint8Array(arraybuffer);
-
       for (let i = 0; i < binaryString.length; i++) {
-        view[i] = binaryString.charCodeAt(i) & 0xff;
+          view[i] = binaryString.charCodeAt(i) & 0xff;
       }
       return new Blob([arraybuffer], { type: contentType });
     },

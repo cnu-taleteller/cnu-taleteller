@@ -43,6 +43,9 @@ public class Book {
     @Column(length = 1)
     private String bookPublic;
 
+    @Column(length = 200)
+    private String bookThumbnail;
+
     @Column(columnDefinition = "TEXT")
     private String scenario;
 
@@ -56,7 +59,7 @@ public class Book {
     private BookMongo bookMongo;
 
     @Builder
-    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, String scenario, Member member, BookMongo bookMongo) {
+    public Book(Long bookId, String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, String bookThumbnail, String scenario, Member member, BookMongo bookMongo) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookRegdate = bookRegdate;
@@ -65,6 +68,7 @@ public class Book {
         this.bookCategory = bookCategory;
         this.bookRecommend = bookRecommend;
         this.bookPublic = bookPublic;
+        this.bookThumbnail = bookThumbnail;
         this.scenario = scenario;
         this.member = member;
         this.bookMongo = bookMongo;
@@ -95,6 +99,9 @@ public class Book {
         this.scenario = scenario;
     }
 
+    public void updateThumbnail(String bookThumbnail){
+        this.bookThumbnail = bookThumbnail;
+    }
 
     public Book(Long bookId) {
         this.bookId = bookId;

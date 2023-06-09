@@ -2,6 +2,7 @@ package com.cnu.taleteller.backend.domain.book.dto;
 
 import com.cnu.taleteller.backend.domain.book.entity.Book;
 
+import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +29,7 @@ public class BookDto {
     private String bookCategory;
 
     private int bookRecommend;
-
+    private String bookThumbnail;
     private String bookPublic;
 
     private Long memberId;
@@ -45,4 +46,5 @@ public class BookDto {
         bookDto.setBookPublic(book.getBookPublic());
         return bookDto;
     }
+
 }

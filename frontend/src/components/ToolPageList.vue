@@ -116,6 +116,8 @@ export default {
   },
   async created() {
     this.bookId = this.$store.getters.getBookId;
+  },
+  async mounted() {
     if (this.bookId !== null) {
       const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
       this.pageList = selPageLists.data.pageList;

@@ -178,19 +178,14 @@ export default {
       uploadBackList: [],
       uploadCharList: [],
 
-      // 기본적으로 있는 이미지 배열
-      charList: Array.from({length: 25}, (_, i) => ({
+      charList: Array.from({ length: 25 }, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/character${i}.png`,
         id: `character${i}`,
         draggable: "true",
         height: "100px",
       })),
-      // 기본적으로 있는 배경 배열
-      backList: Array.from({length: 18}, (_, i) => ({
-        src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/background${i}.png`,
-        id: `background${i}`,
+      backList: Array.from({ length: 18 }, (_, i) => ({
         draggable: "true",
-        height: "100px",
       })),
       recordingStarted: false,
       timer: null,
@@ -387,7 +382,6 @@ export default {
       const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
       window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
     },
-
     handleTtsChange(event) {
       const selectedValue = event.target.value;
       this.$emit('ttsValueChange', selectedValue);
@@ -417,6 +411,21 @@ export default {
         //window.open(ttsUrl, '_blank');
       }).catch(error => {
         console.error(error);
+     })
+    },
+    reScenario() {
+      if (this.finalScenario[4].length > 0) {
+        alert('시나리오는 작품당 5번만 받을 수 있습니다.');
+        return;
+      }
+      this.isReScenario = true;
+      this.isDisabled2 = true;
+      console.log("axios 통신 요청");
+      axios.post("/api/v1/tool/scenario/", {
+        who: this.scenarioKeyword.who,
+        when: this.scenarioKeyword.when,
+        where: this.scenarioKeyword.where,
+        event: this.scenarioKeyword.event
       })
     },
     startRecording() {
@@ -512,37 +521,35 @@ export default {
           this.isReScenario = false;
         });
   },
-
-  setScenarioArr() {
-    // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
-    const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
-    let num = 0;
-    if (this.finalScenario[0].length > 0) {
-      num = 1;
-    }
-    if (this.finalScenario[1].length > 0) {
-      num = 2;
-    }
-    if (this.finalScenario[2].length > 0) {
-      num = 3;
-    }
-    if (this.finalScenario[3].length > 0) {
-      num = 4;
-    }
-    sections.forEach((section, index) => {
-      const scenario = this.resultScenario;
-      const start = scenario.indexOf(section);
-      let end;
-
-      if (index < sections.length - 1) {
-        end = scenario.indexOf(sections[index + 1]);
-      } else {
-        end = scenario.length;
+    setScenarioArr() {
+      // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)
+      const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
+      let num = 0;
+      if (this.finalScenario[0].length > 0) {
+        num = 1;
       }
-      this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
-    });
-  },
+      if (this.finalScenario[1].length > 0) {
+        num = 2;
+      }
+      if (this.finalScenario[2].length > 0) {
+        num = 3;
+      }
+      if (this.finalScenario[3].length > 0) {
+        num = 4;
+      }
+      sections.forEach((section, index) => {
+        const scenario = this.resultScenario;
+        const start = scenario.indexOf(section);
+        let end;
 
+        if (index < sections.length - 1) {
+          end = scenario.indexOf(sections[index + 1]);
+        } else {
+          end = scenario.length;
+        }
+        this.finalScenario[num][index] = scenario.slice(start, end).replace(section, '').trim();
+      });
+    },
 }
 </script>
 <style scoped>

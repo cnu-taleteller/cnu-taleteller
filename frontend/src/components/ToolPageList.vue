@@ -18,8 +18,6 @@
     <div>
       <button @click="addPage()"><img src="@/assets/icon.png" width="40"></button>
       <button @click="deletePage()"><img src="@/assets/trash.png" width="35" style="opacity: 0.8;"></button>
-      <button @click="statusTestPre()">상태 테스트(previus)</button>
-      <button @click="statusTestNxt()">상태 테스트(next)</button>
     </div>
   </div>
 </template>
@@ -36,67 +34,76 @@ export default {
   data() {
     return {
       bookId: null,
-      //현재 사용중인 데이터
       pageList: null,
       currentPageIndexNo: 0,
       stackStatus : [],
       stackIndex: 0,
-      prevSaveStackIndex: null,
-      isStackPrev: false,
+      prevSaveStackIndex: 0,
+      isStackChange: false,
       isPrev: false,
       mostRecentWorkPage: 0,
-      isAddPage : false,
-    }
-  },
-  computed: {
-    computedPageList() {
-      if(this.pageList) { return JSON.parse(JSON.stringify(this.pageList)); } 
+      isfirstPush : false,
+      changePageIndexNo : 0,
+      isRecentChange : false,
+      isAdd : false,
+      isDelete : false,
+      isNoHaveNext : false,
+      isHavaNext : false,
     }
   },
   watch: {
-    computedPageList: {
-      handler: function (newPageList, oldPageList) {
-        //ctrl + z 한건 스택에 추가 안함.
-        if(!this.isStackPrev && oldPageList) {
-          //맵 형식으로 해당 요소의 페이지 번호를 추적함.
-          const pageListMap = {
-            value : oldPageList,
-            pageNo : this.currentPageIndexNo, //페이지 리스트의 인덱스
-          }
-
-          if(this.isAddPage) {  this.currentPageIndexNo += 1; this.isAddPage = false };
-
-          console.log(pageListMap);
-
-          this.stackStatus.push(JSON.parse(JSON.stringify(pageListMap)));
+    pageList: {
+      handler: function (newPageList) {
+        if (!this.isStackChange && newPageList) {
           
-          const stack = JSON.parse(JSON.stringify(this.stackStatus));
-          this.stackIndex = stack.length - 1;
+          const pageListMap = {
+            value: JSON.parse(JSON.stringify(newPageList)),
+            ctrlZPageNo: this.currentPageIndexNo,
+            ctrlYPageNo: this.currentPageIndexNo,
+          };
 
-          //prev 돌린 인덱스 사잇값 ~ 추가한 값 사이의 요소들을 삭제함.
+          this.changePageIndexNo = this.currentPageIndexNo;
+          this.stackStatus.push(pageListMap);
+          this.stackIndex = this.stackStatus.length - 1;
+
           if (this.stackIndex - this.prevSaveStackIndex >= 2 && this.isPrev) {
             this.stackStatus.splice(this.prevSaveStackIndex + 1, this.stackIndex - this.prevSaveStackIndex - 1);
-          } 
-
-          this.stackIndex = this.stackStatus.length - 1;
-          this.isPrev = false;
-
-          if(!this.isPrev) {
-            this.prevSaveStackIndex = this.stackIndex;
+            this.isPrev = false;
           }
 
+          if (this.isRecentChange) {
+            if (!this.isAdd && !this.isDelete) {
+              this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo;
+            } else if (this.isAdd) {
+              this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo - 1;
+              this.isAdd = false;
+            } else if (this.isDelete) {
+              if (this.isNoHaveNext) {
+                this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1;
+                this.isNoHaveNext = false;
+              } else if (this.isHavaNext) {
+                this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo;
+                this.isHavaNext = false;
+              }
+              this.isDelete = false;
+            }
+            this.isRecentChange = false;
+          };
+
+          if(this.isPrev === false) {
+            this.prevSaveStackIndex = this.stackStatus.length - 1;
+          }
           this.isStackPrev = false;
         }
-
         this.$emit('pageList', newPageList);
         this.$store.commit('setSaveState', true);
-        this.isStackPrev = false;
+        this.isStackChange = false;
       },
-      deep : true,
-    },
+      deep: true
+    }
   },
   async created() {
-    this.bookId = this.$store.getters.getBookId;
+    this.bookId = sessionStorage.getItem('bookId');
     if (this.bookId !== null) {
       const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
       this.pageList = selPageLists.data.pageList;
@@ -128,24 +135,70 @@ export default {
       this.$emit('pageList', this.pageList);
     }
   },
+  mounted() {
+    if (this.$route.path === '/tool') {
+      window.addEventListener('keydown', this.ctrlZandY);
+    }
+  },
+  beforeDestroy() {
+    if (this.$route.path === '/tool') {
+      window.removeEventListener('keydown', this.ctrlZandY);
+    }
+  },
   methods: {
+    ctrlZandY(event) {
+      if (event.ctrlKey) {
+        const stack = JSON.parse(JSON.stringify(this.stackStatus));
+        const stackLength = stack.length;
+
+        if (event.key === 'z' && this.prevSaveStackIndex - 1 >= 0 && stackLength >= 1) {
+          this.isStackChange = true;
+          this.pageList = stack[this.prevSaveStackIndex - 1].value;
+          this.mostRecentWorkPage = stack[this.prevSaveStackIndex - 1].ctrlZPageNo;
+
+          this.prevSaveStackIndex = Math.max(this.prevSaveStackIndex - 1, 0);
+
+          this.currentPageIndexNo = this.mostRecentWorkPage;
+          this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+
+          this.isPrev = true;
+          return;
+        }
+
+        if (event.key === 'y' && this.prevSaveStackIndex + 1 <= stackLength - 1) {
+          // 앞으로 갈 작업이 있을 때
+          this.isStackChange = true;
+          this.pageList = stack[this.prevSaveStackIndex + 1].value;
+          this.mostRecentWorkPage = stack[this.prevSaveStackIndex + 1].ctrlYPageNo;
+
+          this.prevSaveStackIndex = Math.min(this.prevSaveStackIndex + 1, stackLength - 1);
+
+          this.currentPageIndexNo = this.mostRecentWorkPage;
+          this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+          this.isPrev = true;
+          return;
+        }
+      }
+    },
     defalutReset() {
       this.currentPageIndexNo = items.length - 1;
     },
     //페이지 변경 시 그 페이지의 내용들을 보냄
     clickPage(index) {
+      this.isRecentChange = true;
       this.currentPageIndexNo = index;
       this.$emit('currentPageList', this.pageList[index]);
-      console.log(this.currentPageIndexNo);
     },
     //페이지 추가부분
     addPage() {
+      this.isAdd = true;
       let current = this.currentPageIndexNo;
       let self = this;
       let newNo = 1;
       if (self.pageList.concat().length > 0) {
         newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageId; })) + 1;
       }
+      this.currentPageIndexNo += 1;
       this.pageList.splice(
         current + 1,
         0,
@@ -170,59 +223,26 @@ export default {
         }
       );
       this.$emit('currentPageList', this.pageList[current + 1]);
-      this.isAddPage = true;
       this.saveSession();
     },
     saveSession() {
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageList));
     },
-    statusTestPre() {
-      //이전 으로 돌리는 작업을 실행중인가.
-      this.isStackPrev = true;
-      const stack = JSON.parse(JSON.stringify(this.stackStatus));
-
-      //뒤로 되돌릴 작업이 있을 때
-      if(this.prevSaveStackIndex >= 0 && stack.length >= 1) {
-
-        this.pageList = stack[this.prevSaveStackIndex].value;
-        this.mostRecentWorkPage = stack[this.prevSaveStackIndex].pageNo;
-        
-        console.log(this.mostRecentWorkPage);
-        this.currentPageIndexNo = this.mostRecentWorkPage;
-
-        if(this.prevSaveStackIndex === 0) {
-          this.prevSaveStackIndex = 0;
-        } else {
-          this.prevSaveStackIndex -= 1;
-        }
-
-        this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
-        this.isPrev = true;
-        return;
-
-      } else if(stack.length == 0){
-        this.isStackPrev = false;
-        return;
-
-      }
-    },
-    statusTestNxt() {
-
-    },
     deletePage() {
+      this.isDelete = true;
       //리스트에 전 후 값이 있나 확인 다음이 있으면 다음으로 넘김 아니면 전으로 만약에 페이지가 1개뿐이다 이러면 삭제되고 바로 빈리스트 추가 //this.pageList[]
       if(this.pageList[this.currentPageIndexNo + 1] === undefined) {
-        console.log('not have next page');
         this.pageList.splice(this.currentPageIndexNo, 1);
         if(this.pageList.length === 0) {
-          console.log('not found page');
+          let current = this.currentPageIndexNo;
           let self = this;
           let newNo = 1;
           if (self.pageList.concat().length > 0) {
             newNo = Math.max.apply(null, self.pageList.concat().map(function (item) { return item.pageId; })) + 1;
           }
+          this.currentPageIndexNo = 0;
           this.pageList.splice(
-            this.currentPageIndexNo + 1,
+            current + 1,
             0,
             {
               caption: {
@@ -244,15 +264,15 @@ export default {
               layerList: [],
             }
           );
-          this.currentPageIndexNo = 0;
-          this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
+          this.$emit('currentPageList', this.pageList[current]);
           return;
         }
+        this.isNoHaveNext = true;
         this.currentPageIndexNo -= 1;
         this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
       } else if(this.pageList[this.currentPageIndexNo + 1] !== undefined) {
+        this.isHavaNext = true;
         this.pageList.splice(this.currentPageIndexNo, 1);
-        console.log('have next page');
         this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
       }
     },

@@ -53,7 +53,7 @@ export default {
     },
     //기존 작품 접근 할 때
     updateExistingBook(bookId) {
-      this.$store.commit('setBookId', bookId);
+      sessionStorage.setItem('bookId', bookId);
       this.$router.push({
         path : '/tool',
       });

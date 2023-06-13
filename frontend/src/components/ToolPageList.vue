@@ -71,20 +71,12 @@ export default {
             this.isPrev = false;
           }
 
-          if (this.isRecentChange) {
-            if (!this.isAdd && !this.isDelete) {
-              this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo;
-            } else if (this.isAdd) {
-              this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo - 1;
-              this.isAdd = false;
-            } else if (this.isDelete) {
-              if (this.isNoHaveNext) {
-                this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1;
-                this.isNoHaveNext = false;
-              } else if (this.isHavaNext) {
-                this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo;
-                this.isHavaNext = false;
-              }
+          if(this.isRecentChange) {
+            if(!this.isAdd && !this.isDelete) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; }
+            else if(this.isAdd) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo - 1; this.isAdd = false; }
+            else if(this.isDelete) { 
+              if(this.isNoHaveNext) { console.log('n h n'); this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1; this.isNoHaveNext = false; }
+              else if(this.isHavaNext) { console.log('h n'); this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; this.isHavaNext = false; }
               this.isDelete = false;
             }
             this.isRecentChange = false;
@@ -137,12 +129,12 @@ export default {
   },
   mounted() {
     if (this.$route.path === '/tool') {
-      window.addEventListener('keydown', this.ctrlZandY);
+      document.addEventListener('keydown', this.ctrlZandY);
     }
   },
   beforeDestroy() {
     if (this.$route.path === '/tool') {
-      window.removeEventListener('keydown', this.ctrlZandY);
+      document.removeEventListener('keydown', this.ctrlZandY);
     }
   },
   methods: {
@@ -150,35 +142,38 @@ export default {
       if (event.ctrlKey) {
         const stack = JSON.parse(JSON.stringify(this.stackStatus));
         const stackLength = stack.length;
+        
+        if (event.key === 'z') {
+          if(this.prevSaveStackIndex - 1 >= 0 && stackLength >= 1) {
+            this.isStackChange = true;
+            this.pageList = stack[this.prevSaveStackIndex - 1].value;
+            this.mostRecentWorkPage = stack[this.prevSaveStackIndex - 1].ctrlZPageNo;
 
-        if (event.key === 'z' && this.prevSaveStackIndex - 1 >= 0 && stackLength >= 1) {
-          this.isStackChange = true;
-          this.pageList = stack[this.prevSaveStackIndex - 1].value;
-          this.mostRecentWorkPage = stack[this.prevSaveStackIndex - 1].ctrlZPageNo;
+            this.prevSaveStackIndex = Math.max(this.prevSaveStackIndex - 1, 0);
 
-          this.prevSaveStackIndex = Math.max(this.prevSaveStackIndex - 1, 0);
+            this.currentPageIndexNo = this.mostRecentWorkPage;
+            this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
 
-          this.currentPageIndexNo = this.mostRecentWorkPage;
-          this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+            this.isPrev = true;
+            return;
+          }
+        };
 
-          this.isPrev = true;
-          return;
-        }
+        if (event.key === 'y') {
+          if(this.prevSaveStackIndex + 1 <= stackLength - 1) {
+            this.isStackChange = true;
+            this.pageList = stack[this.prevSaveStackIndex + 1].value;
+            this.mostRecentWorkPage = stack[this.prevSaveStackIndex + 1].ctrlYPageNo;
 
-        if (event.key === 'y' && this.prevSaveStackIndex + 1 <= stackLength - 1) {
-          // 앞으로 갈 작업이 있을 때
-          this.isStackChange = true;
-          this.pageList = stack[this.prevSaveStackIndex + 1].value;
-          this.mostRecentWorkPage = stack[this.prevSaveStackIndex + 1].ctrlYPageNo;
+            this.prevSaveStackIndex = Math.min(this.prevSaveStackIndex + 1, stackLength - 1);
 
-          this.prevSaveStackIndex = Math.min(this.prevSaveStackIndex + 1, stackLength - 1);
-
-          this.currentPageIndexNo = this.mostRecentWorkPage;
-          this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
-          this.isPrev = true;
-          return;
-        }
-      }
+            this.currentPageIndexNo = this.mostRecentWorkPage;
+            this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+            this.isPrev = true;
+            return;
+          }
+        };
+      };
     },
     defalutReset() {
       this.currentPageIndexNo = items.length - 1;

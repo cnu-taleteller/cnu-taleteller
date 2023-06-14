@@ -2,54 +2,62 @@ package com.cnu.taleteller.backend.domain.tool.controller;
 
 import com.cnu.taleteller.backend.domain.tool.dto.CaptionRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.KeywordRequestDto;
+import com.cnu.taleteller.backend.domain.tool.service.ApiService;
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
 @RequestMapping("/api/v1/tool/scenario")
 @RequiredArgsConstructor
 public class ScenarioController {
 
+    private final ApiService apiService;
     private final ScenarioService scenarioService;
 
     @PostMapping("/")
-    public ResponseEntity generateScenario(@RequestBody KeywordRequestDto requestDto){
-        try {
-            String result = scenarioService.generateScenario(requestDto);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public DeferredResult<ResponseEntity> generateScenario(@RequestBody KeywordRequestDto requestDto) {
+        DeferredResult<ResponseEntity> deferredResult = new DeferredResult<>(120000L); // 120초(2분) 타임아웃 설정
+
+        apiService.enqueueRequest(() -> {
+            try {
+                System.out.println("실행중");
+                String result = scenarioService.generateScenario(requestDto);
+                deferredResult.setResult(ResponseEntity.ok(result));
+            } catch (Exception e) {
+                deferredResult.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        deferredResult.onTimeout(() -> {
+            deferredResult.setErrorResult(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build());
+        });
+
+        return deferredResult;
     }
 
     @PostMapping("/flow")
-    public ResponseEntity checkScenarioFlow(@RequestBody CaptionRequestDto requestDto){
-        try {
-            String result = scenarioService.generateFlow(requestDto);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public DeferredResult<ResponseEntity> checkScenarioFlow(@RequestBody CaptionRequestDto requestDto) {
+        DeferredResult<ResponseEntity> deferredResult = new DeferredResult<>(60000L); // 60초(1분) 타임아웃 설정
+
+        apiService.enqueueRequest(() -> {
+            try {
+                System.out.println("실행중");
+                String result = scenarioService.generateFlow(requestDto);
+                deferredResult.setResult(ResponseEntity.ok(result));
+            } catch (Exception e) {
+                deferredResult.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        deferredResult.onTimeout(() -> {
+            deferredResult.setErrorResult(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build());
+        });
+
+        return deferredResult;
     }
-
-    @PostMapping("/{bookId}")
-    public ResponseEntity saveScenario(@RequestBody String scenario, @PathVariable Long bookId){
-        String decodedData = null;
-        try {
-            decodedData = URLDecoder.decode(scenario, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        scenarioService.save(decodedData, bookId);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
-
-
 }
+

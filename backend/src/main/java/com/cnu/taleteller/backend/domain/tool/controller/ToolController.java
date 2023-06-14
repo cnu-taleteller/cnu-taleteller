@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class ToolController {
 
     private final UploadFileService uploadFileService;
     private final UploadVoiceService uploadVoiceService;
+    private final ScenarioService scenarioService;
     private final S3Service s3Service;
     private final TTSService ttsService;
     private final ToolService toolService;
@@ -78,4 +81,18 @@ public class ToolController {
         System.out.println(bookId);
         return toolService.firstAccessData(bookId);
     }
+
+    @PostMapping("/scenario/{bookId}")
+    public ResponseEntity saveScenario(@RequestBody String scenario, @PathVariable Long bookId){
+        String decodedData = null;
+        try {
+            decodedData = URLDecoder.decode(scenario, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        scenarioService.save(decodedData, bookId);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+
 }

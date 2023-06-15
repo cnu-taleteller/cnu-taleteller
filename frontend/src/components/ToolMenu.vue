@@ -718,4 +718,3 @@ input[type=file]::file-selector-button:hover {
   color: white;
 }
 </style>
-  

@@ -130,8 +130,8 @@ export default {
     objArea.addEventListener('mouseup', dragEnd);
 
     document.addEventListener('input', (e) => {
-      contentText = textInput(e);
       toolMenu.isCaptionChange = true;
+      contentText = textInput(e);
     });
 
     //오른쪽 마우스 클릭
@@ -176,7 +176,7 @@ export default {
       const textDiv = document.querySelector('[data-text-content="true"]');
       if (textDiv) {
         textDiv.contentEditable = false;
-        if(contentText && isCaptionChange) {
+        if(contentText && toolMenu.isCaptionChange) {
           toolMenu.canvas().then((todataUrl) => {
             toolMenu.currentPageList.caption.content = contentText;
             toolMenu.currentPageList.thumbnail = todataUrl;

@@ -55,7 +55,7 @@ export default {
     pageList: {
       handler: function (newPageList) {
         if (!this.isStackChange && newPageList) {
-          
+
           const pageListMap = {
             value: JSON.parse(JSON.stringify(newPageList)),
             ctrlZPageNo: this.currentPageIndexNo,
@@ -75,8 +75,8 @@ export default {
             if(!this.isAdd && !this.isDelete) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; }
             else if(this.isAdd) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo - 1; this.isAdd = false; }
             else if(this.isDelete) { 
-              if(this.isNoHaveNext) { console.log('n h n'); this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1; this.isNoHaveNext = false; }
-              else if(this.isHavaNext) { console.log('h n'); this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; this.isHavaNext = false; }
+              if(this.isNoHaveNext) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1; this.isNoHaveNext = false; }
+              else if(this.isHavaNext) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; this.isHavaNext = false; }
               this.isDelete = false;
             }
             this.isRecentChange = false;
@@ -169,6 +169,7 @@ export default {
 
             this.currentPageIndexNo = this.mostRecentWorkPage;
             this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+            
             this.isPrev = true;
             return;
           }

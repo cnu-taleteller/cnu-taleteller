@@ -29,26 +29,25 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<?> saveSubmit(@RequestBody BookDto dto) {
-        System.out.println("ㅎㅇ");
         bookService.submitBook(dto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/tmp")
     public Long saveTmp(@RequestBody BookTempSaveDto dto) {
-        String bookName = dto.getBookName();
-        String bookStatus = dto.getBookStatus();
-        String email = dto.getEmail();
         Page[] pageList = dto.getPageList();
-
         ObjectId objectId = toolService.saveBook(pageList);
+        return bookService.saveBook(dto, objectId.toString());
+    }
 
-        return bookService.saveBook(bookName, bookStatus, email, objectId.toString());
+    @PostMapping("/thumbnail")
+    public ResponseEntity<?> saveThumbnail(@RequestBody BookDto dto) {
+        bookService.saveThumbnail(dto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{bookId}")
     public Long update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {
-
         return bookService.updateBook(dto, bookId);
     }
 

@@ -51,9 +51,9 @@ public class BookService {
     }
 
     @Transactional
-    public Long saveBook(String bookName, String bookStatus, String email, String objectId) {
+    public Long saveBook(BookTempSaveDto dto, String objectId) {
 
-        Member member = memberRepository.findByMemberEmail(email)
+        Member member = memberRepository.findByMemberEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("err"));
 
         BookMongo bookMongo = BookMongo.builder()
@@ -62,8 +62,8 @@ public class BookService {
         bookMongoRepository.save(bookMongo);
 
         Book bookEntity = Book.builder()
-                .bookName(bookName)
-                .bookStatus(bookStatus)
+                .bookName(dto.getBookName())
+                .bookStatus(dto.getBookStatus())
                 .member(member)
                 .bookMongo(bookMongo)
                 .build();
@@ -81,6 +81,14 @@ public class BookService {
                 dto.getBookStatus(),
                 dto.getBookCategory(),
                 dto.getBookPublic());
+        return bookRepository.save(book);
+    }
+
+
+    public Book saveThumbnail(BookDto dto) {
+        Book book = bookRepository.findById(dto.getBookId())
+                .orElseThrow(() -> new IllegalArgumentException("err"));
+        book.updateThumbnail(dto.getBookThumbnail());
         return bookRepository.save(book);
     }
 

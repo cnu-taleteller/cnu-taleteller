@@ -102,6 +102,27 @@ export default {
       this.$emit('currentPageList', this.pageList[0]);
       this.$emit('pageList', this.pageList);
     } else {
+      this.pageList =  [
+        {
+          pageId: 1,
+          pageStatus: 1,
+          caption: {
+            captionState: 0,
+            fontSize: '',
+            fontColor: '',
+            content: '',
+            height: '',
+            width: '',
+            left: '',
+            top: '',
+            ttsVoice:'',
+            ttsName:'',
+            recordedChunks: [],
+          },
+          thumbnail: '',
+          layerList: [],
+        }
+      ];
       this.$emit('currentPageList', this.pageList[0]);
       this.$emit('pageList', this.pageList);
     }

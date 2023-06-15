@@ -18,7 +18,8 @@
                     <tr>
                         <td>
                             <!--동화책 썸네일 대체-->
-                            <img src='@/assets/book1.png'>
+                            <img v-if="result.bookThumbnail == null" src='@/assets/book1.png'>
+                            <img v-else v-bind:src='result.bookThumbnail'>
                         </td>
                     </tr>
                 </thead>
@@ -39,7 +40,8 @@
                     <tr>
                         <td>
                             <!--동화책 썸네일 대체-->
-                            <img src='@/assets/book1.png'>
+                            <img v-if="result.bookThumbnail == null" src='@/assets/book1.png'>
+                            <img v-else v-bind:src='result.bookThumbnail'>
                         </td>
                     </tr>
                 </thead>

@@ -1,4 +1,5 @@
 package com.cnu.taleteller.backend.domain.user.entity;
+import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import lombok.*;
 
@@ -27,6 +28,14 @@ public class Payment extends BaseTimeEntity{
 
     @Column(length = 100)
     private String payDetails; //상세내역
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     public static Payment toPayment(PaymentDto paymentDto) {
         Payment payment = new Payment();

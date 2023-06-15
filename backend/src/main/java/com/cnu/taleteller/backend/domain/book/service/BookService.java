@@ -10,8 +10,10 @@ import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookService {
 
     private final BookRepository bookRepository;
@@ -81,6 +84,7 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+
     public Book saveThumbnail(BookDto dto) {
         Book book = bookRepository.findById(dto.getBookId())
                 .orElseThrow(() -> new IllegalArgumentException("err"));
@@ -89,13 +93,17 @@ public class BookService {
     }
 
     @Transactional
-    public Long updateBook(BookTempSaveDto dto, Long bookId) throws ExecutionException, InterruptedException, RuntimeException {
+    public Long updateBook(BookTempSaveDto dto, Long bookId) {
         CompletableFuture<Void> work = toolService.updateBookPages(bookId, dto.getPageList());
         Book book = bookRepository.findById(bookId)
-        .orElseThrow(() -> new IllegalArgumentException("err"));
+                .orElseThrow(() -> new IllegalArgumentException("err"));
         book.update(dto.getBookName(), dto.getBookStatus());
-        work.get();
-
+        try {
+            work.get();
+        } catch (InterruptedException | ExecutionException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            log.info("-------" + e);
+        }
         Book savedBook = bookRepository.save(book);
         return savedBook.getBookId();
     }

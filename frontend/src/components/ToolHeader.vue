@@ -44,7 +44,7 @@ export default {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
-    this.bookId = this.$store.getters.getBookId;
+    this.bookId = sessionStorage.getItem('bookId');
 
     if (this.bookId) {
       this.isSave = true;
@@ -96,8 +96,6 @@ export default {
               console.log(res.data);
               this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
-              this.$store.commit('setBookId', this.bookId);
-              console.log(this.bookId);
               this.saveScenario();
               this.saveUploadFile();
               this.saveThumbnail();

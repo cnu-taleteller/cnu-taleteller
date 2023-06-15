@@ -399,15 +399,6 @@ export default {
               ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
               const todataUrl = canvas.toDataURL('image/jpeg', reductionRatio);
               resolve(todataUrl);
-
-              const originalWidth = 800;
-              const originalHeight = 600;
-              canvas.width = originalWidth;
-              canvas.height = originalHeight;
-              ctx.drawImage(img, 0, 0, originalWidth, originalHeight);
-              const dataUrl = canvas.toDataURL('image/png', 1);
-              currentPage.thumbnail = dataUrl;
-
             };
           } catch (err) {
             rejects(err);

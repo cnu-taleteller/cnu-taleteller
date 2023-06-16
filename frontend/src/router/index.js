@@ -16,6 +16,8 @@ import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
 import Preview from '../views/Preview.vue'
 import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
+import ModalPassword from '../views/ModalPassword.vue'
+
 
 Vue.use(VueRouter)
 
@@ -89,6 +91,11 @@ const routes = [
     path: '/signupview',
     name: 'SignupView',
     component: SignupView
+  },
+  {
+    path: '/modalpassword',
+    name: 'ModalPassword',
+    component: ModalPassword
   },
 ]
 

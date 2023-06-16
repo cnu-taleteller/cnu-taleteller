@@ -1,5 +1,6 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
+import com.cnu.taleteller.backend.domain.user.dto.MailDTO;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
 import com.cnu.taleteller.backend.domain.user.service.MemberService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +61,22 @@ public class MemberController {
             return false; // 해당 이메일을 가진 회원이 존재하지 않음
         }
     }
+
+    @Transactional
+    @PostMapping("/sendEmail")
+    @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
+    public String sendEmail(@RequestParam("memberEmail") String memberEmail){
+        try {
+            MailDTO dto = memberService.createMailAndChangePassword(memberEmail);
+            memberService.mailSend(dto);
+            return "yes";
+        } catch (Exception e) {
+            System.out.println("입력 실패: " + e.getMessage());
+            return "no";
+        }
+    }
+
+
 
 
     @GetMapping(value = "/logout")

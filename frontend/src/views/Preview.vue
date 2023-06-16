@@ -2,6 +2,7 @@
   <div class="preview-form">
     <img :src="pageList[currentIndex].thumbnail" width="960px" height="600px">
     <div class="preview-menu">
+      <audio :src="ttsUrl" controls autoplay></audio>
       <button class="menu-btn" @click="prevImage" :disabled="currentIndex === 0">이전</button>
       <button class="menu-btn" @click="nextImage" :disabled="currentIndex === pageList.length - 1">다음</button>
     </div>
@@ -15,6 +16,12 @@ export default {
       pageList: null,
       currentIndex: 0,
     };
+  },
+  computed: {
+    ttsUrl() {
+      const caption = this.pageList[this.currentIndex].caption.ttsName;
+      return caption; // 음성 파일의 경로를 반환
+    },
   },
   created() {
     const queryString = window.location.search;
@@ -36,6 +43,16 @@ export default {
       if (this.currentIndex < this.pageList.length - 1) {
         this.currentIndex++;
       }
+    },
+    playTTS() {
+      const audioElement = this.$refs.audioPlayer;
+
+      // 음성 파일 경로 설정
+      const ttsUrl = this.ttsUrl;
+      audioElement.src = ttsUrl;
+
+      // 음성 재생
+      audioElement.play();
     },
   },
 };

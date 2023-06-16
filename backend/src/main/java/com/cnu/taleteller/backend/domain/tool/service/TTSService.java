@@ -46,7 +46,7 @@ public class TTSService {
         }
 
         // Google Cloud 플랫폼 서비스 계정 키 파일 경로
-        String serviceAccountKeyFile = "C:/Users/qustj/Documents/카카오톡 받은 파일/taleteller-382100-b7cc202c3850.json";
+        String serviceAccountKeyFile = "C:/Users/rhrjs/OneDrive/문서/카카오톡 받은 파일/taleteller-382100-b7cc202c3850.json";
 
         // Google Cloud 플랫폼 서비스 계정 인증
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(serviceAccountKeyFile));

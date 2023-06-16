@@ -408,8 +408,8 @@ export default {
               console.log(this.currentPageList.caption.ttsName);
 
               this.voiceList.push(this.currentPageList.caption.ttsName);
-              sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
-              console.log(this.voiceList);
+              //sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
+             // console.log(this.voiceList);
 
               // 작은 인터넷 창을 새로 열어 TTS 음성 재생
               //window.open(ttsUrl, '_blank');

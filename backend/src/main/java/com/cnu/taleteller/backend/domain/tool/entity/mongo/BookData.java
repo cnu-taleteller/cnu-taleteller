@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class BookData {
     @Id
     private ObjectId id;
-
     private Page[] pageList;
 
     @Builder

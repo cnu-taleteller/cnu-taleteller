@@ -3,8 +3,10 @@
     <h1 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">새로만들기</h1>
     <hr>
     <div class="column">
-      <div class="column-icon" v-for="bookId, index in bookList" :key=index>
-        <img src="@/assets/bookDummies/book.png" @click="updateExistingBook(bookId)">
+      <button v-if="selectedBookList.length > 0" @click="deleteSelectedBooks()">삭제하기</button>
+      <div class="column-icon" v-for="bookData, index in bookList" :key=index>
+        <input type="checkbox" :value="bookData.bookId" v-model="selectedBookList">
+        <img :src="bookData.bookThumbnail" @click="updateExistingBook(bookData.bookId)">
         <small>미완성작품리스트</small>
         <p></p>
       </div>
@@ -15,10 +17,10 @@
 <script>
 import axios from 'axios';
 
-
 export default {
   data() {
     return {
+      selectedBookList: [],
       bookList : [],
     }
   },
@@ -57,7 +59,15 @@ export default {
       this.$router.push({
         path : '/tool',
       });
-    }
+    },
+    async deleteSelectedBooks() { 
+      await axios.delete('api/v1/book/deleteBookList', { data : this.selectedBookList }).then(response => {
+        console.log(response);
+        this.$router.replace({ path: '/' });
+      }).catch(err => {
+        console.error(err);
+      }); 
+    },
   },
 }
 </script>

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookMongoRepository extends JpaRepository<BookMongo, Long> {
-
+    void deleteByBookMongoId(Long bookMongoId);
 }

@@ -25,6 +25,7 @@
 <script>
 import draggable from 'vuedraggable';
 import axios from 'axios';
+import _ from 'lodash';
 
 export default {
   components: {
@@ -51,43 +52,70 @@ export default {
       isHavaNext : false,
     }
   },
+  computed: {
+    allPageList() {
+      return JSON.parse(JSON.stringify(this.pageList));
+    }
+  },
   watch: {
-    pageList: {
-      handler: function (newPageList) {
+    allPageList: {
+      handler: function (newPageList, oldPageList) {
         if (!this.isStackChange && newPageList) {
+          const newPageLists = JSON.parse(JSON.stringify(newPageList));
 
-          const pageListMap = {
-            value: JSON.parse(JSON.stringify(newPageList)),
-            ctrlZPageNo: this.currentPageIndexNo,
-            ctrlYPageNo: this.currentPageIndexNo,
-          };
-
-          this.changePageIndexNo = this.currentPageIndexNo;
-          this.stackStatus.push(pageListMap);
-          this.stackIndex = this.stackStatus.length - 1;
-
-          if (this.stackIndex - this.prevSaveStackIndex >= 2 && this.isPrev) {
-            this.stackStatus.splice(this.prevSaveStackIndex + 1, this.stackIndex - this.prevSaveStackIndex - 1);
-            this.isPrev = false;
-          }
-
-          if(this.isRecentChange) {
-            if(!this.isAdd && !this.isDelete) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; }
-            else if(this.isAdd) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo - 1; this.isAdd = false; }
-            else if(this.isDelete) { 
-              if(this.isNoHaveNext) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1; this.isNoHaveNext = false; }
-              else if(this.isHavaNext) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; this.isHavaNext = false; }
-              this.isDelete = false;
+          //pageList 첫번째 변경이 된지 확인하는 부분
+          if (oldPageList) {
+            const oldPageLists = JSON.parse(JSON.stringify(oldPageList));
+            if (!_.isEqual(newPageLists[0], oldPageLists[0])) {
+              this.$store.commit('setCanSaveThumbNail', true);
             }
-            this.isRecentChange = false;
-          };
-
-          if(this.isPrev === false) {
-            this.prevSaveStackIndex = this.stackStatus.length - 1;
           }
-          this.isStackPrev = false;
+          
+          // const pageListMap = {
+          //   value: JSON.parse(JSON.stringify(newPageList)),
+          //   ctrlZPageNo: this.currentPageIndexNo,
+          //   ctrlYPageNo: this.currentPageIndexNo,
+          // };
+
+          // this.changePageIndexNo = this.currentPageIndexNo;
+          // this.stackStatus.push(pageListMap);
+          // this.stackIndex = this.stackStatus.length - 1;
+
+          // ctrl + z 오류가 있는 부분이 있어서 잠궈둠
+          // const pageListMap = {
+          //   value: newPageLists,
+          //   ctrlZPageNo: this.currentPageIndexNo,
+          //   ctrlYPageNo: this.currentPageIndexNo,
+          // };
+
+          // this.changePageIndexNo = this.currentPageIndexNo;
+          // this.stackStatus.push(pageListMap);
+          
+          // this.stackIndex = this.stackStatus.length - 1;
+          // console.log(this.stackStatus);
+          // if (this.stackIndex - this.prevSaveStackIndex >= 2 && this.isPrev) {
+          //   this.stackStatus.splice(this.prevSaveStackIndex + 1, this.stackIndex - this.prevSaveStackIndex - 1);
+          //   this.isPrev = false;
+          // }
+
+          // if(this.isRecentChange) {
+          //   if(!this.isAdd && !this.isDelete) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; }
+          //   else if(this.isAdd) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo - 1; this.isAdd = false; }
+          //   else if(this.isDelete) { 
+          //     if(this.isNoHaveNext) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo + 1; this.isNoHaveNext = false; }
+          //     else if(this.isHavaNext) { this.stackStatus[this.prevSaveStackIndex].ctrlZPageNo = this.currentPageIndexNo; this.isHavaNext = false; }
+          //     this.isDelete = false;
+          //   }
+          //   this.isRecentChange = false;
+          // };
+
+          // if(this.isPrev === false) {
+          //   this.prevSaveStackIndex = this.stackStatus.length - 1;
+          // }
+          // this.isStackPrev = false;
         }
         this.$emit('pageList', newPageList);
+        this.$store.commit('setPageList', newPageList);
         this.$store.commit('setSaveState', true);
         this.isStackChange = false;
       },
@@ -95,11 +123,20 @@ export default {
     }
   },
   async created() {
+    this.$store.commit('setCanSaveThumbNail', true);
     this.bookId = sessionStorage.getItem('bookId');
+    
     if (this.bookId !== null) {
       const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
-      this.pageList = selPageLists.data.pageList;
+      
+      //시나리오 데이터 가져오는 부분
+      const scenario = selPageLists.data.scenario;
+
+      if(scenario !== null) { sessionStorage.setItem('') };
+
+      this.pageList = selPageLists.data.bookData.pageList;
       this.$emit('currentPageList', this.pageList[0]);
+      this.$store.commit('setPageList', this.pageList);
       this.$emit('pageList', this.pageList);
     } else {
       this.pageList =  [
@@ -124,6 +161,7 @@ export default {
         }
       ];
       this.$emit('currentPageList', this.pageList[0]);
+      this.$store.commit('setPageList', this.pageList);
       this.$emit('pageList', this.pageList);
     }
   },
@@ -138,44 +176,44 @@ export default {
     }
   },
   methods: {
-    ctrlZandY(event) {
-      if (event.ctrlKey) {
-        const stack = JSON.parse(JSON.stringify(this.stackStatus));
-        const stackLength = stack.length;
+    // ctrlZandY(event) {
+    //   if (event.ctrlKey) {
+    //     const stack = JSON.parse(JSON.stringify(this.stackStatus));
+    //     const stackLength = stack.length;
         
-        if (event.key === 'z') {
-          if(this.prevSaveStackIndex - 1 >= 0 && stackLength >= 1) {
-            this.isStackChange = true;
-            this.pageList = stack[this.prevSaveStackIndex - 1].value;
-            this.mostRecentWorkPage = stack[this.prevSaveStackIndex - 1].ctrlZPageNo;
-
-            this.prevSaveStackIndex = Math.max(this.prevSaveStackIndex - 1, 0);
-
-            this.currentPageIndexNo = this.mostRecentWorkPage;
-            this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
-
-            this.isPrev = true;
-            return;
-          }
-        };
-
-        if (event.key === 'y') {
-          if(this.prevSaveStackIndex + 1 <= stackLength - 1) {
-            this.isStackChange = true;
-            this.pageList = stack[this.prevSaveStackIndex + 1].value;
-            this.mostRecentWorkPage = stack[this.prevSaveStackIndex + 1].ctrlYPageNo;
-
-            this.prevSaveStackIndex = Math.min(this.prevSaveStackIndex + 1, stackLength - 1);
-
-            this.currentPageIndexNo = this.mostRecentWorkPage;
-            this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+    //     if (event.key === 'z') {
+    //       if(this.prevSaveStackIndex - 1 >= 0 && stackLength >= 1) {
+    //         this.isStackChange = true;
+    //         this.pageList = stack[this.prevSaveStackIndex - 1].value;
+    //         this.mostRecentWorkPage = stack[this.prevSaveStackIndex - 1].ctrlZPageNo;
             
-            this.isPrev = true;
-            return;
-          }
-        };
-      };
-    },
+    //         this.prevSaveStackIndex -= 1;
+
+    //         this.currentPageIndexNo = this.mostRecentWorkPage;
+    //         this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+
+    //         this.isPrev = true;
+    //         return;
+    //       }
+    //     };
+
+    //     if (event.key === 'y') {
+    //       if(this.prevSaveStackIndex + 1 <= stackLength - 1) {
+    //         this.isStackChange = true;
+    //         this.pageList = stack[this.prevSaveStackIndex + 1].value;
+    //         this.mostRecentWorkPage = stack[this.prevSaveStackIndex + 1].ctrlYPageNo;
+    //         console.log(this.pageList);
+    //         this.prevSaveStackIndex += 1;
+
+    //         this.currentPageIndexNo = this.mostRecentWorkPage;
+    //         this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
+            
+    //         this.isPrev = true;
+    //         return;
+    //       }
+    //     };
+    //   };
+    // },
     defalutReset() {
       this.currentPageIndexNo = items.length - 1;
     },

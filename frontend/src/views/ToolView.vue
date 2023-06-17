@@ -3,7 +3,7 @@
     <div class="tool-header">
       <!-- 전체 페이지 리스트 전달 -->
       <ToolHeader :pageList="this.pageList" :toolState="this.toolState" :currentPageList="this.currentPageList"
-        :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword"></ToolHeader>
+        :viewFinalScenario="this.finalScenario" :scenarioKeyword="this.scenarioKeyword" :pageObject="this.pageObjects"></ToolHeader>
     </div>
     <!-- 새로 만드는 작품일 때만 -->
     <div v-if="toolState === 'new'" class="tool-content">
@@ -48,7 +48,7 @@
       </div>
       <div class="tool-center">
         <!-- toolSelectedPage에 값을 전달해줌 -->
-        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList" ref="toolSelectedPage"></ToolSelectedPage>
+        <ToolSelectedPage :currentPageList="this.currentPageList" :selectedMenu="this.selectedMenu" :pageList="this.pageList" @pageObjects="handlePageObjects" ref="toolSelectedPage"></ToolSelectedPage>
       </div>
       <div class="tool-right">
         <ToolMenu @ttsValueChange="handleTtsValueChanged" @selectedMenu="handleSelectedMenu" :currentPageList="this.currentPageList"
@@ -91,6 +91,7 @@ export default {
       currentPageList: {}, //pageList[현재 인덱스] 객체가 들어감
       pageList: [],
       bookId: null, // 작품 번호
+      pageObjects: null,
     }
   },
   created() {
@@ -103,7 +104,6 @@ export default {
       this.resultScenario = sessionStorage.getItem('scenario');
       this.setScenarioArr();
     }
-    
   },
   mounted() {
     window.addEventListener('beforeunload', this.unLoadEvent);
@@ -134,6 +134,9 @@ export default {
     //매개변수로 selectedMenu (ex) background, character 를 받아서 data에 있는 this.selectedMenu에 넣어주눈 부분
     handleSelectedMenu(selectedMenu) {
       this.selectedMenu = selectedMenu;
+    },
+    handlePageObjects(pageObjects) {
+      this.pageObjects = pageObjects;
     },
     selectScenarioMenu(arg) {
       this.toolState = arg;

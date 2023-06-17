@@ -99,11 +99,11 @@
         </div>
         <div v-else-if="selectedMenu == 'recode'">
           <div v-if="!recordingStarted">
-            <button @click="startRecording">녹음 시작</button>
+            <button @click="startRecording()">녹음 시작</button>
           </div>
           <div v-else>
             <div>{{ timerDisplay }}</div>
-            <button @click="stopRecording">멈춤</button>
+            <button @click="stopRecording()">멈춤</button>
           </div>
           <div>
             <div v-for="(audioUrl, index) in this.voiceList" :key="index">
@@ -132,6 +132,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import axios from 'axios';
 
@@ -220,6 +221,17 @@ export default {
   },
   methods: {
     // S3 presigned url 받아오기
+    saveSelectedAudio() {
+      if (this.selectedAudio !== null) {
+        this.currentPageList.caption.ttsName = this.selectedAudio;
+        console.log(this.currentPageList.caption.ttsName);
+      }
+    },
+    handleTtsChange() {
+      console.log('aa');
+      // const selectedValue = event.target.value;
+      this.$emit('ttsValueChange', selectedValue);
+    },
     async uploadFile(menu) {
       const maxSize = 5 * 1024 * 1024;
       const fileSize = document.getElementById("image").files[0].size;
@@ -357,7 +369,6 @@ export default {
       }
 
     },
-
     checkFlowGpt() {
       this.flowcnt++;
       this.loading = true;
@@ -385,12 +396,8 @@ export default {
       const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
       const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
       window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
-      }
-    },
-    handleTtsChange(event) {
-      const selectedValue = event.target.value;
-      this.$emit('ttsValueChange', selectedValue);
-    },
+      },
+    
     addTts() {
       const text = this.currentPageList.caption.content;
       const voice = this.currentPageList.caption.ttsVoice;
@@ -417,21 +424,6 @@ export default {
       }).catch(error => {
         console.error(error);
      })
-    },
-    reScenario() {
-      if (this.finalScenario[4].length > 0) {
-        alert('시나리오는 작품당 5번만 받을 수 있습니다.');
-        return;
-      }
-      this.isReScenario = true;
-      this.isDisabled2 = true;
-      console.log("axios 통신 요청");
-      axios.post("/api/v1/tool/scenario/", {
-        who: this.scenarioKeyword.who,
-        when: this.scenarioKeyword.when,
-        where: this.scenarioKeyword.where,
-        event: this.scenarioKeyword.event
-      })
     },
     startRecording() {
         navigator.mediaDevices.getUserMedia({ audio: true })
@@ -488,13 +480,6 @@ export default {
                console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);
            });
     },
-
-    saveSelectedAudio() {
-      if (this.selectedAudio !== null) {
-        this.currentPageList.caption.ttsName = this.selectedAudio;
-        console.log(this.currentPageList.caption.ttsName);
-      }
-    },
   reScenario() {
     if (this.finalScenario[4].length > 0) {
       alert('시나리오는 작품당 5번만 받을 수 있습니다.');
@@ -550,6 +535,7 @@ export default {
       }
     })
   },
+}
 }
 </script>
 <style scoped>

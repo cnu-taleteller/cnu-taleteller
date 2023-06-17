@@ -41,11 +41,12 @@ public class BookController {
         return bookService.saveBook(dto, objectId.toString());
     }
 
-    @PostMapping("/thumbnail")
-    public ResponseEntity<?> saveThumbnail(@RequestBody BookDto dto) {
-        bookService.saveThumbnail(dto);
+    @PostMapping("/thumbnailScenario")
+    public ResponseEntity<?> saveThumbnailScenario(@RequestBody BookDto dto) {
+        bookService.saveThumbnailScenario(dto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
     @PostMapping("/{bookId}")
     public Long update(@RequestBody BookTempSaveDto dto, @PathVariable Long bookId) throws ExecutionException, InterruptedException {

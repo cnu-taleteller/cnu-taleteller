@@ -23,7 +23,7 @@ export default {
     ShowHeader() {
       return this.$route.path !== '/preview' && this.$route.path !== '/keyword';
     }
-  }
+  },
 }
 </script>
 

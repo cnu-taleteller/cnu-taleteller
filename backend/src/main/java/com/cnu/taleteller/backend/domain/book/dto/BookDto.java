@@ -29,7 +29,9 @@ public class BookDto {
     private String bookCategory;
 
     private int bookRecommend;
+
     private String bookThumbnail;
+    private String scenario;
     private String bookPublic;
 
     private Long memberId;

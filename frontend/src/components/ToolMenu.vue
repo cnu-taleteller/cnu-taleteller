@@ -33,7 +33,7 @@
             <button class="submit-btn" @click="addScenario()">추가</button>
           </div>
           <!-- 시나리오 선택 완료 -->
-          <div class="scenario-form2" v-else-if="select == true">
+          <div  v-else-if="select == true" class="scenario-form2">
             <button class="submit-btn" :class="{ active: flowMenu == false }" @click="flowMenu = false">선택한 시나리오</button>
             <button class="submit-btn" :class="{ active: flowMenu == true }" @click="checkFlow('menu')">흐름 파악하기</button>
 
@@ -163,19 +163,18 @@ export default {
       isDisabled: true, // 시나리오 textarea 비활성화
       isDisabled2: false, // 시나리오 수정버튼 활성화
       select: false, // 시나리오 선택 여부
-      scenarioNum: 0, // 시나리오 선택 번호
-      flowMenu: false, // 시나리오 or 흐름 파악하기
+      scenarioNum: 0,
+      flowMenu: false, 
       loading: false, // gpt 일때 로딩 여부
-      flowcnt: 0, // 흐름 파악 횟수
-      flowResult: null, // gpt로 받은 흐름 파악하기
-      allCaption: [], // 모든 자막
+      flowcnt: 0,
+      flowResult: null, 
+      allCaption: [],
       finalScenario: [[], [], [], [], []], // gpt로 받는 시나리오
       selectScenario: [], // 선택한 시나리오
       resultScenario: [],  // [도입], [전개] 등 다 있는 시나리오 - session 저장용
       isReScenario: false,
       voiceList: [], //TTS나 음성녹음 리스트
 
-      // 업로드되는 이미지 리스트
       uploadBackList: [],
       uploadCharList: [],
 
@@ -186,7 +185,6 @@ export default {
         height: "100px",
       })),
 
-      // 기본적으로 있는 배경 배열
       backList: Array.from({ length: 18 }, (_, i) => ({
         src: `${process.env.VUE_APP_S3_DEFAULT_PATH}/background${i}.png`,
         id: `background${i}`,
@@ -210,6 +208,12 @@ export default {
     this.imageEventDragStart();
     this.scenarioKeyword = JSON.parse(sessionStorage.getItem('scenarioKeyword'));
     this.finalScenario = this.viewFinalScenario;
+
+    if(sessionStorage.getItem('scenario')) {
+      this.resultScenario = sessionStorage.getItem('scenario');
+      this.selectScenario = this.finalScenario[this.scenarioNum];
+      this.select=true;
+    }
   },
   computed: {
     timerDisplay() {
@@ -289,7 +293,7 @@ export default {
               });
           });
       },
-      // 시나리오 label 나누는 함수
+
       setScenarioLabel(index) {
           switch (index) {
               case 0:

@@ -1,7 +1,10 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
+import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.book.service.BookService;
 import com.cnu.taleteller.backend.domain.tool.dto.CaptionRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.KeywordRequestDto;
+import com.cnu.taleteller.backend.domain.tool.dto.UploadVoiceRequestDto;
 import com.cnu.taleteller.backend.domain.tool.service.ApiService;
 import com.cnu.taleteller.backend.domain.tool.service.ScenarioService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +19,13 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class ScenarioController {
 
     private final ApiService apiService;
+    private final BookService bookService;
     private final ScenarioService scenarioService;
+
+    @GetMapping
+    public String getScenario(@RequestParam("bookId") Long bookId) {
+        return bookService.getScenario(bookId);
+    }
 
     @PostMapping("/")
     public DeferredResult<ResponseEntity> generateScenario(@RequestBody KeywordRequestDto requestDto) {

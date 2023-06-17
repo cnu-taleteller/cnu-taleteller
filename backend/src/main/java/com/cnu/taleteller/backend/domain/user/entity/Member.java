@@ -84,7 +84,9 @@ public class Member implements UserDetails {
         return roles;
     }
 
-    // 사용자의 id를 반환 (unique한 값)
+    public void setPassword(String memberPassword) {
+        this.memberPassword = memberPassword;
+    }
     @Override
     public String getUsername() {
         return memberEmail;

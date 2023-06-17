@@ -220,321 +220,324 @@ export default {
     },
   },
   methods: {
-    // S3 presigned url 받아오기
-    saveSelectedAudio() {
-      if (this.selectedAudio !== null) {
-        this.currentPageList.caption.ttsName = this.selectedAudio;
-        console.log(this.currentPageList.caption.ttsName);
-      }
-    },
-    handleTtsChange() {
-      console.log('aa');
-      // const selectedValue = event.target.value;
-      this.$emit('ttsValueChange', selectedValue);
-    },
-    async uploadFile(menu) {
-      const maxSize = 5 * 1024 * 1024;
-      const fileSize = document.getElementById("image").files[0].size;
-      if (fileSize > maxSize) {
-        alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
-        return;
-      }
-
-      this.file = this.$refs.file.files[0];
-      await axios.get("/api/v1/tool/s3/image", {params: {fileName: this.file.name}},)
-          .then((res) => {
-            this.s3.preSignedUrl = res.data.preSignedUrl
-            this.s3.encodedFileName = res.data.encodedFileName
-            this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
-          })
-    },
-    // S3 업로드
-    async uploadImageToS3(preSignedUrl, file, menu) {
-      await axios.put(preSignedUrl, file)
-          .then((res) => {
-            this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
-
-            if (menu === 'background') {
-              this.uploadBackList.push(this.s3.uploadedUrl);
-              sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
-              this.backList.push({
-                src: this.s3.uploadedUrl,
-                id: 'upload' + this.uploadId,
-                draggable: "true",
-                height: "100px",
-              });
-            } else if (menu === 'character') {
-              this.uploadCharList.push(this.s3.uploadedUrl);
-              sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
-              this.charList.push({
-                src: this.s3.uploadedUrl,
-                id: 'upload' + this.uploadId,
-                draggable: "true",
-                height: "100px",
-              });
-            }
-            this.uploadId++;
-            console.log("S3 업로드 성공");
-            document.getElementById("image").value = "";
-          })
-          .catch((err) => {
-            console.error(err);
-            alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
-          });
-    },
-
-    setSelectedMenu(menu) {
-      this.selectedMenu = menu;
-      this.$emit('selectedMenu', this.selectedMenu);
-    },
-
-    //기존 이미지 배열에 있는 이미지들에게 drag이벤트 추가
-    imageEventDragStart() {
-      document.querySelectorAll(".menu .image-list #item").forEach((element) => {
-        element.addEventListener("dragstart", (e) => {
-          const x = e.offsetX;
-          const y = e.offsetY;
-          //기본적으로 e.target.id -> img<id> 클릭했을 때 해당이미지의 x 좌표 y 좌표를 setData해줌
-          e.dataTransfer.setData("text/plain", `${e.target.id}, ${x}, ${y}`);
-        });
-      });
-    },
-    // 시나리오 label 나누는 함수
-    setScenarioLabel(index) {
-      switch (index) {
-        case 0:
-          return '[도입]';
-        case 1:
-          return '[전개]';
-        case 2:
-          return '[위기]';
-        case 3:
-          return '[결말]';
-        default:
-          return '';
-      }
-    },
-    // 시나리오 직접 작성
-    addScenario() {
-      this.select = true;
-      for (let i = 0; i < 4; i++) {
-        this.selectScenario.push('');
-      }
-      this.editScenario('edit');
-    },
-
-    // 시나리오 수정
-    editScenario(arg) {
-      this.isDisabled = !!!this.isDisabled;
-      this.resultScenario = '[도입]' + this.selectScenario[0] + '[전개]' + this.selectScenario[1] + '[위기]' + this.selectScenario[2] + '[결말]' + this.selectScenario[3];
-      if (arg === 'save') {
-        sessionStorage.setItem('scenario', this.resultScenario);
-      }
-    },
-    setNum(num) {
-      this.scenarioNum = num;
-    },
-    // 최종 선택
-    setScenario() {
-      this.selectScenario = this.finalScenario[this.scenarioNum];
-      this.select = true; // 임시 저장, 제출에 필요한 데이터
-      sessionStorage.setItem('select', true);
-      sessionStorage.removeItem('scenarioKeyword');
-    },
-    // 기승전결 흐름 파악
-    checkFlow(arg) {
-      this.flowMenu = true;
-      let len = this.pageList.length;
-
-      if (len < 3) {
-        alert('3페이지 이상 작업하셔야 흐름을 파악할 수 있습니다!');
-        this.flowMenu = false;
-        return;
-      }
-      if (this.flowcnt > 4) {
-        alert('흐름 파악은 5번까지만 가능합니다!');
-        return;
-      }
-
-      for (let i = 0; i < len; i++) {
-        this.allCaption[i] = this.pageList[i].caption.content;
-      }
-
-      if (arg === 'menu') {
-        if (this.flowResult == null) {
-          this.checkFlowGpt();
-        }
-      } else if (arg === 're') {
-        this.checkFlowGpt();
-      }
-
-    },
-    checkFlowGpt() {
-      this.flowcnt++;
-      this.loading = true;
-      const story = sessionStorage.getItem('scenario');
-      const captions = this.allCaption;
-
-      console.log("axios 통신 요청");
-      axios.post("/api/v1/tool/scenario/flow", {
-        story, captions
-      })
-          .then((res) => {
-            this.flowResult = res.data;
-            this.loading = false;
-          })
-          .catch((err) => {
-            // this.gpt = false;
-            alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-            console.log(err);
-          })
-    },
-    // 키워드 변경
-    reKeyword() {
-      const popupWidth = 550;
-      const popupHeight = 650;
-      const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
-      const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
-      window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
-      },
-    
-    addTts() {
-      const text = this.currentPageList.caption.content;
-      const voice = this.currentPageList.caption.ttsVoice;
-      const language = "ko-KR";
-      console.log(text);
-
-      axios.post('/api/v1/tool/tts', {
-            text,
-            language,
-            voice
+      // S3 presigned url 받아오기
+      async uploadFile(menu) {
+          const maxSize = 5 * 1024 * 1024;
+          const fileSize = document.getElementById("image").files[0].size;
+          if (fileSize > maxSize) {
+              alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
+              return;
           }
-      ).then(response => {
-        const ttsUrl = response.data.ttsUrl;
 
-        this.currentPageList.caption.ttsName = `${process.env.VUE_APP_S3_PATH}/${response.data.encodedFileName}`;
-        console.log(this.currentPageList.caption.ttsName);
+          this.file = this.$refs.file.files[0];
+          await axios.get("/api/v1/tool/s3/image", {params: {fileName: this.file.name}},)
+              .then((res) => {
+                  this.s3.preSignedUrl = res.data.preSignedUrl
+                  this.s3.encodedFileName = res.data.encodedFileName
+                  this.uploadImageToS3(this.s3.preSignedUrl, this.file, menu)
+              })
+      },
+      // S3 업로드
+      async uploadImageToS3(preSignedUrl, file, menu) {
+          await axios.put(preSignedUrl, file)
+              .then((res) => {
+                  this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`
 
-        this.voiceList.push(this.currentPageList.caption.ttsName);
-        sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
-        console.log(this.voiceList);
+                  if (menu === 'background') {
+                      this.uploadBackList.push(this.s3.uploadedUrl);
+                      sessionStorage.setItem('uploadBackList', JSON.stringify(this.uploadBackList));
+                      this.backList.push({
+                          src: this.s3.uploadedUrl,
+                          id: 'upload' + this.uploadId,
+                          draggable: "true",
+                          height: "100px",
+                      });
+                  } else if (menu === 'character') {
+                      this.uploadCharList.push(this.s3.uploadedUrl);
+                      sessionStorage.setItem('uploadCharList', JSON.stringify(this.uploadCharList));
+                      this.charList.push({
+                          src: this.s3.uploadedUrl,
+                          id: 'upload' + this.uploadId,
+                          draggable: "true",
+                          height: "100px",
+                      });
+                  }
+                  this.uploadId++;
+                  console.log("S3 업로드 성공");
+                  document.getElementById("image").value = "";
+              })
+              .catch((err) => {
+                  console.error(err);
+                  alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
 
-        // 작은 인터넷 창을 새로 열어 TTS 음성 재생
-        //window.open(ttsUrl, '_blank');
-      }).catch(error => {
-        console.error(error);
-     })
-    },
-    startRecording() {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-              this.recordingStarted = true;
-              this.timer = setInterval(() => {
-                this.elapsedTime++;
-              }, 1000);
-                this.currentPageList.caption.ttsVoice = new MediaRecorder(stream);
-                this.currentPageList.caption.ttsVoice.addEventListener('dataavailable', event => {
-                    if (event.data.size > 0) {
-                      console.log(this.currentPageList);
-                        this.currentPageList.caption.recordedChunks.push(event.data);
-                    }
-                });
-                this.currentPageList.caption.ttsVoice.start();
-            })
-            .catch(error => {
-                console.error('녹음을 시작할 수 없습니다:', error);
-            });
-    },
-    stopRecording() {
-        if (this.currentPageList.caption.ttsVoice && this.currentPageList.caption.ttsVoice.state === 'recording') {
-            this.currentPageList.caption.ttsVoice.addEventListener('stop', () => {
-                const audioBlob = new Blob(this.currentPageList.caption.recordedChunks, { type: 'audio/wav' });
-                this.sendRecording(audioBlob);
-                this.currentPageList.caption.recordedChunks = [];
-              this.recordingStarted = false;
-              clearInterval(this.timer);
-              this.elapsedTime = 0;
-            });
-            this.currentPageList.caption.ttsVoice.stop();
-        }
-    },
-    sendRecording(audioBlob) {
-        const formData = new FormData();
-        formData.append('audio', audioBlob, 'recording.wav');
+              });
+      },
 
-        const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-       };
+      setSelectedMenu(menu) {
+          this.selectedMenu = menu;
+          this.$emit('selectedMenu', this.selectedMenu);
+      },
 
-       axios.post('/api/v1/tool/audio', formData, config)
-           .then(response => {
-             const fileName = `${process.env.VUE_APP_S3_PATH}/`+response.data;
-             this.currentPageList.caption.ttsName=fileName;
-               console.log('음성 녹음이 S3 서버로 전송되었습니다.');
-               console.log(this.currentPageList.caption.ttsName);
-             this.voiceList.push(this.currentPageList.caption.ttsName);
-           })
-            .catch(error => {
-               console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);
-           });
-    },
-  reScenario() {
-    if (this.finalScenario[4].length > 0) {
-      alert('시나리오는 작품당 5번만 받을 수 있습니다.');
-      return;
-    }
-    this.isReScenario = true;
-    this.isDisabled2 = true;
-    console.log("axios 통신 요청");
-    axios.post("/api/v1/tool/scenario/", {
-      who: this.scenarioKeyword.who,
-      when: this.scenarioKeyword.when,
-      where: this.scenarioKeyword.where,
-      event: this.scenarioKeyword.event
-    })
-        .then((res) => {
-          this.resultScenario = res.data;
-          sessionStorage.setItem('scenario', this.resultScenario);
-          this.setScenarioArr();
-          this.isDisabled2 = false;
-        })
-        .catch((err) => {
-          alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-          console.error(err);
-        })
-        .finally(() => {
-          this.isReScenario = false;
-        });
-  },
-  setScenarioArr() {
-    const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
-    let num = 0;
-    if (this.finalScenario[0].length > 0) {
-      num = 1;
-    }
-    if (this.finalScenario[1].length > 0) {
-      num = 2;
-    }
-    if (this.finalScenario[2].length > 0) {
-      num = 3;
-    }
-    if (this.finalScenario[3].length > 0) {
-      num = 4;
-    }
-    sections.forEach((section, index) => {
-      const scenario = this.resultScenario;
-      const start = scenario.indexOf(section);
-      let end;
+      //기존 이미지 배열에 있는 이미지들에게 drag이벤트 추가
+      imageEventDragStart() {
+          document.querySelectorAll(".menu .image-list #item").forEach((element) => {
+              element.addEventListener("dragstart", (e) => {
+                  const x = e.offsetX;
+                  const y = e.offsetY;
+                  //기본적으로 e.target.id -> img<id> 클릭했을 때 해당이미지의 x 좌표 y 좌표를 setData해줌
+                  e.dataTransfer.setData("text/plain", `${e.target.id}, ${x}, ${y}`);
+              });
+          });
+      },
+      // 시나리오 label 나누는 함수
+      setScenarioLabel(index) {
+          switch (index) {
+              case 0:
+                  return '[도입]';
+              case 1:
+                  return '[전개]';
+              case 2:
+                  return '[위기]';
+              case 3:
+                  return '[결말]';
+              default:
+                  return '';
+          }
+      },
+      // 시나리오 직접 작성
+      addScenario() {
+          this.select = true;
+          for (let i = 0; i < 4; i++) {
+              this.selectScenario.push('');
+          }
+          this.editScenario('edit');
+      },
 
-      if (index < sections.length - 1) {
-        end = scenario.indexOf(sections[index + 1]);
-      } else {
-        end = scenario.length;
-      }
-    })
-  },
+      // 시나리오 수정
+      editScenario(arg) {
+          this.isDisabled = !!!this.isDisabled;
+          this.resultScenario = '[도입]' + this.selectScenario[0] + '[전개]' + this.selectScenario[1] + '[위기]' + this.selectScenario[2] + '[결말]' + this.selectScenario[3];
+          if (arg === 'save') {
+              sessionStorage.setItem('scenario', this.resultScenario);
+          }
+      },
+      setNum(num) {
+          this.scenarioNum = num;
+      },
+      // 최종 선택
+      setScenario() {
+          this.selectScenario = this.finalScenario[this.scenarioNum];
+          this.select = true; // 임시 저장, 제출에 필요한 데이터
+          sessionStorage.setItem('select', true);
+          sessionStorage.removeItem('scenarioKeyword');
+      },
+      // 기승전결 흐름 파악
+      checkFlow(arg) {
+          this.flowMenu = true;
+          let len = this.pageList.length;
+
+          if (len < 3) {
+              alert('3페이지 이상 작업하셔야 흐름을 파악할 수 있습니다!');
+              this.flowMenu = false;
+              return;
+          }
+          if (this.flowcnt > 4) {
+              alert('흐름 파악은 5번까지만 가능합니다!');
+              return;
+          }
+
+          for (let i = 0; i < len; i++) {
+              this.allCaption[i] = this.pageList[i].caption.content;
+          }
+
+          if (arg === 'menu') {
+              if (this.flowResult == null) {
+                  this.checkFlowGpt();
+              }
+          } else if (arg === 're') {
+              this.checkFlowGpt();
+          }
+      },
+
+      checkFlowGpt() {
+          this.flowcnt++;
+          this.loading = true;
+          const story = sessionStorage.getItem('scenario');
+          const captions = this.allCaption;
+
+          console.log("axios 통신 요청");
+          axios.post("/api/v1/tool/scenario/flow", {
+              story, captions
+
+          })
+              .then((res) => {
+                  this.flowResult = res.data;
+                  this.loading = false;
+              })
+              .catch((err) => {
+                  // this.gpt = false;
+                  alert('서버 오류로 시나리오 요청에 실패하였습니다.');
+                  console.log(err);
+              })
+      },
+      // 키워드 변경
+      reKeyword() {
+          const popupWidth = 550;
+          const popupHeight = 650;
+          const popupX = Math.ceil((window.screen.width - popupWidth) / 2);
+          const popupY = Math.ceil((window.screen.height - popupHeight) / 2);
+          window.open("/keyword", "toolKeyword", ` width=${popupWidth}, height=${popupHeight}, left=${popupX}, top=${popupY}`);
+      },
+      handleTtsChange(event) {
+          const selectedValue = event.target.value;
+          this.$emit('ttsValueChange', selectedValue);
+      },
+      addTts() {
+          const text = this.currentPageList.caption.content;
+          const voice = this.currentPageList.caption.ttsVoice;
+          const language = "ko-KR";
+          console.log(text);
+
+          axios.post('/api/v1/tool/tts', {
+                  text,
+                  language,
+                  voice,
+              }
+          ).then(response => {
+              const ttsUrl = response.data.ttsUrl;
+
+              this.currentPageList.caption.ttsName = `${process.env.VUE_APP_S3_PATH}/${response.data.encodedFileName}`;
+              console.log(this.currentPageList.caption.ttsName);
+
+              this.voiceList.push(this.currentPageList.caption.ttsName);
+              //sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
+             // console.log(this.voiceList);
+
+              // 작은 인터넷 창을 새로 열어 TTS 음성 재생
+              //window.open(ttsUrl, '_blank');
+          }).catch(error => {
+              console.error(error);
+          })
+      },
+      startRecording() {
+          navigator.mediaDevices.getUserMedia({audio: true})
+              .then(stream => {
+                  this.recordingStarted = true;
+                  this.timer = setInterval(() => {
+                      this.elapsedTime++;
+                  }, 1000);
+                  this.currentPageList.caption.ttsVoice = new MediaRecorder(stream);
+                  this.currentPageList.caption.ttsVoice.addEventListener('dataavailable', event => {
+                      if (event.data.size > 0) {
+                          console.log(this.currentPageList);
+                          this.currentPageList.caption.recordedChunks.push(event.data);
+                      }
+                  });
+                  this.currentPageList.caption.ttsVoice.start();
+              })
+              .catch(error => {
+                  console.error('녹음을 시작할 수 없습니다:', error);
+              });
+      },
+      stopRecording() {
+          if (this.currentPageList.caption.ttsVoice && this.currentPageList.caption.ttsVoice.state === 'recording') {
+              this.currentPageList.caption.ttsVoice.addEventListener('stop', () => {
+                  const audioBlob = new Blob(this.currentPageList.caption.recordedChunks, {type: 'audio/wav'});
+                  this.sendRecording(audioBlob);
+                  this.currentPageList.caption.recordedChunks = [];
+                  this.recordingStarted = false;
+                  clearInterval(this.timer);
+                  this.elapsedTime = 0;
+              });
+              this.currentPageList.caption.ttsVoice.stop();
+          }
+      },
+      sendRecording(audioBlob) {
+          const formData = new FormData();
+          formData.append('audio', audioBlob, 'recording.wav');
+
+          const config = {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+              },
+          };
+
+          axios.post('/api/v1/tool/audio', formData, config)
+              .then(response => {
+                  const fileName = `${process.env.VUE_APP_S3_PATH}/` + response.data;
+                  this.currentPageList.caption.ttsName = fileName;
+                  console.log('음성 녹음이 S3 서버로 전송되었습니다.');
+                  console.log(this.currentPageList.caption.ttsName);
+                  this.voiceList.push(this.currentPageList.caption.ttsName);
+              })
+              .catch(error => {
+                  console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);
+              });
+      },
+
+      saveSelectedAudio() {
+          if (this.selectedAudio !== null) {
+              this.currentPageList.caption.ttsName = this.selectedAudio;
+              console.log(this.currentPageList.caption.ttsName);
+          }
+      },
+      reScenario() {
+          if (this.finalScenario[4].length > 0) {
+              alert('시나리오는 작품당 5번만 받을 수 있습니다.');
+              return;
+          }
+          this.isReScenario = true;
+          this.isDisabled2 = true;
+          console.log("axios 통신 요청");
+          axios.post("/api/v1/tool/scenario/", {
+              who: this.scenarioKeyword.who,
+              when: this.scenarioKeyword.when,
+              where: this.scenarioKeyword.where,
+              event: this.scenarioKeyword.event
+          })
+              .then((res) => {
+                  this.resultScenario = res.data;
+                  sessionStorage.setItem('scenario', this.resultScenario);
+                  this.setScenarioArr();
+                  this.isDisabled2 = false;
+              })
+              .catch((err) => {
+                  alert('서버 오류로 시나리오 요청에 실패하였습니다.');
+                  console.error(err);
+              })
+              .finally(() => {
+                  this.isReScenario = false;
+              });
+      },
+      setScenarioArr() {
+          const sections = ['[도입]', '[전개]', '[위기]', '[결말]'];
+          let num = 0;
+          if (this.finalScenario[0].length > 0) {
+              num = 1;
+          }
+          if (this.finalScenario[1].length > 0) {
+              num = 2;
+          }
+          if (this.finalScenario[2].length > 0) {
+              num = 3;
+          }
+          if (this.finalScenario[3].length > 0) {
+              num = 4;
+          }
+          sections.forEach((section, index) => {
+              const scenario = this.resultScenario;
+              const start = scenario.indexOf(section);
+              let end;
+
+              if (index < sections.length - 1) {
+                  end = scenario.indexOf(sections[index + 1]);
+              } else {
+                  end = scenario.length;
+              }
+          })
+      },
+  }
+
 }
 }
 </script>
@@ -704,4 +707,3 @@ input[type=file]::file-selector-button:hover {
   color: white;
 }
 </style>
-  

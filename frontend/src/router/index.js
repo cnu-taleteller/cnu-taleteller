@@ -12,11 +12,13 @@ import ToolSubmitView from '../views/ToolSubmitView.vue';
 import DummySearchView from "../views/DummySearchView.vue";
 import DummyDetailView from "../views/DummyDetailView.vue";
 //import BookDetailView from "../views/BookDetailView.vue";
-import LoginView from '../views/LoginView.vue';
-import SignupView from '../views/SignupView.vue';
-import Preview from '../views/Preview.vue';
-import ChangeKeyword from '../views/ToolChangeKeywordView.vue';
+import LoginView from '../views/LoginView.vue'
+import SignupView from '../views/SignupView.vue'
+import Preview from '../views/Preview.vue'
+import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
+import ModalPassword from '../views/ModalPassword.vue'
 import GoingTool from '../components/GoingTool.vue';
+
 
 Vue.use(VueRouter)
 
@@ -90,6 +92,11 @@ const routes = [
     path: '/signupview',
     name: 'SignupView',
     component: SignupView
+  },
+  {
+    path: '/modalpassword',
+    name: 'ModalPassword',
+    component: ModalPassword
   },
   {
     path: '/goingTool',

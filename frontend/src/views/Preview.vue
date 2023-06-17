@@ -21,12 +21,13 @@ export default {
       currentIndex: 0,
     };
   },
-  // computed: {
-  //   ttsUrl() {
-  //     const caption = this.pageList[this.currentIndex].caption.ttsName;
-  //     return caption; // 음성 파일의 경로를 반환
-  //   },
-  // },
+
+  computed: {
+    ttsUrl() {
+      const caption = this.pageList[this.currentIndex].caption.ttsName;
+      return caption; // 음성 파일의 경로를 반환
+    },
+  },
   created() {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);

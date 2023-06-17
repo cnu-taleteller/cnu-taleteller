@@ -1,13 +1,13 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import ToolView from '../views/ToolView.vue'
-import MyPageWork from '../views/MypageViewWork.vue'
-import MyPagePoint from '../views/MypageViewPoint.vue'
-import MyPageChargeResult from '../views/MypageViewChargeResult.vue'
-import MyPageMemInfo from '../views/MypageViewMemInfo.vue'
-import MyPageBookMark from '../views/MypageViewBookMark.vue'
-import ToolSubmitView from '../views/ToolSubmitView.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import ToolView from '../views/ToolView.vue';
+import MyPageWork from '../views/MypageViewWork.vue';
+import MyPagePoint from '../views/MypageViewPoint.vue';
+import MyPageChargeResult from '../views/MypageViewChargeResult.vue';
+import MyPageMemInfo from '../views/MypageViewMemInfo.vue';
+import MyPageBookMark from '../views/MypageViewBookMark.vue';
+import ToolSubmitView from '../views/ToolSubmitView.vue';
 //import SearchView from "../views/SearchView.vue";
 import DummySearchView from "../views/DummySearchView.vue";
 import DummyDetailView from "../views/DummyDetailView.vue";
@@ -17,6 +17,7 @@ import SignupView from '../views/SignupView.vue'
 import Preview from '../views/Preview.vue'
 import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
 import ModalPassword from '../views/ModalPassword.vue'
+import GoingTool from '../components/GoingTool.vue';
 
 
 Vue.use(VueRouter)
@@ -96,6 +97,11 @@ const routes = [
     path: '/modalpassword',
     name: 'ModalPassword',
     component: ModalPassword
+  },
+  {
+    path: '/goingTool',
+    name: 'GoingTool',
+    component: GoingTool
   },
 ]
 

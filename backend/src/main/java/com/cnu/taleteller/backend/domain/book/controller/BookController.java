@@ -6,8 +6,8 @@ import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.service.BookService;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
-import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @RequestMapping("/api/v1/book")
 @RequiredArgsConstructor
+@Slf4j
 public class BookController {
 
     private final BookService bookService;
@@ -106,10 +107,23 @@ public class BookController {
     }
         
     @PostMapping("/userBookList")
-    public List<Long> userBookList(@RequestBody String userEmail) throws UnsupportedEncodingException {
+    public List<Book> userBookList(@RequestBody String userEmail) throws UnsupportedEncodingException {
         String decodedEmail = URLDecoder.decode(userEmail, "UTF-8").replace("=", "");
-        System.out.println(decodedEmail);
+        log.info("------" + decodedEmail);
         return bookService.findUserBookList(decodedEmail);
+    }
+
+    @DeleteMapping("/deleteBookList")
+    public ResponseEntity<Void> deleteSelectedList(@RequestBody List<Long> selectedBookList) {
+        log.info( "---" + selectedBookList);
+        boolean successOrFail = bookService.deleteBookList(selectedBookList);
+
+        if(successOrFail) {
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

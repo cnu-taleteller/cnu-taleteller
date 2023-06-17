@@ -10,6 +10,7 @@ export const store = new Vuex.Store({
     pageList: [], // 작품 페이지 리스트
     saveState : false,
     canvasCompleted: false,
+    canSaveThumbNail: false,
   },
   getters: {
     getBookId(state) {
@@ -23,6 +24,9 @@ export const store = new Vuex.Store({
     },
     getCanvasCompleted(state) {
       return state.canvasCompleted;
+    },
+    getCanSaveThumbNail(state) {
+      return state.canSaveThumbNail;
     }
   },
   mutations: {
@@ -38,13 +42,16 @@ export const store = new Vuex.Store({
     setCanvasCompleted(state, canvasCompleted) {
       state.canvasCompleted = canvasCompleted;
     },
+    setCanSaveThumbNail(state, newCanSaveThumbNail) {
+      state.canSaveThumbNail = newCanSaveThumbNail;
+    }
   },
   actions: {
     
   },
   plugins: [
     createPersistedState({
-      path: ['bookId', 'pageList', 'saveState']
+      path: ['bookId', 'saveState']
     })
   ]
 });

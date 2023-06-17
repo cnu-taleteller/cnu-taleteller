@@ -5,12 +5,15 @@ import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
+import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
 import com.cnu.taleteller.backend.domain.tool.repository.BookMongoRepository;
+import com.cnu.taleteller.backend.domain.tool.repository.UploadFileRepository;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -31,6 +35,7 @@ public class BookService {
     private final MemberRepository memberRepository;
     private final BookMongoRepository bookMongoRepository;
     private final ToolService toolService;
+    private final UploadFileRepository uploadFileRepository;
 
     public List<Book> searchByTitle(String keyword) {
         return bookRepository.findByBookNameContaining(keyword);
@@ -134,8 +139,48 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> findUserBookList(String userEmail) {
-        List<Long> bookList = bookRepository.findMyBookList(userEmail);
+    public List<Book> findUserBookList(String userEmail) {
+        List<Book> bookList = bookRepository.findMyBookList(userEmail);
         return bookList != null ? bookList : Collections.emptyList();
+    }
+
+    @Transactional
+    public boolean deleteBookList(List<Long> selectedBookList) {
+        for (Long bookId : selectedBookList) {
+            Optional<Book> book = bookRepository.findByBookId(bookId);
+
+            if (book.isPresent()) {
+
+                log.info("---" + book.get().getBookId());
+
+                String mongoId = book.get().getBookMongo().getMongoId();
+                CompletableFuture<Void> work = toolService.deleteBook(mongoId);
+
+                List<UploadFile> uploadFiles = uploadFileRepository.findAllByBookId(bookId);
+
+                if (!uploadFiles.isEmpty()) {
+                    uploadFileRepository.deleteAll(uploadFiles);
+                }
+
+                bookRepository.deleteById(bookId);
+
+                Long bookMongoId = book.get().getBookMongo().getBookMongoId();
+                log.info("---" + bookMongoId);
+                bookMongoRepository.deleteByBookMongoId(bookMongoId);
+
+                try {
+                    work.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    log.info("-------" + e);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    @Transactional(readOnly = true)
+    public String getScenario(Long bookId) {
+        return bookRepository.findScenarioByBookId(bookId);
     }
 }

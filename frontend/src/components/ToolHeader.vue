@@ -10,6 +10,8 @@
     </div>
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
       <button @click="preview()">미리보기</button>
+      <button @click="makeFirstThumbNail()">썸네일만들기</button>
+      <button @click="preview2()">미리보기2</button>
       <button @click="saveTmp('temp')">임시저장</button>
       <button @click="saveBook()">제출</button>
     </div>
@@ -17,6 +19,7 @@
 </template>
 <script>
 import axios from 'axios';
+import html2canvas from 'html2canvas';
 
 export default {
   data() {
@@ -38,14 +41,14 @@ export default {
     scenarioKeyword: Object,
     pageList: Array,
     currentPageList: Object,
-    toolState: String
+    toolState: String,
+    pageObject: HTMLDivElement,
   },
   created() {
     if (sessionStorage.getItem('bookName')) {
       this.bookName = sessionStorage.getItem('bookName');
     }
     this.bookId = sessionStorage.getItem('bookId');
-
     if (this.bookId) {
       this.isSave = true;
     }
@@ -71,13 +74,16 @@ export default {
     },
     // 임시 저장
     async saveTmp(status) {
+      //canvas 작업 기다림
       const isCanvasRunning = this.$store.getters.getCanvasCompleted;
 
       if (!isCanvasRunning) {
         await this.waitForCanvas();
       }
 
+      //저장이 가능한 상태인가 -> pageList 가 변경이 되었는가
       const saveState = this.$store.getters.getSaveState;
+
       const select = sessionStorage.getItem('select');
 
       if (!select || select == 'false') {
@@ -93,12 +99,11 @@ export default {
             pageList: this.pageList,
           })
             .then((res) => {
-              console.log(res.data);
               this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
+              this.saveThumbnail();
               this.saveScenario();
               this.saveUploadFile();
-              this.saveThumbnail();
               this.saveVoice();
               this.isSave = true;
               if (status === 'temp') alert('저장 완료');
@@ -133,11 +138,21 @@ export default {
         this.$store.commit('setSaveState', false);
       }
     },
+
     async saveThumbnail() {
-      for (let i = 0; i < this.pageList.length; i++) {
-        const dataUrl = this.pageList[i].thumbnail;
-        const base64Data = dataUrl.split(',')[1];
-        const fileName = `${this.bookId}_${i}_thumbnail.png`;
+      const saveThumbnail = this.$store.getters.getCanSaveThumbNail;
+      if (this.pageList && saveThumbnail) {
+        const pageOneThumbNail = this.pageList[0].thumbnail;
+        let base64Data;
+
+        if (pageOneThumbNail === '') {
+          const canvas = await this.canvas();
+          this.pageList[0].thumbnail = canvas;
+          base64Data = this.pageList[0].thumbnail.split(',')[1];
+        } else { base64Data = pageOneThumbNail.split(',')[1]; }
+
+        const fileName = `${this.bookId}_thumbnail.png`;
+
         try {
           const res = await axios.get('/api/v1/tool/s3/image', {
             params: { fileName: fileName }
@@ -150,28 +165,32 @@ export default {
           try {
             await axios.put(this.s3.preSignedUrl, blob);
             this.s3.uploadedUrl = `${process.env.VUE_APP_S3_PATH}/${this.s3.encodedFileName}`;
-            this.pageList[i].thumbnail = this.s3.uploadedUrl;
           } catch (error) {
             console.error(error);
           }
-          console.log(`Thumbnail ${i} 처리 완료`);
+          console.log("썸네일 처리 완료");
+
           await axios.post('/api/v1/book/thumbnail', {
             bookId: this.bookId,
-            bookThumbnail: this.pageList[0].thumbnail,
-          })
-        }
-        catch (err) {
-          console.error(`Thumbnail ${i} 처리 실패:`, err);
+            bookThumbnail: this.s3.uploadedUrl,
+          });
+
+          this.$store.commit('setCanSaveThumbNail', false);
+        } catch (error) {
+          console.error(error);
+          console.error(`Thumbnail 처리 실패:`, err);
           alert('서버 문제로 파일 처리에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️');
-        }
-      }
+        };
+      };
+      return null;
     },
+
     base64ToBlob(base64Data, contentType = '') {
       const binaryString = window.atob(base64Data);
       const arraybuffer = new ArrayBuffer(binaryString.length);
       const view = new Uint8Array(arraybuffer);
       for (let i = 0; i < binaryString.length; i++) {
-          view[i] = binaryString.charCodeAt(i) & 0xff;
+        view[i] = binaryString.charCodeAt(i) & 0xff;
       }
       return new Blob([arraybuffer], { type: contentType });
     },
@@ -253,10 +272,12 @@ export default {
       }
 
     },
+
     async saveScenario() {
       const scenario = sessionStorage.getItem('scenario');
       if (scenario === null) return;
 
+      //이 부분 합쳐야함
       await axios.post("/api/v1/tool/scenario/" + this.bookId, JSON.stringify(scenario), {
         headers: {
           'Content-Type': 'application/json'
@@ -269,6 +290,7 @@ export default {
           console.log(error);
         });
     },
+
     preview() {
       const chk = confirm('임시저장 후 이용하실 수 있습니다. 저장하시겠습니까?');
       if (!chk) return;
@@ -291,7 +313,48 @@ export default {
         window.open(`/preview?${queryString}`, 'previewWindow', `width=${windowWidth}, height=${windowHeight}, left=${left}, top=${top}`);
       }, 2000);
     },
-  },
+
+    preview2() {
+      window.open('/preview', 'previewWindow', 'width=1100, height=600');
+    },
+
+    async canvas() {
+      try {
+        this.$store.commit('setCanvasCompleted', false);
+        const imageArea = this.pageObject;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        const reductionRatioPageSize = 0.5;
+        const reductionRatio = 0.5;
+
+        const canvas = await html2canvas(imageArea, { useCORS: true });
+        const ctx = canvas.getContext('2d');
+
+        await new Promise((resolve, reject) => {
+          const dataUrl = canvas.toDataURL('image/jpeg', reductionRatio);
+          img.src = dataUrl;
+          img.onload = () => resolve();
+          img.onerror = reject;
+        });
+
+        const reducedWidth = Math.floor(img.width * reductionRatioPageSize);
+        const reducedHeight = Math.floor(img.height * reductionRatioPageSize);
+        canvas.width = reducedWidth;
+        canvas.height = reducedHeight;
+
+        ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
+        const todataUrl = canvas.toDataURL('image/jpeg', reductionRatio);
+
+        this.$store.commit('setCanvasCompleted', true);
+        return Promise.resolve(todataUrl);
+      } catch (err) {
+        this.$store.commit('setCanvasCompleted', true);
+        console.log(err);
+        return Promise.reject(err);
+      }
+    },
+  }
 }
 </script>
 <style scoped>

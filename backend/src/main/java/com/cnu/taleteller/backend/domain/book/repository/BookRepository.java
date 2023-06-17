@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByBookNameContaining(String keyword);
+    @Query("SELECT b.scenario FROM Book b WHERE b.bookId = :bookId")
+    String findScenarioByBookId(@Param("bookId") Long bookId);
 
     // 회원 DB 수정해야 돼서 아직 작성자 검색 안 됨
     // List<Book> findByUserNameContaining(String keyword);
@@ -23,8 +25,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT bm.mongoId FROM Book b RIGHT JOIN b.bookMongo bm WHERE b.bookId = :bookId")
     String findMongoIdByBookId(@Param("bookId") Long bookId);
 
-    @Query("SELECT b.bookId FROM Book b LEFT JOIN b.member m WHERE m.memberEmail = :userEmail")
-    List<Long> findMyBookList(@Param("userEmail") String userEmail);
+    @Query("SELECT b FROM Book b LEFT JOIN b.member m WHERE m.memberEmail = :userEmail")
+    List<Book> findMyBookList(@Param("userEmail") String userEmail);
 
     Book save(Book book);
 

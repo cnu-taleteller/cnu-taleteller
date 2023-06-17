@@ -99,11 +99,11 @@
         </div>
         <div v-else-if="selectedMenu == 'recode'">
           <div v-if="!recordingStarted">
-            <button @click="startRecording">녹음 시작</button>
+            <button @click="startRecording()">녹음 시작</button>
           </div>
           <div v-else>
             <div>{{ timerDisplay }}</div>
-            <button @click="stopRecording">멈춤</button>
+            <button @click="stopRecording()">멈춤</button>
           </div>
           <div>
             <div v-for="(audioUrl, index) in this.voiceList" :key="index">
@@ -132,6 +132,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import axios from 'axios';
 
@@ -268,6 +269,7 @@ export default {
               .catch((err) => {
                   console.error(err);
                   alert("서버 문제로 파일 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️");
+
               });
       },
 
@@ -355,7 +357,6 @@ export default {
           } else if (arg === 're') {
               this.checkFlowGpt();
           }
-
       },
 
       checkFlowGpt() {
@@ -367,6 +368,7 @@ export default {
           console.log("axios 통신 요청");
           axios.post("/api/v1/tool/scenario/flow", {
               story, captions
+
           })
               .then((res) => {
                   this.flowResult = res.data;
@@ -535,6 +537,8 @@ export default {
           })
       },
   }
+
+}
 }
 </script>
 <style scoped>

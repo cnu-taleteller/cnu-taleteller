@@ -402,6 +402,7 @@ export default {
 
         const reducedWidth = Math.floor(img.width * reductionRatioPageSize);
         const reducedHeight = Math.floor(img.height * reductionRatioPageSize);
+
         canvas.width = reducedWidth;
         canvas.height = reducedHeight;
 

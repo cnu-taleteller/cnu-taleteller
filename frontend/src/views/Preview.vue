@@ -23,10 +23,10 @@ export default {
   },
 
   computed: {
-    ttsUrl() {
-      const caption = this.pageList[this.currentIndex].caption.ttsName;
-      return caption; // 음성 파일의 경로를 반환
-    },
+    // ttsUrl() {
+    //   const caption = this.pageList[this.currentIndex].caption.ttsName;
+    //   return caption; // 음성 파일의 경로를 반환
+    // },
   },
   created() {
     const queryString = window.location.search;

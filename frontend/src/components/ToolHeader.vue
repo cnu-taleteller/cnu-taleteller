@@ -19,7 +19,6 @@
 </template>
 <script>
 import axios from 'axios';
-import html2canvas from 'html2canvas';
 
 export default {
   data() {
@@ -146,13 +145,11 @@ export default {
         let base64Data;
 
         if (pageOneThumbNail === '') {
-          const canvas = await this.canvas();
-          this.pageList[0].thumbnail = canvas;
+          this.pageList[0].thumbnail = this.canvas();
           base64Data = this.pageList[0].thumbnail.split(',')[1];
         } else { base64Data = pageOneThumbNail.split(',')[1]; }
 
         const fileName = `${this.bookId}_thumbnail.png`;
-
         try {
           const res = await axios.get('/api/v1/tool/s3/image', {
             params: { fileName: fileName }
@@ -317,42 +314,29 @@ export default {
     preview2() {
       window.open('/preview', 'previewWindow', 'width=1100, height=600');
     },
+    
+    canvas() {
+      const imageArea = this.pageObject;
+      const canvas = document.createElement('canvas');
+      const reductionRatioPageSize = 0.5;
 
-    async canvas() {
-      try {
-        this.$store.commit('setCanvasCompleted', false);
-        const imageArea = this.pageObject;
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
+      const width = imageArea.offsetWidth;
+      const height = imageArea.offsetHeight;
 
-        const reductionRatioPageSize = 0.5;
-        const reductionRatio = 0.5;
+      const reducedWidth = Math.floor(width * reductionRatioPageSize);
+      const reducedHeight = Math.floor(height * reductionRatioPageSize);
+      
+      canvas.width = reducedWidth;
+      canvas.height = reducedHeight;
 
-        const canvas = await html2canvas(imageArea, { useCORS: true });
-        const ctx = canvas.getContext('2d');
+      const context = canvas.getContext('2d');
 
-        await new Promise((resolve, reject) => {
-          const dataUrl = canvas.toDataURL('image/jpeg', reductionRatio);
-          img.src = dataUrl;
-          img.onload = () => resolve();
-          img.onerror = reject;
-        });
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, reducedWidth, reducedHeight);
 
-        const reducedWidth = Math.floor(img.width * reductionRatioPageSize);
-        const reducedHeight = Math.floor(img.height * reductionRatioPageSize);
-        canvas.width = reducedWidth;
-        canvas.height = reducedHeight;
-
-        ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
-        const todataUrl = canvas.toDataURL('image/jpeg', reductionRatio);
-
-        this.$store.commit('setCanvasCompleted', true);
-        return Promise.resolve(todataUrl);
-      } catch (err) {
-        this.$store.commit('setCanvasCompleted', true);
-        console.log(err);
-        return Promise.reject(err);
-      }
+      const imageUrl = canvas.toDataURL();
+      console.log(imageUrl);
+      return imageUrl;
     },
   }
 }

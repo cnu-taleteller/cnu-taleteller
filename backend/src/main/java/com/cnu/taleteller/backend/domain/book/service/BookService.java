@@ -13,13 +13,10 @@ import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -89,12 +86,20 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-
-    public Book saveThumbnail(BookDto dto) {
+    @Transactional
+    public Book saveThumbnailScenario(BookDto dto) {
         Book book = bookRepository.findById(dto.getBookId())
                 .orElseThrow(() -> new IllegalArgumentException("err"));
-        book.updateThumbnail(dto.getBookThumbnail());
+
+        book.updateThumbnailScenario(dto.getScenario(), dto.getBookThumbnail());
         return bookRepository.save(book);
+    }
+
+    public String getScenario(Long bookId) {
+        Book book = bookRepository.findByBookId(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("err"));
+
+        return book.getScenario();
     }
 
     @Transactional
@@ -178,9 +183,6 @@ public class BookService {
             }
         }
         return true;
-    }
-    @Transactional(readOnly = true)
-    public String getScenario(Long bookId) {
-        return bookRepository.findScenarioByBookId(bookId);
+
     }
 }

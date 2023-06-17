@@ -95,13 +95,11 @@ public class Book {
         this.bookPublic = bookPublic;
     }
 
-    public void updateScenario(String scenario){
+    public void updateThumbnailScenario(String scenario, String bookThumbnail){
         this.scenario = scenario;
-    }
-
-    public void updateThumbnail(String bookThumbnail){
         this.bookThumbnail = bookThumbnail;
     }
+
 
     public Book(Long bookId) {
         this.bookId = bookId;

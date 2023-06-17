@@ -125,14 +125,8 @@ export default {
   async created() {
     this.$store.commit('setCanSaveThumbNail', true);
     this.bookId = sessionStorage.getItem('bookId');
-    
     if (this.bookId !== null) {
       const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
-      
-      //시나리오 데이터 가져오는 부분
-      const scenario = selPageLists.data.scenario;
-
-      if(scenario !== null) { sessionStorage.setItem('') };
 
       this.pageList = selPageLists.data.bookData.pageList;
       this.$emit('currentPageList', this.pageList[0]);

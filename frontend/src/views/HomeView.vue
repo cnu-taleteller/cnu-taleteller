@@ -21,6 +21,7 @@ import GoingTool from '../components/GoingTool.vue';
 // import RecommendationSort from '../components/RecommendationSort.vue';
 import PopularitySort from '../components/PopularitySort.vue';
 
+
 export default {
   name: "Tab",
   components: {
@@ -45,6 +46,17 @@ export default {
     }
     // 초기 탭 설정
     this.currentTab = this.tabList[1];
+
+    if(sessionStorage.getItem('goingtool')){
+      this.currentTab = this.tabList[2];
+    }
+  },
+  mounted(){
+    if(sessionStorage.getItem('goingtool')){
+      sessionStorage.removeItem('goingtool');
+    }
+    sessionStorage.removeItem('bookId');
+    this.$store.dispatch('clearSession');
   },
   methods: {
     handleTabClick(tab) {

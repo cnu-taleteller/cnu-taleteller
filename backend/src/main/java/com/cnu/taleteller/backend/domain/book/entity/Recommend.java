@@ -6,29 +6,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
-@Table(name = "bookmarks")
+@Table(name = "recommend")
+@IdClass(RecommendId.class)
 @NoArgsConstructor
-public class BookMark {
+public class Recommend implements Serializable {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long bookmarkId;
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book bookId;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
-
     @Builder
-    public BookMark(Long bookmarkId, Member member, Book book){
-        this.bookmarkId = bookmarkId;
+    public Recommend(Book bookId, Member member) {
+        this.bookId = bookId;
         this.member = member;
-        this.book = book;
     }
 }

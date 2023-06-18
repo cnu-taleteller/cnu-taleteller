@@ -2,14 +2,21 @@ package com.cnu.taleteller.backend.domain.book.service;
 
 import com.cnu.taleteller.backend.domain.book.dto.BookDto;
 import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
+import com.cnu.taleteller.backend.domain.book.dto.BookmarkDto;
+import com.cnu.taleteller.backend.domain.book.dto.RecommendDto;
+import com.cnu.taleteller.backend.domain.book.entity.Bookmark;
+import com.cnu.taleteller.backend.domain.book.entity.Recommend;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.book.repository.BookmarkRepository;
+import com.cnu.taleteller.backend.domain.book.repository.RecommendRepository;
 import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
 import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
 import com.cnu.taleteller.backend.domain.tool.repository.BookMongoRepository;
 import com.cnu.taleteller.backend.domain.tool.repository.UploadFileRepository;
 import com.cnu.taleteller.backend.domain.tool.service.ToolService;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
+import com.cnu.taleteller.backend.domain.user.dto.BookManagementDto;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,14 +40,16 @@ public class BookService {
     private final BookMongoRepository bookMongoRepository;
     private final ToolService toolService;
     private final UploadFileRepository uploadFileRepository;
+    private final RecommendRepository recommendRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     public List<Book> searchByTitle(String keyword) {
         return bookRepository.findByBookNameContaining(keyword);
     }
 
-/*    public List<Book> searchByName(String keyword) {
-        return bookRepository.findByUserNameContaining(keyword);
-    }*/
+    public List<Book> searchByName(String keyword) {
+        return bookRepository.findByMember_MemberNameContaining(keyword);
+    }
 
     public List<Book> searchByContent(String keyword) {
         return bookRepository.findByBookDescriptionContaining(keyword);
@@ -118,15 +127,70 @@ public class BookService {
         return savedBook.getBookId();
     }
 
-    @Transactional
-    public BookDto recommendBook(Long bookId, BookDto bookDto) {
+    public Recommend recommendBook(Long bookId, RecommendDto recommendDto) {
+        Member member = memberRepository.findByMemberEmail(recommendDto.getMemberEmail()).orElse(null);
         Book book = bookRepository.findById(bookId).orElse(null);
-        if (book != null) {
-            book.incrementRecommend();
-            bookRepository.save(book);
-            return BookDto.fromEntity(book);
+        recommendDto.setMember(member);
+        recommendDto.setBookId(book);
+        book.incrementRecommend();
+
+        Recommend recommend = recommendRepository.save(recommendDto.toEntity());
+        return recommend;
+    }
+
+    public Recommend unrecommendBook(Long bookId, RecommendDto recommendDto) {
+        Member member = memberRepository.findByMemberEmail(recommendDto.getMemberEmail()).orElse(null);
+        Book book = bookRepository.findById(bookId).orElse(null);
+
+        if (member != null && book != null) {
+            Recommend recommend = recommendRepository.findByMemberAndBookId(member, book);
+            if (recommend != null) {
+                book.decrementRecommend();
+                recommendRepository.delete(recommend);
+                return recommend;
+            }
         }
         return null;
+    }
+
+    public Bookmark bookmarkBook(Long bookId, BookmarkDto bookmarkDto) {
+        Member member = memberRepository.findByMemberEmail(bookmarkDto.getMemberEmail()).orElse(null);
+        Book book = bookRepository.findById(bookId).orElse(null);
+        bookmarkDto.setMember(member);
+        bookmarkDto.setBookId(book);
+
+        Bookmark bookmark = bookmarkRepository.save(bookmarkDto.toEntity());
+        return bookmark;
+    }
+
+    public Bookmark unbookmarkBook(Long bookId, BookmarkDto bookmarkDto) {
+        Member member = memberRepository.findByMemberEmail(bookmarkDto.getMemberEmail()).orElse(null);
+        Book book = bookRepository.findById(bookId).orElse(null);
+
+        if (member != null && book != null) {
+            Bookmark bookmark = bookmarkRepository.findByMemberAndBookId(member, book);
+            if (bookmark != null) {
+                bookmarkRepository.delete(bookmark);
+                return bookmark;
+            }
+        }
+        return null;
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public List<Book> getAllNonTempBooks() {
+        return bookRepository.findByBookStatusNot("temp");
+    }
+
+    public Book setPublic(Long bookId, BookManagementDto bookManagementDto) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("책 없음"));
+
+        book.updatePublic(bookId, bookManagementDto.getBookPublic());
+        return bookRepository.save(book);
     }
 
     public List<Book> findAllMyWork(String email) {

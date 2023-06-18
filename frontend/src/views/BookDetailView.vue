@@ -1,147 +1,313 @@
 <template>
-    <div class="book">
-        <div class="book-detail">
-            <div class="book-image">
-                <img src="@/assets/bookDummies/book.png" class="book-image">
-            </div>
-            <div class="book-info">
-                <h1>{{ book && book.bookName }}</h1>
-                <p>{{ author }}</p>
-                <p>소개: {{ book && book.bookDescription }}</p>
-                <p>추천 수: {{ book && book.bookRecommend }}</p>
-            </div>
-            <div class="book-button">
-                <button @click="recommend">추천</button>
-                <button>즐겨찾기</button>
-                <button @click="bookPayment(-10)">{{this.paymentCheck}}</button>
-            </div>
-        </div>
-        <div class="book-reply">
-            <reply :bookId="bookId" @created="writeReply" :replies="replies"/>
-        </div>
+  <div class="book">
+    <div class="book-detail">
+      <div class="book-image">
+        <!-- 썸네일 추가되면 바꿀 자리 -->
+        <img :src="require(`@/assets/bookDummies/book.png`)" :alt="bookName">
+      </div>
+      <div class="book-info">
+        <h1>{{ bookName }}</h1>
+        <p>{{ memberName }}</p>
+        <p>{{ bookDescription }}</p>
+      </div>
     </div>
+    <div class="book-button">
+      <button class="btn1" @click="toggleRecommend">{{ bookRecommend }} 추천</button>
+      <button class="btn2" @click="toggleBookmark">즐겨찾기</button>
+      <button class="btn3" @click="bookPayment(-10)">{{ this.paymentCheck }}</button>
+    </div>
+    <Reply :replies="replies" @addReply="addReply" @editReply="editReply" @deleteReply="deleteReply" />
+  </div>
 </template>
 
 <script>
+import Reply from '../components/Reply.vue';
 import axios from "axios";
-import Reply from "../components/Reply.vue";
 
 export default {
-    components: {
-        Reply,
-    },
-    data() {
-        return {
-            book: null,
-            bookId: this.$route.params.id,
-            replies: [],
-            paymentCheck:'결제',
-        }
-    },
-    created() {
-        const bookId = this.$route.params.id;
+  components: {
+    Reply
+  },
+  data() {
+    return {
+      book: null,
+      bookName: null,
+      bookDescription: null,
+      bookRecommend: null,
+      replies: [],
+      memberId: null,
+      memberName: null,
+      paymentCheck: '결제',
+      isRecommended: false,
+      isBookmark: false
+    };
+  },
+  created() {
+    const id = this.$route.params.id;
 
+    axios
+        .get(`/api/v1/book/detail/${id}`)
+        .then((response) => {
+          this.book = response.data.book;
+          this.bookName = this.book.bookName;
+          this.bookDescription = this.book.bookDescription;
+          this.memberName = this.book.member.memberName;
+          this.bookRecommend = this.book.bookRecommend;
+          this.replies = response.data.replies;
+          this.replies.forEach((reply) => {
+            reply.replyRegdate = new Date(reply.replyRegdate).toLocaleString("ko-KR");
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  },
+
+  methods: {
+    // 댓글
+    addReply(replyContent) {
+      const id = this.$route.params.id;
+
+      axios
+          .post("/api/v1/book/detail/reply", {
+            bookId: this.book.bookId,
+            memberEmail: sessionStorage.getItem('user'),
+            replyContent: replyContent,
+          })
+          .then((response) => {
+            const replyContent = response.data;
+            console.log(response.data);
+            this.replies.push(replyContent);
+            this.fetchBookDetail(id);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+    editReply(replyId, replyContent) {
+      const id = this.$route.params.id;
+
+      axios
+          .put(`/api/v1/book/detail/reply/${replyId}`, {
+            replyContent: replyContent,
+          })
+          .then((response) => {
+            const updatedReply = response.data;
+            const index = this.replies.findIndex((reply) => reply.replyId === replyId);
+            if (index !== -1) {
+              this.replies.splice(index, 1, updatedReply);
+              this.fetchBookDetail(id);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+    deleteReply(replyId) {
+      axios
+          .delete(`/api/v1/book/detail/reply/${replyId}`)
+          .then(() => {
+            const index = this.replies.findIndex((reply) => reply.replyId === replyId);
+            if (index !== -1) {
+              this.replies.splice(index, 1);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+
+    // 추천
+    toggleRecommend() {
+      if (this.isRecommended) {
+        this.unrecommend();
+      } else {
+        this.recommend();
+      }
+    },
+    recommend() {
+      const id = this.$route.params.id;
+
+      axios
+          .post(`/api/v1/book/detail/${id}/recommend`, {
+            bookId: this.book.bookId,
+            memberEmail: sessionStorage.getItem('user')
+          })
+          .then((response) => {
+            this.bookRecommend = response.data.bookRecommend;
+            alert("작품을 추천합니다!");
+            this.isRecommended = true;
+            this.fetchBookDetail(id);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+    },
+    unrecommend() {
+      const id = this.$route.params.id;
+
+      axios
+          .delete(`/api/v1/book/detail/${id}/recommend`, {
+            data: {
+              bookId: this.book.bookId,
+              memberEmail: sessionStorage.getItem('user')
+            }
+          })
+          .then(() => {
+            alert("작품 추천을 취소합니다!");
+            this.isRecommended = false;
+            this.fetchBookDetail(id);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+    },
+
+    // 즐겨찾기
+    toggleBookmark() {
+      if (this.isBookmark) {
+        this.unbookmark();
+      } else {
+        this.bookmark();
+      }
+    },
+    bookmark(e) {
+      const id = this.$route.params.id;
+
+      if (confirm("즐겨찾기하시겠습니까?")) {
         axios
-            .get(`/api/v1/book/detail/${bookId}`)
-            .then((response) => {
-                this.book = response.data;
+            .post(`/api/v1/book/detail/${id}/bookmark`, {
+              bookId: this.book.bookId,
+              memberEmail: sessionStorage.getItem('user')
+            })
+            .then(() => {
+              this.isBookmark = true;
+              this.fetchBookDetail(id);
+              const bookmark = confirm("즐겨찾기 창으로 이동하시겠습니까?");
+              if (bookmark == true) {
+                this.$router.push({ path: `/mypage/bookmark` });
+              } else {
+                e.preventDefault();
+                console.log("페이지 이동 안 함")
+              }
             })
             .catch((error) => {
-                console.log(error);
+              console.log(error);
             });
+      }
     },
-    methods: {
-        recommend() {
-            const bookId = this.$route.params.id;
+    unbookmark() {
+      const id = this.$route.params.id;
 
-            axios
-                .post(`/api/v1/book/detail/${bookId}/recommend`)
-                .then(response => {
-                    this.book = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        },
-        writeReply(reply) {
-            this.replies.push(reply);
-        },
-        bookPayment(Value){
-            if(confirm("결제하시겠습니까?")){
-                axios.post("/api/v1/point/bookPayment", {
-                    paymentPoint : Value,
-                })
-                .then((res) => {
-                    alert("상품이 결제되었습니다.")
-                    this.paymentCheck = "감상"
-                    console.log(res);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });  
+      axios
+          .delete(`/api/v1/book/detail/${id}/bookmark`, {
+            data: {
+              bookId: this.book.bookId,
+              memberEmail: sessionStorage.getItem('user')
             }
-        },
-
+          })
+          .then(() => {
+            alert("즐겨찾기를 취소합니다!");
+            this.isBookmark = false;
+            this.fetchBookDetail(id);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
-};
+
+    fetchBookDetail(id) {
+      axios
+          .get(`/api/v1/book/detail/${id}`)
+          .then((response) => {
+            this.book = response.data.book;
+            this.bookName = this.book.bookName;
+            this.bookDescription = this.book.bookDescription;
+            this.memberName = this.book.member.memberName;
+            this.bookRecommend = this.book.bookRecommend;
+            this.replies = response.data.replies;
+            this.replies.forEach((reply) => {
+              reply.replyRegdate = new Date(reply.replyRegdate).toLocaleString("ko-KR");
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+
+    bookPayment(Value) {
+      if (confirm("결제하시겠습니까?")) {
+        axios.post("/api/point/bookPayment", {
+          paymentPoint: Value,
+        })
+            .then((res) => {
+              alert("상품이 결제되었습니다.")
+              this.paymentCheck = "감상"
+              console.log(res);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+      }
+    },
+  },
+}
 </script>
 
 <style scoped>
+.book {
+  margin-top: 5%;
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
 .book-detail {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 0 20%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 5%;
 }
 
 .book-image {
-    flex: 1;
-    margin-right: 20px;
+  flex-basis: 40%;
 }
 
 .book-image img {
-    width: 100%;
-    max-width: 200px;
+  max-width: 70%;
+  height: auto;
 }
 
 .book-info {
-    flex: 2;
-    text-align: left;
-}
-
-.book-info h1 {
-    margin-bottom: 10px;
-}
-
-.book-info p {
-    margin-bottom: 10px;
+  flex-basis: 40%;
+  text-align: left;
 }
 
 .book-button {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 5%;
 }
 
 .book-button button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
+  flex-basis: 33.3%;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.book-button button:first-child {
-    margin-top: 0;
+.book-button .btn1 {
+  background-color: #97C93E;
 }
 
-.book-button button:hover {
-    background-color: steelblue;
+.book-button .btn2 {
+  background-color: #EE7CAE;
 }
 
-.book-reply {
-    padding: 0 20%;
+.book-button .btn3 {
+  background-color: #4AAEE2;
 }
+
 </style>

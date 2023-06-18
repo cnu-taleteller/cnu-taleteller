@@ -17,11 +17,22 @@ public class ReplyController {
     @Autowired
     private ReplyService replyService;
 
-    @PostMapping("/detail/{bookId}/reply")
-    public ResponseEntity<ReplyDto> saveReply(@RequestBody ReplyDto replyDto) {
-        Reply reply = replyDto.toEntity();
-        replyService.saveReply(reply);
-        return new ResponseEntity<>(replyDto, HttpStatus.CREATED);
+    @PostMapping("/detail/reply")
+    public ResponseEntity<Reply> saveReply(@RequestBody ReplyDto replyDto) {
+        Reply reply = replyService.saveReply(replyDto);
+        return new ResponseEntity<>(reply, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/detail/reply/{replyId}")
+    public ResponseEntity<Reply> editReply(@PathVariable Long replyId, @RequestBody ReplyDto replyDto) {
+        Reply reply = replyService.editReply(replyId, replyDto);
+        return new ResponseEntity<>(reply, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/detail/reply/{replyId}")
+    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId) {
+        boolean reply = replyService.deleteReply(replyId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

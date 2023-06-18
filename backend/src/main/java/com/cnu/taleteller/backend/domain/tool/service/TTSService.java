@@ -12,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -30,6 +30,12 @@ public class TTSService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${TTS_CLIENT_ID}")
+    private String clientId;
+
+    @Value("${TTS_CLIENT_PW}")
+    private String clientSecret;
+
     private String encodedFileName;
 
     public String getEncodedFileName() {
@@ -37,54 +43,56 @@ public class TTSService {
     }
     public String generateTTSUrl(TTSDto dto) throws IOException {
         String text = dto.getText();
-        String language = dto.getLanguage();
         String voice = dto.getVoice();
-        if (voice.equals("female")) {
-            voice = "ko-KR-Standard-A";
-        } else {
-            voice = "ko-KR-Standard-C";
-        }
+        System.out.println(text);
 
-        // Google Cloud 플랫폼 서비스 계정 키 파일 경로
-        String serviceAccountKeyFile = "C:/Users/rhrjs/OneDrive/문서/카카오톡 받은 파일/taleteller-382100-b7cc202c3850.json";
+        try {
+            text = URLEncoder.encode(text, "UTF-8");
+            String apiURL = "https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts";
+            URL url = new URL(apiURL);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", clientId);
+            con.setRequestProperty("X-NCP-APIGW-API-KEY", clientSecret);
+            // post request
+            String postParams = "speaker="+voice+"&volume=0&speed=0&pitch=0&format=mp3&text=" + text;
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(postParams);
+            wr.flush();
+            wr.close();
+            int responseCode = con.getResponseCode();
+            BufferedReader br;
+            if(responseCode==200) { // 정상 호출
+                InputStream is = con.getInputStream();
+                int read = 0;
+                byte[] bytes = new byte[1024];
+                // 랜덤한 이름으로 mp3 파일 생성
+                String tempname = Long.valueOf(new Date().getTime()).toString();
+                String ttsUrl = "TTS"+tempname+".mp3";
+                File f = new File(tempname + ".mp3");
+                f.createNewFile();
+                // S3 서버에 업로드
+                Map<String, Serializable> s3UploadResult = s3Service.getPreSignedUrl(ttsUrl);
+                encodedFileName = (String) s3UploadResult.get("encodedFileName");
+                s3Service.uploadFile(encodedFileName, is);
 
-        // Google Cloud 플랫폼 서비스 계정 인증
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(serviceAccountKeyFile));
-
-        // TTS 클라이언트 초기화
-        try (TextToSpeechClient ttsClient = TextToSpeechClient.create(TextToSpeechSettings.newBuilder()
-                .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-                .build())) {
-
-            // TTS 요청 생성
-            SynthesisInput input = SynthesisInput.newBuilder().setText(text).build();
-            VoiceSelectionParams voiceSelection = VoiceSelectionParams.newBuilder().setLanguageCode(language).setName(voice).build();
-            AudioConfig audioConfig = AudioConfig.newBuilder().setAudioEncoding(AudioEncoding.MP3).build();
-            SynthesizeSpeechRequest request = SynthesizeSpeechRequest.newBuilder()
-                    .setInput(input)
-                    .setVoice(voiceSelection)
-                    .setAudioConfig(audioConfig)
-                    .build();
-
-            // TTS 호출 및 음성 파일 생성
-            SynthesizeSpeechResponse response = ttsClient.synthesizeSpeech(request);
-            ByteString audioContent = response.getAudioContent();
-
-            // 음성 파일을 S3 서버에 업로드
-            String audioFileName = "TTS.mp3";
-            Map<String, Serializable> s3UploadResult = s3Service.getPreSignedUrl(audioFileName);
-            encodedFileName = (String) s3UploadResult.get("encodedFileName");
-            Serializable preSignedUrl = (s3UploadResult.get("preSignedUrl"));
-            System.out.println(preSignedUrl);
-            try (ByteArrayInputStream inputStream = new ByteArrayInputStream(audioContent.toByteArray())) {
-                s3Service.uploadFile(encodedFileName, inputStream);
+                return ttsUrl;
+            } else {  // 오류 발생
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = br.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                br.close();
+                System.out.println(response.toString());
             }
-
-            // TTS 듣기 URL 생성
-            String baseUrl = "https://translate.google.com/translate_tts?ie=UTF-8&tl=" + language + "&q=";
-            String ttsUrl = baseUrl + text;
-
-            return ttsUrl;
+        } catch (Exception e) {
+            System.out.println(e);
         }
-    }
+
+    return null;
+
+        }
 }

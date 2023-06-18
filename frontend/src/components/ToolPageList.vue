@@ -148,7 +148,7 @@ export default {
             top: '',
             ttsVoice:'',
             ttsName:'',
-            recordedChunks: [],
+            voiceList: [],
           },
           thumbnail: '',
           layerList: [],

@@ -8,10 +8,8 @@ import MyPageChargeResult from '../views/MypageViewChargeResult.vue';
 import MyPageMemInfo from '../views/MypageViewMemInfo.vue';
 import MyPageBookMark from '../views/MypageViewBookMark.vue';
 import ToolSubmitView from '../views/ToolSubmitView.vue';
-//import SearchView from "../views/SearchView.vue";
-import DummySearchView from "../views/DummySearchView.vue";
-import DummyDetailView from "../views/DummyDetailView.vue";
-//import BookDetailView from "../views/BookDetailView.vue";
+import SearchView from "../views/SearchView.vue";
+import BookDetailView from "../views/BookDetailView.vue";
 import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
 import Preview from '../views/Preview.vue'
@@ -76,12 +74,12 @@ const routes = [
   {
     path: '/search',
     name: 'Search',
-    component: DummySearchView
+    component: SearchView
   },
   {
     path: '/detail/:id',
     name: 'BookDetail',
-    component: DummyDetailView
+    component: BookDetailView
   },
   {
     path: '/loginview',

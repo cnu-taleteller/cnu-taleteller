@@ -2,10 +2,10 @@
   <div class="wrap">
     <div class="tab">
       <button
-        v-for="(tab, index) in tabList"
-        :key="index"
-        @click.prevent="handleTabClick(tab)"
-        :class="{ active: currentTab === tab }"
+          v-for="(tab, index) in tabList"
+          :key="index"
+          @click.prevent="handleTabClick(tab)"
+          :class="{ active: currentTab === tab }"
       >
         {{ tab.name }}
       </button>
@@ -18,15 +18,14 @@
 
 <script>
 import GoingTool from '../components/GoingTool.vue';
-// import RecommendationSort from '../components/RecommendationSort.vue';
+import RecommendationSort from '../components/RecommendationSort.vue';
 import PopularitySort from '../components/PopularitySort.vue';
-
 
 export default {
   name: "Tab",
   components: {
     GoingTool,
-    // RecommendationSort,
+    RecommendationSort,
     PopularitySort
   },
   data() {
@@ -35,7 +34,7 @@ export default {
       loginState: false,
       tabList: [
         { name: "🔥인기순", component: "PopularitySort", access: true },
-        { name: "🆕최신순", component: "PopularitySort", access: true },
+        { name: "🆕최신순", component: "RecommendationSort", access: true },
         { name: "🛠️만들어보기", component: "GoingTool", access: false },
       ]
     };
@@ -46,17 +45,6 @@ export default {
     }
     // 초기 탭 설정
     this.currentTab = this.tabList[1];
-
-    if(sessionStorage.getItem('goingtool')){
-      this.currentTab = this.tabList[2];
-    }
-  },
-  mounted(){
-    if(sessionStorage.getItem('goingtool')){
-      sessionStorage.removeItem('goingtool');
-    }
-    sessionStorage.removeItem('bookId');
-    this.$store.dispatch('clearSession');
   },
   methods: {
     handleTabClick(tab) {

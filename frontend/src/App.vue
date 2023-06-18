@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     ShowSearchHeader() {
-      return this.$route.path != '/tool' &&  this.$route.path !== '/preview' && this.$route.path !== '/keyword';
+      return this.$route.path != '/tool' &&  this.$route.path !== '/preview' && this.$route.path !== '/keyword' && !this.$route.path.startsWith('/admin');
     },
     ShowHeader() {
       return this.$route.path !== '/preview' && this.$route.path !== '/keyword';

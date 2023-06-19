@@ -42,10 +42,10 @@ export default {
     // 새로 만드는 작품일 때, session에 toolState new 해줘야 시나리오 진입함
     makeNewBook(){
       this.$store.commit('setBookId', null);
-      sessionStorage.setItem('toolState', 'new');
       sessionStorage.removeItem('goingtool');
       sessionStorage.removeItem('bookId');
       this.$store.dispatch('clearSession');
+      sessionStorage.setItem('toolState', 'new');
       this.$router.push({
         path : '/tool'
       });

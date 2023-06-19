@@ -10,15 +10,15 @@ import java.io.Serializable;
 
 @Entity
 @Getter
-@Table(name = "bookmark")
-@IdClass(BookmarkId.class)
+@Table(name = "recommend")
+@IdClass(RecommendId.class)
 @NoArgsConstructor
-public class Bookmark implements Serializable {
+public class Recommend implements Serializable {
 
     @Id
     @ManyToOne
     @JoinColumn(name = "book_id")
-    private Book book;
+    private Book bookId;
 
     @Id
     @ManyToOne
@@ -26,8 +26,8 @@ public class Bookmark implements Serializable {
     private Member member;
 
     @Builder
-    public Bookmark(Book book, Member member) {
-        this.book = book;
+    public Recommend(Book bookId, Member member) {
+        this.bookId = bookId;
         this.member = member;
     }
 }

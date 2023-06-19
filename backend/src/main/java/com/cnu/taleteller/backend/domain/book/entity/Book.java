@@ -76,10 +76,14 @@ public class Book {
 
     public void incrementRecommend() {
         this.bookRecommend = bookRecommend + 1;
-        this.bookId = bookId;
-        this.bookName = bookName;
-        this.bookDescription = bookDescription;
-        // 로그인 기능 되면 사용자 이름도 추가
+    }
+
+    public void decrementRecommend() {
+        this.bookRecommend = bookRecommend - 1;
+    }
+
+    public void updatePublic(Long bookId, String bookPublic) {
+        this.bookPublic = bookPublic;
     }
 
     public void update(String bookName, String bookStatus){
@@ -95,13 +99,11 @@ public class Book {
         this.bookPublic = bookPublic;
     }
 
-    public void updateScenario(String scenario){
+    public void updateThumbnailScenario(String scenario, String bookThumbnail){
         this.scenario = scenario;
-    }
-
-    public void updateThumbnail(String bookThumbnail){
         this.bookThumbnail = bookThumbnail;
     }
+
 
     public Book(Long bookId) {
         this.bookId = bookId;

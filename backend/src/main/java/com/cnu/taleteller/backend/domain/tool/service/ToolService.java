@@ -1,6 +1,8 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
+import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
+import com.cnu.taleteller.backend.domain.tool.entity.BookMongo;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
 import com.cnu.taleteller.backend.domain.tool.dto.BookDataDTO;
@@ -78,6 +80,17 @@ public class ToolService {
             throw new IllegalArgumentException("Book not found");
         }
         return existingBook;
+    }
+
+    @Async
+    @Transactional
+    public CompletableFuture<Void> deleteBook(String mongodbId) {
+        ObjectId objectId = new ObjectId(mongodbId);
+
+        Query query = new Query(Criteria.where("_id").is(objectId));
+        mongoTemplate.remove(query, BookData.class);
+
+        return CompletableFuture.completedFuture(null);
     }
 
 }

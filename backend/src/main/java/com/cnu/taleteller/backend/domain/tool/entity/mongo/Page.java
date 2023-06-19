@@ -13,12 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class Page {
     private int pageId;
-
     private int pageStatus;
-
     private Caption caption;
-
     private String thumbnail;
-
     private Layer[] layerList;
 }

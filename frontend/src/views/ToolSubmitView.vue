@@ -67,9 +67,7 @@ export default {
       await axios.post("/api/v1/book", this.book)
       .then((res) => {
         alert("제출 완료되었습니다");
-        sessionStorage.removeItem('scenario');
-        sessionStorage.removeItem('uploadBackList');
-        sessionStorage.removeItem('uploadCharList');
+        this.$store.dispatch('clearSession');
         this.$router.push("/");
       })
       .catch((err)=>{

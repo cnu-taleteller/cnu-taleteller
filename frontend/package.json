@@ -18,9 +18,12 @@
     "dotenv": "^16.0.3",
     "html2canvas": "^1.4.1",
     "jquery": "^3.6.4",
+    "lodash": "^4.17.21",
     "spectrum-colorpicker2": "^2.0.10",
+    "uuid": "^9.0.0",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
+    "vue-uuid": "^2.1.0",
     "vuedraggable": "^2.24.3",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^4.1.0"

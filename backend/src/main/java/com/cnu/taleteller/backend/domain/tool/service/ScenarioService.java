@@ -1,6 +1,5 @@
 package com.cnu.taleteller.backend.domain.tool.service;
 
-import com.cnu.taleteller.backend.domain.book.entity.Book;
 import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.tool.dto.CaptionRequestDto;
 import com.cnu.taleteller.backend.domain.tool.dto.KeywordRequestDto;
@@ -8,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -88,16 +86,6 @@ public class ScenarioService {
             }
         }
         return null;
-    }
-
-    @Transactional
-    public Book save(String scenario, Long bookId) {
-        Book optionalBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("err"));
-
-        Book book = optionalBook;
-        book.updateScenario(scenario);
-        return bookRepository.save(book);
     }
 
 }

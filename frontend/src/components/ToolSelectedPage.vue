@@ -8,7 +8,6 @@
         <div class="caption-color" ref="contentColor">
           <div class="color-preview sp-colorize" ref="colorPreview" :value="this.currentColor"
             @change="currentColor = $event.target.value"></div>
-          <!-- <div class="color-picker" ref="colorPicker">▼</div> -->
         </div>
       </div>
     </div>
@@ -68,6 +67,9 @@ export default {
     const objArea = this.$refs.pageObject;
     const imageArea = this.$refs.dragImage;
     const popupMenu = document.querySelector("#popupMenu");
+
+    const dragImage = this.$refs.dragImage;
+    this.$emit('pageObjects', dragImage);
 
     let textArea;
     let currentColor;
@@ -309,8 +311,12 @@ export default {
       this.fontSize = newVal;
       const textArea = document.querySelector('[data-text-content="true"]');
       if (textArea) {
+        console.log(newVal);
         textArea.style.fontSize = newVal + 'px';
-        this.currentPageList.caption.fontSize = newVal;
+        this.canvas().then((todataUrl) => {
+          this.currentPageList.caption.fontSize = newVal + '';
+          this.currentPageList.thumbnail = todataUrl;
+        });
       }
     },
   },
@@ -323,7 +329,6 @@ export default {
     },
     setFontSize() {
       const textarea = document.querySelector('textarea');
-      console.log(textarea);
       textarea.style.fontSize = this.fontSize + "px";
     },
     setFontColor() {
@@ -335,6 +340,7 @@ export default {
         alert('한 페이지당 하나의 자막만 넣을 수 있습니다.');
         return;
       };
+
       const currentPageList = this.currentPageList;
       const objectArea = this.$refs.pageObject;
       const addDiv = document.createElement("div");
@@ -377,6 +383,9 @@ export default {
         const img = new Image();
         img.crossOrigin = 'anonymous';
 
+        const reductionRatioPageSize = 0.5;
+        const reductionRatio = 0.8;
+
         const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
         const resizableElementSet = new Set(resizableElements);
         const ignoreElements = element => resizableElementSet.has(element);
@@ -384,33 +393,28 @@ export default {
         const canvas = await html2canvas(imageArea, { useCORS: true, ignoreElements });
         const ctx = canvas.getContext('2d');
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-        img.src = dataUrl;
-
-        const todataUrlPromise = new Promise((resolve, rejects) => {
-          try {
-            img.onload = () => {
-
-              const reductionRatio = 0.5;
-              const reducedWidth = Math.floor(img.width * reductionRatio);
-              const reducedHeight = Math.floor(img.height * reductionRatio);
-              canvas.width = reducedWidth;
-              canvas.height = reducedHeight;
-              ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
-              const todataUrl = canvas.toDataURL('image/jpeg', reductionRatio);
-              resolve(todataUrl);
-            };
-          } catch (err) {
-            rejects(err);
-          }
+        await new Promise((resolve, reject) => {
+          const dataUrl = canvas.toDataURL('image/png', reductionRatio);
+          img.src = dataUrl;
+          img.onload = () => resolve();
+          img.onerror = reject;
         });
 
-        this.$store.commit('setCanvasCompleted', true);
-        return todataUrlPromise;
+        const reducedWidth = Math.floor(img.width * reductionRatioPageSize);
+        const reducedHeight = Math.floor(img.height * reductionRatioPageSize);
 
+        canvas.width = reducedWidth;
+        canvas.height = reducedHeight;
+
+        ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
+        const todataUrl = canvas.toDataURL('image/png', reductionRatio);
+
+        this.$store.commit('setCanvasCompleted', true);
+        return Promise.resolve(todataUrl);
       } catch (err) {
         this.$store.commit('setCanvasCompleted', true);
         console.log(err);
+        return Promise.reject(err);
       }
     },
 
@@ -446,7 +450,6 @@ export default {
       }
 
       if (this.currentPageList.caption.captionState !== 0) {
-
         const caption = this.currentPageList.caption;
 
         const addDiv = document.createElement('div');
@@ -809,12 +812,6 @@ export default {
   },
 }
 
-//1. 현재 자막 부분 문제점 자막을 다 지우면 글자크기 작아짐... 다른 div 안에 글이 들어감 새로운 div 를 추가를 해서 거기에 글을 적게 하고 드래그를 전체로 하도록 해야할듯 --해결
-//2. 썸네일 제작 부분 비동기 형식이라 만약에 canvas() 하기 전에 currentPageList가 변경이되면 해당 currentPageList의 썸네일이 변경됨... --해결
-//3. 모듈화 해야함... resizable 모듈화 --해결
-//4. 썸네일 크기가 다름
-//5. 자막 더블클릭했을 때 마지막이면 글이 입력이 안됌
-
 </script>
 <style scoped>
 .selected-page-form {
@@ -987,4 +984,6 @@ textarea {
   background: none;
   border: none;
   outline: 0;
-}</style>
+}
+
+</style>

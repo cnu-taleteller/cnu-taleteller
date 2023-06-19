@@ -1,98 +1,164 @@
 <template>
-    <div class="reply">
-      <div class="reply-form">
-          <form @submit.prevent="writeReply">
-            <input v-model="replyContent" placeholder="댓글을 입력하세요" />
-            <button type="submit">작성</button>
-          </form>
-      </div>
-      <div class="reply-list" v-for="reply in replies" :key="reply.replyId">
-          <p>내용: {{ reply.replyContent }}</p>
-          <p>작성자: 테스트</p>
-      </div>
-    </div>
+  <div class="book-reply">
+    <form @submit.prevent="submitReply">
+      <input type="text" v-model="replyContent" placeholder="댓글을 입력하세요">
+      <button type="submit">등록</button>
+    </form>
+    <ul class="reply-list">
+      <li v-for="reply in replies" :key="reply.replyId" class="reply-item">
+        <div class="reply-author">{{ reply.member.memberName }}</div>
+        <div v-if="editMode === reply.replyId" class="edit-form">
+          <input type="text" v-model="newReplyContent">
+        </div>
+        <div v-else class="reply-content">{{ reply.replyContent }}</div>
+        <div class="reply-time">{{ reply.replyRegdate }}</div>
+        <div v-if="reply.member.memberEmail === sessionStorage.getItem('user')" class="reply-actions">
+          <button @click="editReply(reply)" class="edit-button">{{ editMode === reply.replyId ? '저장' : '수정' }}</button>
+          <button @click="deleteReply(reply)" class="delete-button">삭제</button>
+        </div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
-import axios from "axios";
 export default {
-    props: {
-        replies: {
-            type: Array,
-            default: () => [],
-            required: true,
-        },
-        bookId: {
-            type: Number,
-            required: true,
+  props: {
+    replies: {
+      type: Array,
+      required: true
+    }
+  },
+  data() {
+    return {
+      replyContent: "",
+      sessionStorage: sessionStorage,
+      editMode: null,
+      newReplyContent: ""
+    }
+  },
+  methods: {
+    submitReply() {
+      this.$emit("addReply", this.replyContent);
+      this.replyContent = "";
+    },
+    editReply(reply) {
+      if (this.editMode === reply.replyId) {
+        const replyContent = this.newReplyContent;
+        if (replyContent) {
+          this.$emit('editReply', reply.replyId, replyContent);
+          this.newReplyContent = '';
+          this.editMode = null;
         }
+      } else {
+        this.newReplyContent = reply.replyContent;
+        this.editMode = reply.replyId;
+      }
     },
-    data() {
-        return {
-            replyContent: "",
-        };
+    deleteReply(reply) {
+      alert("삭제하시겠습니까?");
+      this.$emit("deleteReply", reply.replyId);
     },
-    methods: {
-        writeReply() {
-            const payload = {
-                replyContent: this.replyContent,
-            };
-            axios
-                .post(`/api/book/detail/${this.bookId}/reply`, payload)
-                .then((response) => {
-                    this.$emit("created", response.data);
-                    this.replyContent = "";
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        },
-    },
-};
-
+  }
+}
 </script>
 
 <style scoped>
-.reply {
-    border: 1px solid #ccc;
-    padding: 20px;
-    margin-bottom: 20px;
+.book-reply form {
+  display: flex;
+  margin-left: 5%;
+  margin-top: 5%;
 }
 
-.reply-form {
-    margin-bottom: 20px;
+.book-reply input[type="text"] {
+  flex-basis: 90%;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.reply-form input {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    width: 80%;
-    margin-right: 10px;
+.book-reply button[type="submit"] {
+  flex-basis: 10%;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  background-color: #faab19;
+  cursor: pointer;
+  margin-left: 10px;
 }
 
-.reply-form button {
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    background-color: #0080ff;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
+.book-reply button[type="submit"]:hover {
+  background-color: #e79e16;
+}
+
+.book-reply button[type="submit"]:active {
+  background-color: #e79e16;
 }
 
 .reply-list {
-    margin-bottom: 10px;
+  list-style-type: none;
+  padding-left: 0;
 }
 
-.reply-list p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
+.reply-item {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
 }
 
-.reply-list p:first-child {
-    font-weight: bold;
+.reply-author {
+  font-weight: bold;
+  flex-basis: 20%;
+  align-self: flex-start;
+}
+
+.reply-content {
+  flex-basis: 45%;
+  text-align: left;
+}
+
+.reply-time {
+  flex-basis: 25%;
+  text-align: right;
+}
+
+.reply-item .reply-actions {
+  flex-basis: 10%;
+  display: flex;
+  align-items: center;
+}
+
+.reply-item button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.reply-item .edit-button {
+  background-color: #6db6ff;
+}
+
+.reply-item .edit-button:hover {
+  background-color: #499bea;
+}
+
+.reply-item .delete-button {
+  background-color: #ff7070;
+}
+
+.reply-item .delete-button:hover {
+  background-color: #e64848;
+}
+
+.reply-item .edit-form input[type="text"] {
+  /*나중에 고치기*/
 }
 </style>

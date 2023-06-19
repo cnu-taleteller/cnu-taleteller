@@ -1,14 +1,16 @@
 <template>
   <div class="search-result">
     <h1>검색 결과</h1>
-      <ul>
-        <li v-for="result in searchResults" :key="result.bookId">
-          <router-link :to="{ path: `/detail/${result.bookId}` }" class="book-link">
-              <img src="@/assets/bookDummies/book.png" class="book-image">
-              <p class="book-title"> {{ result.bookName }} </p>
-          </router-link>
+    <ul>
+      <li v-for="result in searchResults" :key="result.bookId">
+        <router-link :to="{ path: `/detail/${result.bookId}` }" class="book-link">
+          <div class="image-container">
+            <img :src="result.bookThumbnail" :alt="result.bookName" class="book-image">
+          </div>
+          <p class="book-title"> {{ result.bookName }} </p>
+        </router-link>
       </li>
-      </ul>
+    </ul>
     <p v-if="searchResults.length === 0">검색 결과가 없습니다.</p>
   </div>
 </template>
@@ -27,7 +29,7 @@ export default {
     const searchKeyword = this.$route.query.searchKeyword;
 
     axios
-        .get("/api/book/search", {
+        .get("/api/v1/book/search", {
           params: {
             searchType: searchType,
             searchKeyword: searchKeyword,
@@ -45,54 +47,61 @@ export default {
 
 <style scoped>
 .search-result {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
 ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 li {
-    width: calc(25% - 30px);
-    margin-bottom: 30px;
-    text-align: center;
+  width: calc(25% - 30px);
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .book-link {
-    text-decoration: none;
-    color: black;
+  text-decoration: none;
+  color: black;
+}
+
+.image-container {
+  width: 100%;
+  padding-bottom: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .book-image {
-    width: 80%;
-    height: auto;
-    object-fit: contain;
+  //width: 80%;
+  //height: auto;
+  object-fit: contain;
 }
 
 .book-title {
-    font-size: 1.2rem;
-    font-weight: bold;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 @media (max-width: 640px) {
-    li {
-        width: calc(50% - 10px);
-    }
+  li {
+    width: calc(50% - 10px);
+  }
 
-    .book-image {
-        width: 70%;
-    }
+  .book-image {
+    width: 70%;
+  }
 
-    .book-title {
-        font-size: 1rem;
-    }
+  .book-title {
+    font-size: 1rem;
+  }
 }
 </style>

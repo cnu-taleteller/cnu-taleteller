@@ -1,10 +1,8 @@
 package com.cnu.taleteller.backend.domain.tool.controller;
 
-import com.cnu.taleteller.backend.domain.tool.dto.TTSDto;
-import com.cnu.taleteller.backend.domain.tool.dto.TTSResponse;
-import com.cnu.taleteller.backend.domain.tool.dto.UploadVoiceRequestDto;
+import com.cnu.taleteller.backend.domain.book.service.BookService;
+import com.cnu.taleteller.backend.domain.tool.dto.*;
 import com.cnu.taleteller.backend.domain.tool.entity.UploadFile;
-import com.cnu.taleteller.backend.domain.tool.dto.UploadFileRequestDto;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
 import com.cnu.taleteller.backend.domain.tool.service.*;
 
@@ -34,6 +32,7 @@ public class ToolController {
     private final S3Service s3Service;
     private final TTSService ttsService;
     private final ToolService toolService;
+    private final BookService bookService;
 
     @GetMapping("/s3/image")
     public Map<String, Serializable> s3saveImage(@RequestParam("fileName") String fileName){
@@ -77,22 +76,13 @@ public class ToolController {
     }
 
     @PostMapping("/firstAccess/{bookId}")
-    public BookData firstAccess(@PathVariable Long bookId) {
-        System.out.println(bookId);
-        return toolService.firstAccessData(bookId);
+    public FirstAccessBookDataDTO firstAccess(@PathVariable Long bookId) {
+        BookData bookData = toolService.firstAccessData(bookId);
+        String scenario = bookService.getScenario(bookId);
+        return FirstAccessBookDataDTO.builder()
+                .bookData(bookData)
+                .scenario(scenario)
+                .build();
     }
-
-    @PostMapping("/scenario/{bookId}")
-    public ResponseEntity saveScenario(@RequestBody String scenario, @PathVariable Long bookId){
-        String decodedData = null;
-        try {
-            decodedData = URLDecoder.decode(scenario, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        scenarioService.save(decodedData, bookId);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
 
 }

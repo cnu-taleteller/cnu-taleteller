@@ -2,8 +2,7 @@
   <div class="container">
     <div v-for="(book, index) in books" :key="index" class="book">
       <div class="wrapper" @click="goToDetail(book.bookId)">
-        <!-- 썸네일 완료되면 수정할 부분 -->
-        <img :src="require('@/assets/bookDummies/book.png')" :alt="book.bookName">
+        <img :src="book.bookThumbnail" :alt="book.bookName">
         <div>
           <p>{{ book.bookName }}</p>
           <button>{{ book.bookCategory }}</button>
@@ -29,7 +28,7 @@ export default {
       this.$router.push({ path: `/detail/${id}` });
     },
     fetchBooks() {
-      axios.get('/api/')
+      axios.get('/api/v1/book/list')
           .then(response => {
             this.books = response.data;
             return this.books = response.data.sort((a, b) => b.bookRecommend - a.bookRecommend);

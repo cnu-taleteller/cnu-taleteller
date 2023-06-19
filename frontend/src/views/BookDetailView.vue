@@ -12,7 +12,7 @@
     <div class="book-button">
       <button class="btn1" @click="toggleRecommend">{{ bookRecommend }} 추천</button>
       <button class="btn2" @click="toggleBookmark">즐겨찾기</button>
-      <button class="btn3" @click="bookPayment(-10)">{{ this.paymentCheck }}</button>
+      <button class="btn3" @click="togglePreview">{{ this.paymentCheck }}</button>
     </div>
     <Reply :replies="replies" @addReply="addReply" @editReply="editReply" @deleteReply="deleteReply" />
   </div>
@@ -38,6 +38,7 @@ export default {
       paymentCheck: '결제',
       isRecommended: false,
       isBookmark: false,
+      isPayment: false,
       bookThumbnail: null,
     };
   },
@@ -235,6 +236,14 @@ export default {
           });
     },
 
+    togglePreview() {
+      if (this.isPayment) {
+        this.bookPreview();
+      } else {
+        this.bookPayment(-10);
+        this.isPayment = true;
+      }
+    },
     bookPayment(Value) {
       if (confirm("결제하시겠습니까?")) {
         axios.post("/api/point/bookPayment", {
@@ -250,6 +259,9 @@ export default {
             });
       }
     },
+    bookPreview() {
+      window.open('/preview', 'previewWindow', 'width=1100, height=600');
+    }
   },
 }
 </script>

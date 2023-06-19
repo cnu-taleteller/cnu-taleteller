@@ -18,7 +18,7 @@ public class Bookmark implements Serializable {
     @Id
     @ManyToOne
     @JoinColumn(name = "book_id")
-    private Book bookId;
+    private Book book;
 
     @Id
     @ManyToOne
@@ -26,8 +26,8 @@ public class Bookmark implements Serializable {
     private Member member;
 
     @Builder
-    public Bookmark(Book bookId, Member member) {
-        this.bookId = bookId;
+    public Bookmark(Book book, Member member) {
+        this.book = book;
         this.member = member;
     }
 }

@@ -157,7 +157,7 @@ public class BookService {
         Member member = memberRepository.findByMemberEmail(bookmarkDto.getMemberEmail()).orElse(null);
         Book book = bookRepository.findById(bookId).orElse(null);
         bookmarkDto.setMember(member);
-        bookmarkDto.setBookId(book);
+        bookmarkDto.setBook(book);
 
         Bookmark bookmark = bookmarkRepository.save(bookmarkDto.toEntity());
         return bookmark;
@@ -168,7 +168,7 @@ public class BookService {
         Book book = bookRepository.findById(bookId).orElse(null);
 
         if (member != null && book != null) {
-            Bookmark bookmark = bookmarkRepository.findByMemberAndBookId(member, book);
+            Bookmark bookmark = bookmarkRepository.findByMemberAndBook(member, book);
             if (bookmark != null) {
                 bookmarkRepository.delete(bookmark);
                 return bookmark;

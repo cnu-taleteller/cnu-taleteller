@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="book-button">
-      <button class="btn1" @click="toggleRecommend">{{ bookRecommend }} 추천</button>
+      <button class="btn1" @click="recommend">{{ bookRecommend }} 추천</button>
       <button class="btn2" @click="toggleBookmark">즐겨찾기</button>
       <button class="btn3" @click="togglePreview">{{ this.paymentCheck }}</button>
     </div>
@@ -118,14 +118,6 @@ export default {
           });
     },
 
-    // 추천
-    toggleRecommend() {
-      if (this.isRecommended) {
-        this.unrecommend();
-      } else {
-        this.recommend();
-      }
-    },
     recommend() {
       const id = this.$route.params.id;
 
@@ -135,28 +127,15 @@ export default {
             memberEmail: sessionStorage.getItem('user')
           })
           .then((response) => {
-            this.bookRecommend = response.data.bookRecommend;
-            alert("작품을 추천합니다!");
-            this.isRecommended = true;
-            this.fetchBookDetail(id);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-    },
-    unrecommend() {
-      const id = this.$route.params.id;
-
-      axios
-          .delete(`/api/v1/book/detail/${id}/recommend`, {
-            data: {
-              bookId: this.book.bookId,
-              memberEmail: sessionStorage.getItem('user')
+            if(this.isRecommended == false) {
+              this.bookRecommend = response.data.bookRecommend;
+              alert("작품 추천을 취소합니다!");
+              this.isRecommended = true;
             }
-          })
-          .then(() => {
-            alert("작품 추천을 취소합니다!");
-            this.isRecommended = false;
+            else {
+              alert("작품을 추천합니다!");
+              this.isRecommended = false;
+            }
             this.fetchBookDetail(id);
           })
           .catch(error => {

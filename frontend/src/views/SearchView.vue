@@ -4,7 +4,9 @@
     <ul>
       <li v-for="result in searchResults" :key="result.bookId">
         <router-link :to="{ path: `/detail/${result.bookId}` }" class="book-link">
-          <img src="@/assets/bookDummies/book.png" class="book-image">
+          <div class="image-container">
+            <img :src="result.bookThumbnail" :alt="result.bookName" class="book-image">
+          </div>
           <p class="book-title"> {{ result.bookName }} </p>
         </router-link>
       </li>
@@ -71,9 +73,16 @@ li {
   color: black;
 }
 
+.image-container {
+  width: 100%;
+  padding-bottom: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
 .book-image {
-  width: 80%;
-  height: auto;
+  //width: 80%;
+  //height: auto;
   object-fit: contain;
 }
 

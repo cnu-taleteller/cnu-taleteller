@@ -2,9 +2,7 @@
   <div class="book">
     <div class="book-detail">
       <div class="book-image">
-        <!-- 썸네일 추가되면 바꿀 자리 -->
-        <img :src="require(`@/assets/bookDummies/book.png`)" :alt="bookName">
-      </div>
+        <img :src="bookThumbnail" :alt="bookName"></div>
       <div class="book-info">
         <h1>{{ bookName }}</h1>
         <p>{{ memberName }}</p>
@@ -39,7 +37,8 @@ export default {
       memberName: null,
       paymentCheck: '결제',
       isRecommended: false,
-      isBookmark: false
+      isBookmark: false,
+      bookThumbnail: null,
     };
   },
   created() {
@@ -53,6 +52,7 @@ export default {
           this.bookDescription = this.book.bookDescription;
           this.memberName = this.book.member.memberName;
           this.bookRecommend = this.book.bookRecommend;
+          this.bookThumbnail = this.book.bookThumbnail;
           this.replies = response.data.replies;
           this.replies.forEach((reply) => {
             reply.replyRegdate = new Date(reply.replyRegdate).toLocaleString("ko-KR");

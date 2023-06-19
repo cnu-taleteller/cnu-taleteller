@@ -8,6 +8,7 @@ import com.cnu.taleteller.backend.domain.book.dto.BookTempSaveDto;
 import com.cnu.taleteller.backend.domain.book.entity.Bookmark;
 import com.cnu.taleteller.backend.domain.book.entity.Recommend;
 import com.cnu.taleteller.backend.domain.book.entity.Reply;
+import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.book.service.BookService;
 import com.cnu.taleteller.backend.domain.book.service.ReplyService;
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.Page;
@@ -37,6 +38,8 @@ public class BookController {
     private final ToolService toolService;
 
     private final ReplyService replyService;
+
+    private final BookRepository bookRepository;
 
     @PostMapping
     public ResponseEntity<?> saveSubmit(@RequestBody BookDto dto) {
@@ -159,6 +162,11 @@ public class BookController {
         else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/list")
+    public List<Book> getBooks() {
+        return bookRepository.findAll();
     }
 
 }

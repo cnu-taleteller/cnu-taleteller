@@ -15,16 +15,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IndexController {
 
-    private final BookRepository bookRepository;
-
     @GetMapping("/")
     public String index() {
         return "Spring test! Hello C&U!";
     }
 
-    @GetMapping("/api/")
-    @CrossOrigin(origins = "http://localhost:8200/")
-    public List<Book> getBooks() {
-        return bookRepository.findAll();
-    }
 }

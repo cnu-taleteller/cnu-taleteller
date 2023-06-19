@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class BookmarkId implements Serializable {
 
-    private Long bookId;
+    private Long book;
 
     private Long member;
 }

@@ -15,20 +15,20 @@ public class BookmarkDto {
 
     private String memberEmail;
 
-    private Book bookId;
+    private Book book;
 
     private Member member;
 
     @Builder
-    public BookmarkDto(String memberEmail, Book bookId, Member member) {
+    public BookmarkDto(String memberEmail, Book book, Member member) {
         this.memberEmail = memberEmail;
-        this.bookId = bookId;
+        this.book = book;
         this.member = member;
     }
 
     public Bookmark toEntity(){
         return Bookmark.builder()
-                .bookId(bookId)
+                .book(book)
                 .member(member)
                 .build();
     }

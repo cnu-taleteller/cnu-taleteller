@@ -1,16 +1,18 @@
 <template>
   <div class="book-reply">
-    <form @submit.prevent="submitReply">
+    <form @submit.prevent="submitReply" class="reply-form">
       <input type="text" v-model="replyContent" placeholder="댓글을 입력하세요">
       <button type="submit">등록</button>
     </form>
     <ul class="reply-list">
       <li v-for="reply in replies" :key="reply.replyId" class="reply-item">
         <div class="reply-author">{{ reply.member.memberName }}</div>
-        <div v-if="editMode === reply.replyId" class="edit-form">
+        <div class="reply-content">
+          <div v-if="editMode === reply.replyId">
           <input type="text" v-model="newReplyContent">
+          </div>
+          <div v-else>{{ reply.replyContent }}</div>
         </div>
-        <div v-else class="reply-content">{{ reply.replyContent }}</div>
         <div class="reply-time">{{ reply.replyRegdate }}</div>
         <div v-if="reply.member.memberEmail === sessionStorage.getItem('user')" class="reply-actions">
           <button @click="editReply(reply)" class="edit-button">{{ editMode === reply.replyId ? '저장' : '수정' }}</button>
@@ -70,7 +72,7 @@ export default {
   margin-top: 5%;
 }
 
-.book-reply input[type="text"] {
+.reply-form input[type="text"] {
   flex-basis: 90%;
   padding: 10px;
   font-size: 16px;
@@ -116,25 +118,24 @@ export default {
   align-self: flex-start;
 }
 
-.reply-content {
-  flex-basis: 45%;
+.reply-content, edit-form {
+  flex-basis: 50%;
   text-align: left;
 }
 
 .reply-time {
-  flex-basis: 25%;
+  flex-basis: 20%;
   text-align: right;
 }
 
 .reply-item .reply-actions {
   flex-basis: 10%;
-  display: flex;
-  align-items: center;
+  align-self: flex-end;
 }
 
 .reply-item button {
   margin-left: 5px;
-  padding: 5px 10px;
+  padding: 5px 5px;
   font-size: 14px;
   color: #fff;
   border: none;
@@ -158,7 +159,12 @@ export default {
   background-color: #e64848;
 }
 
-.reply-item .edit-form input[type="text"] {
-  /*나중에 고치기*/
+.reply-content input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 </style>

@@ -9,6 +9,7 @@
         <th>카테고리</th>
         <th>작성일</th>
         <th>추천수</th>
+        <th>상태</th>
         <th>공개</th>
       </tr>
       </thead>
@@ -20,6 +21,8 @@
         <td>{{ book.bookCategory }}</td>
         <td>{{ book.bookRegdate }}</td>
         <td>{{ book.bookRecommend }}</td>
+        <td v-if="book.bookPublic === '1'">비공개</td>
+        <td v-else>공개</td>
         <button v-if="book.bookPublic === '1'" class="public-button" @click="setBookPublic(book.bookId)">공개</button>
         <button v-else class="private-button" @click="setBookPublic(book.bookId)">비공개</button>
       </tr>
@@ -71,6 +74,7 @@ export default {
                   if (index !== -1) {
                     this.books.splice(index, 1, updatedPublic);
                   }
+                  this.fetchBooks();
                 })
                 .catch((error) => {
                   console.error(error);
@@ -90,6 +94,7 @@ export default {
                   if (index !== -1) {
                     this.books.splice(index, 1, updatedPublic);
                   }
+                  this.fetchBooks();
                 })
                 .catch((error) => {
                   console.error(error);

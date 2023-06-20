@@ -40,6 +40,7 @@ export default {
       isBookmark: false,
       isPayment: false,
       bookThumbnail: null,
+      bookData: null,
     };
   },
   created() {
@@ -166,7 +167,7 @@ export default {
 
     // 즐겨찾기
     toggleBookmark() {
-      if (this.isBookmark) {
+      if (this.isBookmark == true) {
         this.unbookmark();
       } else {
         this.bookmark();
@@ -184,7 +185,7 @@ export default {
             .then(() => {
               this.isBookmark = true;
               this.fetchBookDetail(id);
-              const bookmark = confirm("즐겨찾기 창으로 이동하시겠습니까?");
+              const bookmark = confirm("즐겨찾기되었습니다! 즐겨찾기 창으로이동하시겠습니까?");
               if (bookmark == true) {
                 this.$router.push({ path: `/mypage/bookmark` });
               } else {
@@ -261,6 +262,23 @@ export default {
     },
 
     bookPreview() {
+      const id = this.$route.params.id;
+      axios
+          .post(`/api/v1/tool/firstAccess/${id}`)
+          .then((response) => {
+            const pageLists = response.data;
+            console.log(pageLists);
+            if (pageLists.bookData && pageLists.bookData.pageList) {
+              this.pageList = pageLists.bookData.pageList;
+              this.$emit('currentPageList', this.pageList[0]);
+              this.$store.commit('setPageList', this.pageList);
+              this.$emit('pageList', this.pageList);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+        window.open('/preview', 'previewWindow', 'width=1100, height=600');
     }
   },
 }

@@ -16,6 +16,7 @@ import Preview from '../views/Preview.vue'
 import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
 import ModalPassword from '../views/ModalPassword.vue'
 import GoingTool from '../components/GoingTool.vue';
+import AdminView from "@/views/AdminView.vue";
 
 
 Vue.use(VueRouter)
@@ -100,6 +101,11 @@ const routes = [
     path: '/goingTool',
     name: 'GoingTool',
     component: GoingTool
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminView
   },
 ]
 

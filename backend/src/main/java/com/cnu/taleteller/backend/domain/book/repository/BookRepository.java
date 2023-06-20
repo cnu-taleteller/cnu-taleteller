@@ -39,4 +39,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllMyBookmark(@Param("memberId") Long memberId);
 
     List<Book> findByBookStatusNot(String status);
+
+    List<Book> findByBookStatusNotAndBookPublicNot(String bookStatus, String bookPublic);
 }

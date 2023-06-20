@@ -166,7 +166,7 @@ public class BookController {
 
     @GetMapping("/list")
     public List<Book> getBooks() {
-        return bookRepository.findAll();
+        return bookRepository.findByBookStatusNotAndBookPublicNot("temp", "1");
     }
 
 }

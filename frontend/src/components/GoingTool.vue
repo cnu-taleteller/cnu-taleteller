@@ -1,7 +1,14 @@
 <template>
   <div class="container">
-    <h1 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">새로만들기</h1>
     <hr>
+    <h2>작품 대쉬보드</h2>
+    <br>
+    <br>
+    <div class="row">
+      <h3 class="title" @click="selectAllBooks()">작품 모두 선택</h3>
+      <h4 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">     새로운 동화책 만들기</h4>
+    </div>
+
     <div class="column">
       <button v-if="selectedBookList.length > 0" @click="deleteSelectedBooks()">삭제하기</button>
       <div class="column-icon" v-for="bookData, index in bookList" :key=index>
@@ -11,8 +18,67 @@
         <p></p>
       </div>
     </div>
+
   </div>
 </template>
+
+<style scoped>
+
+.container .row {
+  display: flex;
+  align-items: center;
+}
+
+.container .title {
+  flex: 1;
+  border: none;
+}
+
+.container h4{
+  width: 25%;
+  height: 10%;
+  margin: 5px;
+  background-color: #fceb6eb4;
+  font-weight: bold;
+  color: rgb(51, 51, 51);
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+.icon {
+  width: 10%;
+  height: 10%;
+  margin-top: 3%;
+  margin-bottom: 3%;
+}
+.container{
+  text-align: left;
+}
+
+
+
+
+.column {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  align-items: center;
+}
+.column p {
+  padding-left: 10%;
+}
+.column-icon {
+  width: 30%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}</style>
+
+
+
 
 <script>
 import axios from 'axios';
@@ -22,6 +88,7 @@ export default {
     return {
       selectedBookList: [],
       bookList : [],
+      isAllSelected: false,
     }
   },
   async created() {
@@ -36,6 +103,14 @@ export default {
     this.bookList = bookList.data;
   },
   methods: {
+    selectAllBooks() {
+      if (this.isAllSelected) {
+        this.selectedBookList = [];
+      } else {
+        this.selectedBookList = this.bookList.map((bookData) => bookData.bookId);
+      }
+      this.isAllSelected = !this.isAllSelected;
+    },
     onClickNew() {
       this.$emit('change-testone', false);
     },
@@ -80,30 +155,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.container h1 a {
-  color: black;
-  text-decoration: none;
-}
-.icon {
-  height: 100px;
-}
-
-.column {
-  width: 100%;
-  height: 250px;
-  display: flex;
-  align-items: center;
-}
-.column p {
-  padding-left: 10%;
-}
-.column-icon {
-  width: 30%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-}</style>

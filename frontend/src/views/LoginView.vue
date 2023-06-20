@@ -24,7 +24,7 @@
     <br>
 
     <p>
-      <a>비밀번호 찾기</a>
+      <a href="/modalpassword">비밀번호 찾기</a>
       <span> | </span>
       <a href="/signupview">회원가입</a>
     </p>
@@ -65,7 +65,7 @@ export default {
       sessionStorage.setItem('user', this.memberEmail);
       console.log(sessionStorage.getItem('user'));
       window.location.href = "/"; // 리다이렉트할 경로
-    } else {
+    } else if ('no'){
       alert("로그인에 실패하였습니다.\n아이디 비밀번호 확인 후 다시 진행해주세요.");
       this.$router.go();
       console.log(response.data);

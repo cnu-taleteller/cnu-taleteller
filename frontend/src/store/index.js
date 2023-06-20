@@ -47,7 +47,14 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    
+    clearSession() {
+      sessionStorage.removeItem('scenario');
+      sessionStorage.removeItem('uploadBackList');
+      sessionStorage.removeItem('uploadCharList');
+      sessionStorage.removeItem('select');
+      sessionStorage.removeItem('toolState');
+      sessionStorage.removeItem('bookName');
+    }
   },
   plugins: [
     createPersistedState({

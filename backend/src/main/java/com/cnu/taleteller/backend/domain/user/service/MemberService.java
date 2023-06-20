@@ -2,6 +2,7 @@ package com.cnu.taleteller.backend.domain.user.service;
 
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.dto.MailDTO;
+import com.cnu.taleteller.backend.domain.user.dto.MemberManagementDto;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.dto.MemberInfoDto;
 import lombok.RequiredArgsConstructor;
@@ -178,5 +179,16 @@ public class MemberService implements UserDetailsService {
         return email;
     }
 
+    public List<Member> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
+    public Member suspend(Long memberId, MemberManagementDto memberManagementDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
+
+        member.suspend(memberId, memberManagementDto.getMemberAuth());
+        return memberRepository.save(member);
+    }
 
 }

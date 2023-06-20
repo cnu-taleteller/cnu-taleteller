@@ -85,17 +85,4 @@ public class ToolController {
                 .build();
     }
 
-    @PostMapping("/scenario/{bookId}")
-    public ResponseEntity saveScenario(@RequestBody String scenario, @PathVariable Long bookId){
-        String decodedData = null;
-        try {
-            decodedData = URLDecoder.decode(scenario, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        scenarioService.save(decodedData, bookId);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
-
 }

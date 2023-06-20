@@ -98,8 +98,7 @@ export default {
             .then((res) => {
               this.bookId = res.data;
               sessionStorage.setItem('bookId', this.bookId);
-              this.saveThumbnail();
-              this.saveScenario();
+              this.saveThumbnailScenario();
               this.saveUploadFile();
               this.saveVoice();
               this.isSave = true;
@@ -119,9 +118,8 @@ export default {
             })
               .then((res) => {
                 console.log(res);
-                this.saveScenario();
                 this.saveUploadFile();
-                this.saveThumbnail();
+                this.saveThumbnailScenario();
                 this.saveVoice();
                 this.isSave = true;
                 if (status === 'temp') alert('저장 완료');
@@ -136,7 +134,8 @@ export default {
       }
     },
 
-    async saveThumbnail() {
+    async saveThumbnailScenario() {
+      const scenario = sessionStorage.getItem('scenario');
       const saveThumbnail = this.$store.getters.getCanSaveThumbNail;
       if (this.pageList && saveThumbnail) {
         const pageOneThumbNail = this.pageList[0].thumbnail;
@@ -165,14 +164,14 @@ export default {
           }
           console.log("썸네일 처리 완료");
 
-          await axios.post('/api/v1/book/thumbnail', {
+          await axios.post('/api/v1/book/thumbnailScenario', {
             bookId: this.bookId,
             bookThumbnail: this.s3.uploadedUrl,
+            scenario: scenario
           });
 
           this.$store.commit('setCanSaveThumbNail', false);
-        } catch (error) {
-          console.error(error);
+        } catch (err) {
           console.error(`Thumbnail 처리 실패:`, err);
           alert('서버 문제로 파일 처리에 실패하였습니다. 잠시 후 다시 시도해주세요🙇‍♀️');
         };
@@ -266,24 +265,6 @@ export default {
           });
       }
 
-    },
-
-    async saveScenario() {
-      const scenario = sessionStorage.getItem('scenario');
-      if (scenario === null) return;
-
-      //이 부분 합쳐야함
-      await axios.post("/api/v1/tool/scenario/" + this.bookId, JSON.stringify(scenario), {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     },
 
     preview2() {

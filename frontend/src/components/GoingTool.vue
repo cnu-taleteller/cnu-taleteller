@@ -26,7 +26,7 @@ export default {
   },
   async created() {
     const userEmail = sessionStorage.getItem('user');
-    
+
     if(userEmail == null) {
       alert('로그인 후 이용하세요');
       this.$router.push('/login');
@@ -42,19 +42,27 @@ export default {
     // 새로 만드는 작품일 때, session에 toolState new 해줘야 시나리오 진입함
     makeNewBook(){
       this.$store.commit('setBookId', null);
-      sessionStorage.setItem('toolState', 'new');
+      sessionStorage.removeItem('goingtool');
       sessionStorage.removeItem('bookId');
-      sessionStorage.removeItem('scenario');
-      sessionStorage.removeItem('bookName');
-      sessionStorage.removeItem("uploadCharList");
-      sessionStorage.removeItem("uploadBackList");
-      sessionStorage.removeItem("projectTitle");
+      this.$store.dispatch('clearSession');
+      sessionStorage.setItem('toolState', 'new');
       this.$router.push({
         path : '/tool'
       });
     },
     //기존 작품 접근 할 때
-    updateExistingBook(bookId) {
+    async updateExistingBook(bookId) {
+      await axios.get('/api/v1/tool/scenario', {
+        params: {
+          bookId: bookId
+        }
+      })
+        .then(res => {
+          sessionStorage.setItem('scenario', res.data);
+          sessionStorage.setItem('select', true);
+          sessionStorage.setItem('toolState', 'temp');
+        })
+
       sessionStorage.setItem('bookId', bookId);
       this.$router.push({
         path : '/tool',
@@ -63,7 +71,8 @@ export default {
     async deleteSelectedBooks() { 
       await axios.delete('api/v1/book/deleteBookList', { data : this.selectedBookList }).then(response => {
         console.log(response);
-        this.$router.replace({ path: '/' });
+        sessionStorage.setItem('goingtool','go');
+        this.$router.go();
       }).catch(err => {
         console.error(err);
       }); 

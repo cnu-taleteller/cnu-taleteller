@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <div v-for="(bookDummy, index) in bookDummies" :key="index" class="book-dummies" v-if="bookDummy.title !== null">
-      <div class="wrapper" @click="goToDetail(bookDummy.id)">
-        <img :src="require(`@/assets/bookDummies/${bookDummy.image}`)" :alt="bookDummy.title">
+    <div v-for="(book, index) in books" :key="index" class="book">
+      <div class="wrapper" @click="goToDetail(book.bookId)">
+        <img :src="book.bookThumbnail" :alt="book.bookName">
         <div>
-          <p>{{ bookDummy.title }}</p>
-          <button>#동화</button>
+          <p>{{ book.bookName }}</p>
+          <button>{{ book.bookCategory }}</button>
         </div>
       </div>
     </div>
@@ -13,32 +13,29 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
-      bookDummies: [
-        { id: 1, title: sessionStorage.getItem('bookName'), image: 'book.png', description: sessionStorage.getItem('bookDescription')},
-        { id: 2, title: '양치질은 싫어요', image: 'book1.jpg', description: '설명' },
-        { id: 3, title: '수탉과 돼지', image: 'book2.png', description: '설명' },
-        { id: 4, title: '나도 편식할 거야', image: 'book3.jpg', description: '설명' },
-        { id: 5, title: '또박또박 읽고 써요', image: 'book4.jpg', description: '설명' },
-        { id: 6, title: '회사에 다녀요', image: 'book5.jpg', description: '설명' },
-        { id: 7, title: '오래 친구들', image: 'book6.jpg', description: '설명' },
-        { id: 8, title: '그림 형제', image: 'book7.jpg', description: '설명' },
-        { id: 9, title: '못난이 아기 잠자리', image: 'book8.jpg', description: '설명' },
-        { id: 10, title: '미녀와 야수', image: 'book9.jpg', description: '설명' }
-      ],
-      bookName: null,
-      bookDescription: null
+      books: [],
     }
   },
-  created() {
-    sessionStorage.setItem('bookDummies', JSON.stringify(this.bookDummies));
-    this.bookName = sessionStorage.getItem('bookName');
+  mounted() {
+    this.fetchBooks();
   },
   methods: {
     goToDetail(id) {
       this.$router.push({ path: `/detail/${id}` });
+    },
+    fetchBooks() {
+      axios.get('/api/v1/book/list')
+          .then(response => {
+            this.books = response.data;
+            return this.books = response.data.sort((a, b) => b.bookRecommend - a.bookRecommend);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
   },
 }
@@ -51,7 +48,7 @@ export default {
   justify-content: flex-start;
 }
 
-.book-dummies {
+.book {
   margin-top: 5%;
   flex-basis: 20%;
   text-align: center;
@@ -94,4 +91,5 @@ export default {
   border-radius: 5px;
   font-weight: bold;
 }
+
 </style>

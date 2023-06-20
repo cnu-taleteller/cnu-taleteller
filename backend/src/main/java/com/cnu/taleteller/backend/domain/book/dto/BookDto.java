@@ -3,10 +3,8 @@ package com.cnu.taleteller.backend.domain.book.dto;
 import com.cnu.taleteller.backend.domain.book.entity.Book;
 
 import com.cnu.taleteller.backend.domain.tool.entity.mongo.BookData;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -29,22 +27,35 @@ public class BookDto {
     private String bookCategory;
 
     private int bookRecommend;
+
     private String bookThumbnail;
+    private String scenario;
     private String bookPublic;
 
-    private Long memberId;
+    private Member member;
 
-    public static BookDto fromEntity(Book book) {
-        BookDto bookDto = new BookDto();
-        bookDto.setBookRecommend(book.getBookRecommend());
-        bookDto.setBookId(book.getBookId());
-        bookDto.setBookName(book.getBookName());
-        bookDto.setBookRegdate(book.getBookRegdate());
-        bookDto.setBookDescription(book.getBookDescription());
-        bookDto.setBookStatus(book.getBookStatus());
-        bookDto.setBookCategory(book.getBookCategory());
-        bookDto.setBookPublic(book.getBookPublic());
-        return bookDto;
+    @Builder
+    public BookDto(String bookName, LocalDateTime bookRegdate, String bookDescription, String bookStatus, String bookCategory, int bookRecommend, String bookPublic, Member member) {
+        this.bookName = bookName;
+        this.bookRegdate = bookRegdate;
+        this.bookDescription = bookDescription;
+        this.bookStatus = bookStatus;
+        this.bookCategory = bookCategory;
+        this.bookRecommend = bookRecommend;
+        this.bookPublic = bookPublic;
+        this.member = member;
     }
 
+    public Book toEntity(){
+        return Book.builder()
+                .bookName(bookName)
+                .bookRegdate(bookRegdate)
+                .bookDescription(bookDescription)
+                .bookStatus(bookStatus)
+                .bookCategory(bookCategory)
+                .bookRecommend(bookRecommend)
+                .bookPublic(bookPublic)
+                .member(member)
+                .build();
+    }
 }

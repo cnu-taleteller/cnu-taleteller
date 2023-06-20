@@ -259,8 +259,8 @@ export default {
             });
       }
     },
+
     bookPreview() {
-      window.open('/preview', 'previewWindow', 'width=1100, height=600');
     }
   },
 }

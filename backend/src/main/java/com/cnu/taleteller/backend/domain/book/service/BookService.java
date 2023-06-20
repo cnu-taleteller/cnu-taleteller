@@ -130,12 +130,21 @@ public class BookService {
     public Recommend recommendBook(Long bookId, RecommendDto recommendDto) {
         Member member = memberRepository.findByMemberEmail(recommendDto.getMemberEmail()).orElse(null);
         Book book = bookRepository.findById(bookId).orElse(null);
-        recommendDto.setMember(member);
-        recommendDto.setBookId(book);
-        book.incrementRecommend();
+        if(member != null && book != null) {
+            Recommend recommend = recommendRepository.findByMemberAndBookId(member, book);
+            if (recommend != null && recommend.getMember() == member) {
+                unrecommendBook(book.getBookId(), recommendDto);
+            }
+            else {
+                recommendDto.setMember(member);
+                recommendDto.setBookId(book);
+                book.incrementRecommend();
 
-        Recommend recommend = recommendRepository.save(recommendDto.toEntity());
-        return recommend;
+                recommend = recommendRepository.save(recommendDto.toEntity());
+                return recommend;
+            }
+        }
+        return null;
     }
 
     public Recommend unrecommendBook(Long bookId, RecommendDto recommendDto) {

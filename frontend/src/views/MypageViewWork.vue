@@ -18,7 +18,7 @@
       </div>
       <div v-if="this.searchCheck == false && this.workList == 'mywork'" class="mypage-content">
         <div v-for="result in myWorkResult" :key="result.bookId" class="thumbnail">
-            <table @click="goToDetail(1)">
+            <table @click="goToDetail(result.bookId)">
                 <thead>
                     <tr>
                         <td>
@@ -40,7 +40,7 @@
       </div>
       <div v-else-if="this.searchCheck == false && this.workList == 'bookmark'" class="mypage-content">
         <div v-for="result in bookMarkResult" :key="result.bookId" class="thumbnail">
-            <table @click="goToDetail(1)">
+            <table @click="goToDetail(result.bookId)">
                 <thead>
                     <tr>
                         <td>
@@ -62,7 +62,7 @@
       </div>
       <div v-else-if="this.searchCheck == false && this.workList == 'paywork'" class="mypage-content">
         <div v-for="result in payWorkResult" :key="result.bookId" class="thumbnail">
-            <table @click="goToDetail(1)">
+            <table @click="goToDetail(result.bookId)">
                 <thead>
                     <tr>
                         <td>
@@ -84,7 +84,7 @@
       </div>
       <div v-else-if="this.searchCheck == true && this.workList == 'mywork'" class="mypage-content">
         <div v-for="result in myWorkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
-            <table @click="goToDetail(1)">
+            <table @click="goToDetail(result.bookId)">
                 <thead>
                     <tr>
                         <td>
@@ -106,7 +106,7 @@
       </div>
       <div v-else-if="this.searchCheck == true && this.workList == 'bookmark'" class="mypage-content">
         <div v-for="result in bookMarkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
-            <table @click="goToDetail(1)">
+            <table @click="goToDetail(result.bookId)">
                 <thead>
                     <tr>
                         <td>
@@ -128,7 +128,7 @@
       </div>
       <div v-else-if="this.searchCheck == true && this.workList == 'paywork'" class="mypage-content">
         <div v-for="result in payWorkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
-            <table @click="goToDetail(1)">
+            <table @click="goToDetail(result.bookId)">
                 <thead>
                     <tr>
                         <td>

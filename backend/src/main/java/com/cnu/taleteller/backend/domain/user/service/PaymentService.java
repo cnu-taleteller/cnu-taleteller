@@ -1,7 +1,10 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
+import com.cnu.taleteller.backend.domain.book.entity.Book;
+import com.cnu.taleteller.backend.domain.book.repository.BookRepository;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.Repository.PaymentRepository;
+import com.cnu.taleteller.backend.domain.user.dto.PaymentBookDto;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.entity.Payment;
 import com.cnu.taleteller.backend.domain.user.dto.KakaopayApprovalVO;
@@ -29,6 +32,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
+    private final BookRepository bookRepository;
     PaymentDto paymentDto = new PaymentDto();
 
     private static final String HOST = "https://kapi.kakao.com";
@@ -79,13 +83,22 @@ public class PaymentService {
         System.out.println("환급 완료");
     }
 
-    public void bookPaymentSave(int point) {
-        paymentDto.setPayCount(point);
-        paymentDto.setPaySort("결제");
-        paymentDto.setPayType("엽전");
-        Payment payment = Payment.toPayment(paymentDto);
-        paymentRepository.save(payment);
+    public Payment bookPaymentSave(Long bookId, PaymentBookDto paymentBookDto) {
+        Member member = memberRepository.findByMemberEmail(paymentBookDto.getMemberEmail()).orElse(null);
+        Book book = bookRepository.findById(bookId).orElse(null);
+
+//      paymentRepository.findByMemberAndBook(member, book);
+        Payment payment;
+
+        paymentBookDto.setPayCount(-20);
+        paymentBookDto.setPaySort("결제");
+        paymentBookDto.setPayType("엽전");
+        paymentBookDto.setMemberId(member);
+        paymentBookDto.setBookId(book);
+        payment = paymentRepository.save(paymentBookDto.toEntity());
         System.out.println("상품 결제 완료");
+
+        return payment;
     }
 
     public List<Payment> findAllMyPayList(String email) {

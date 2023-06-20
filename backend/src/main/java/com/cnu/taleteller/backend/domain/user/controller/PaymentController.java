@@ -1,11 +1,13 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
+import com.cnu.taleteller.backend.domain.user.dto.PaymentBookDto;
 import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.entity.Payment;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import com.cnu.taleteller.backend.domain.user.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,11 +50,11 @@ public class PaymentController {
         return ResponseEntity.ok(lastDetails);
     }
 
-    @PostMapping("/bookPayment")
-    public void bookPayment(@RequestBody Map<String, String> paymentInfo){
-        System.out.println("결제액수 = " + paymentInfo.get("paymentPoint"));
-        int paymentPoint = Integer.parseInt(paymentInfo.get("paymentPoint"));
-        paymentService.bookPaymentSave(paymentPoint);
+    @PostMapping("/bookPayment/{bookId}")
+    public ResponseEntity<Payment> bookPayment(@PathVariable Long bookId, @RequestBody PaymentBookDto paymentBookDto){
+        Payment payment = paymentService.bookPaymentSave(bookId, paymentBookDto);
+
+        return new ResponseEntity<>(payment, HttpStatus.OK);
     }
 
     @PostMapping("/return/{email}")

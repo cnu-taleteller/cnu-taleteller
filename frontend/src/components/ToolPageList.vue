@@ -128,60 +128,70 @@ export default {
   async created() {
     this.$store.commit('setCanSaveThumbNail', true);
     this.bookId = sessionStorage.getItem('bookId');
-    if (this.bookId !== null) {
-      const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
-
-      this.pageList = selPageLists.data.bookData.pageList;
-      this.$emit('currentPageList', this.pageList[0]);
-      this.$store.commit('setPageList', this.pageList);
-      this.$emit('pageList', this.pageList);
-    } else {
-      this.pageList =  [
-        {
-          pageId: 1,
-          pageStatus: 1,
-          caption: {
-            captionState: 0,
-            fontSize: '',
-            fontColor: '',
-            content: '',
-            height: '',
-            width: '',
-            left: '',
-            top: '',
-            ttsVoice:'',
-            ttsName:'',
-            voiceList: [],
-          },
-          thumbnail: '',
-          layerList: [],
-        }
-      ];
-      this.$emit('currentPageList', this.pageList[0]);
-      this.$store.commit('setPageList', this.pageList);
-      this.$emit('pageList', this.pageList);
-    }
+    this.firstLoadData(this.bookId);
   },
+
   mounted() {
     if (this.$route.path === '/tool') {
       document.addEventListener('keydown', this.ctrlZandY);
     }
-
-    const pageListElement = this.$refs.pageList.$el;
-    
-    const previousSelectedElement = pageListElement.querySelector('.page-body.selected');
-
-    if(previousSelectedElement) {
-      previousSelectedElement.style.outline = '1px solid rgb(39, 186, 255)';
-    };
-
   },
+
   beforeDestroy() {
     if (this.$route.path === '/tool') {
       document.removeEventListener('keydown', this.ctrlZandY);
     }
   },
+  
   methods: {
+    async firstLoadData(bookId) {
+      if (bookId !== null) {
+        const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
+        this.pageList = selPageLists.data.bookData.pageList;
+        this.$emit('currentPageList', this.pageList[0]);
+        this.$store.commit('setPageList', this.pageList);
+        this.$emit('pageList', this.pageList);
+      } else {
+        this.pageList = [
+          {
+            pageId: 1,
+            pageStatus: 1,
+            caption: {
+              captionState: 0,
+              fontSize: '',
+              fontColor: '',
+              content: '',
+              height: '',
+              width: '',
+              left: '',
+              top: '',
+              ttsVoice: '',
+              ttsName: '',
+              voiceList: [],
+            },
+            thumbnail: '',
+            layerList: [],
+          }
+        ];
+        this.$emit('currentPageList', this.pageList[0]);
+        this.$store.commit('setPageList', this.pageList);
+        this.$emit('pageList', this.pageList);
+      };
+
+      this.handleDataLoaded();
+    },
+
+    handleDataLoaded() {
+      this.$nextTick(() => {
+        const pageListElement = this.$refs.pageList.$el;
+        const previousSelectedElement = pageListElement.querySelector('.page-body.selected');
+
+        if (previousSelectedElement) {
+          previousSelectedElement.style.outline = '1px solid rgb(39, 186, 255)';
+        }
+      });
+    },
+
     // ctrlZandY(event) {
     //   if (event.ctrlKey) {
     //     const stack = JSON.parse(JSON.stringify(this.stackStatus));

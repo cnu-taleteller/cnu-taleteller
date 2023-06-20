@@ -21,14 +21,16 @@ export default {
       currentIndex: 0,
     };
   },
-
+  
   computed: {
      ttsUrl() {
        const caption = this.pageList[this.currentIndex].caption.ttsName;
-       return caption; // 음성 파일의 경로를 반환
+       return caption;
      },
   },
+
   created() {
+    this.pageList = this.$store.getters.getPageList;
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const pageListParam = urlParams.get('pageList');
@@ -38,8 +40,8 @@ export default {
       console.log(this.pageList);
     }
   },
+
   mounted() {
-    this.pageList = this.$store.getters.getPageList;
     const list = this.$refs.pageForm;
     this.layerList(list, this.currentIndex);
     this.captionList(list, this.currentIndex);
@@ -52,6 +54,7 @@ export default {
       document.querySelector('#next').disabled = true;
     }
   },
+  
   methods: {
     prevImage() {
       if (this.currentIndex > 0) {

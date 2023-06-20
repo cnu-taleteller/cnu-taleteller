@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface UploadFileRepository extends JpaRepository<UploadFile, String> {
+
     @Query("SELECT f FROM UploadFile f WHERE f.book.bookId = :bookId")
     List<UploadFile> findAllByBookId(@Param("bookId") Long bookId);
 

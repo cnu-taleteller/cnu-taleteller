@@ -241,14 +241,16 @@ export default {
       if (this.isPayment) {
         this.bookPreview();
       } else {
-        this.bookPayment(-10);
+        this.bookPayment(-20);
         this.isPayment = true;
       }
     },
-    bookPayment(Value) {
+    bookPayment() {
       if (confirm("결제하시겠습니까?")) {
-        axios.post("/api/point/bookPayment", {
-          paymentPoint: Value,
+        const id = this.$route.params.id;
+        axios.post(`/api/point/bookPayment/${id}`, {
+          bookId: this.book.bookId,
+          memberEmail: sessionStorage.getItem('user')
         })
             .then((res) => {
               alert("상품이 결제되었습니다.")

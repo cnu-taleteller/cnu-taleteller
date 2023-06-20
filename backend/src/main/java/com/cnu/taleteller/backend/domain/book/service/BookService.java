@@ -165,11 +165,18 @@ public class BookService {
     public Bookmark bookmarkBook(Long bookId, BookmarkDto bookmarkDto) {
         Member member = memberRepository.findByMemberEmail(bookmarkDto.getMemberEmail()).orElse(null);
         Book book = bookRepository.findById(bookId).orElse(null);
-        bookmarkDto.setMember(member);
-        bookmarkDto.setBook(book);
-
-        Bookmark bookmark = bookmarkRepository.save(bookmarkDto.toEntity());
-        return bookmark;
+        if (member != null && book != null) {
+            Bookmark bookmark = bookmarkRepository.findByMemberAndBook(member, book);
+            if (bookmark != null && bookmark.getMember() == member) {
+                unbookmarkBook(book.getBookId(), bookmarkDto);
+            } else {
+                bookmarkDto.setMember(member);
+                bookmarkDto.setBook(book);
+                bookmark = bookmarkRepository.save(bookmarkDto.toEntity());
+                return bookmark;
+            }
+        }
+        return null;
     }
 
     public Bookmark unbookmarkBook(Long bookId, BookmarkDto bookmarkDto) {

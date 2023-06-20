@@ -94,65 +94,77 @@
             <p></p><p></p>
           <div class="ttsbtbox">
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="다인"><p></p>
+              <img src="@/assets/people.png" alt="다인" @click="playSound(1)"><p></p>
               <input type="radio" name="myRadio" value="ndain" @change="handleTtsChange">
               <label for="ndain">다인</label><p></p>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="마녀 사바나" ><p></p>
+              <img src="@/assets/people.png" alt="마녀 사바나" @click="playSound(2)"><p></p>
               <input type="radio" name="myRadio" value="nsabina" @change="handleTtsChange">
               <label for="nsabina">마녀 사바나</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="아라"><p></p>
+              <img src="@/assets/people.png" alt="아라" @click="playSound(3)"><p></p>
               <input type="radio" name="myRadio" value="dara_ang" @change="handleTtsChange">
               <label for="dara_ang">아라</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="민영"><p></p>
+              <img src="@/assets/people.png" alt="민영" @click="playSound(4)"><p></p>
               <input type="radio" name="myRadio" value="nminyoung" @change="handleTtsChange">
               <label for="nminyoung">민영</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="샤샤"><p></p>
+              <img src="@/assets/people.png" alt="샤샤" @click="playSound(5)"><p></p>
               <input type="radio" name="myRadio" value="nshasha" @change="handleTtsChange">
               <label for="nshasha">샤샤</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="미경"><p></p>
+              <img src="@/assets/people.png" alt="미경" @click="playSound(6)"><p></p>
               <input type="radio" name="myRadio" value="vmikyung" @change="handleTtsChange">
               <label for="vmikyung">미경</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="하준"><p></p>
+              <img src="@/assets/people.png" alt="하준" @click="playSound(7)"><p></p>
               <input type="radio" name="myRadio" value="nhajun" @change="handleTtsChange">
               <label for="nhajun">하준</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="기태"><p></p>
+              <img src="@/assets/people.png" alt="기태" @click="playSound(8)"><p></p>
               <input type="radio" name="myRadio" value="nkitae" @change="handleTtsChange">
               <label for="nkitae">기태</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="기효"><p></p>
+              <img src="@/assets/people.png" alt="기효" @click="playSound(9)"><p></p>
               <input type="radio" name="myRadio" value="nes_c_kihyo" @change="handleTtsChange">
               <label for="nes_c_kihyo">기효</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="래원"><p></p>
+              <img src="@/assets/people.png" alt="래원" @click="playSound(10)"><p></p>
               <input type="radio" name="myRadio" value="nraewon" @change="handleTtsChange">
               <label for="nraewon">래원</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="악마 마몬"><p></p>
+              <img src="@/assets/people.png" alt="악마 마몬" @click="playSound(11)"><p></p>
               <input type="radio" name="myRadio" value="nmammon" @change="handleTtsChange">
               <label for="nmammon">악마 마몬</label>
             </div>
             <div class="ttsbt">
-              <img src="@/assets/people.png" alt="영일"><p></p>
+              <img src="@/assets/people.png" alt="영일" @click="playSound(12)"><p></p>
               <input type="radio" name="myRadio" value="nyoungil" @change="handleTtsChange">
               <label for="nyoungil">영일</label>
             </div>
+            <audio id="audioElement1" src="@/assets/다인.mp3"></audio>
+            <audio id="audioElement2" src="@/assets/마녀 사바나.mp3"></audio>
+            <audio id="audioElement3" src="@/assets/아라.mp3"></audio>
+            <audio id="audioElement4" src="@/assets/민영.mp3"></audio>
+            <audio id="audioElement5" src="@/assets/샤샤.mp3"></audio>
+            <audio id="audioElement6" src="@/assets/미경.mp3"></audio>
+            <audio id="audioElement7" src="@/assets/하준.mp3"></audio>
+            <audio id="audioElement8" src="@/assets/기태.mp3"></audio>
+            <audio id="audioElement9" src="@/assets/기효.mp3"></audio>
+            <audio id="audioElement10" src="@/assets/래원.mp3"></audio>
+            <audio id="audioElement11" src="@/assets/악마 마몬.mp3"></audio>
+            <audio id="audioElement12" src="@/assets/영일.mp3"></audio>
           </div>
         </div>
         <div class="record" v-else-if="selectedMenu == 'recode'">
@@ -280,6 +292,54 @@ export default {
     },
   },
   methods: {
+    playSound(divId) {
+      var audioElement;
+
+      switch (divId) {
+        case 1:
+          audioElement = document.getElementById("audioElement1");
+          break;
+        case 2:
+          audioElement = document.getElementById("audioElement2");
+          break;
+        case 3:
+          audioElement = document.getElementById("audioElement3");
+          break;
+        case 4:
+          audioElement = document.getElementById("audioElement4");
+          break;
+        case 5:
+          audioElement = document.getElementById("audioElement5");
+          break;
+        case 6:
+          audioElement = document.getElementById("audioElement6");
+          break;
+        case 7:
+          audioElement = document.getElementById("audioElement7");
+          break;
+        case 8:
+          audioElement = document.getElementById("audioElement8");
+          break;
+        case 9:
+          audioElement = document.getElementById("audioElement9");
+          break;
+        case 10:
+          audioElement = document.getElementById("audioElement10");
+          break;
+        case 11:
+          audioElement = document.getElementById("audioElement11");
+          break;
+        case 12:
+          audioElement = document.getElementById("audioElement12");
+          break;
+          // Add more cases for other divs if needed
+
+        default:
+          return;
+      }
+
+      audioElement.play();
+    },
       // S3 presigned url 받아오기
       async uploadFile(menu) {
           const maxSize = 5 * 1024 * 1024;
@@ -451,10 +511,6 @@ export default {
       handleTtsChange(event) {
           const selectedValue = event.target.value;
           this.$emit('ttsValueChange', selectedValue);
-      },
-      playAudio(audioPath){
-        const audio = new Audio(audioPath);
-        audio.play();
       },
       addTts() {
           const text = this.currentPageList.caption.content;

@@ -71,7 +71,6 @@ public class TTSService {
                 String tempname = Long.valueOf(new Date().getTime()).toString();
                 String ttsUrl = "TTS"+tempname+".mp3";
                 File f = new File(tempname + ".mp3");
-                f.createNewFile();
                 // S3 서버에 업로드
                 Map<String, Serializable> s3UploadResult = s3Service.getPreSignedUrl(ttsUrl);
                 encodedFileName = (String) s3UploadResult.get("encodedFileName");

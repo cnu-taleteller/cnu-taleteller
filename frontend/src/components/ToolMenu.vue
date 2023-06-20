@@ -90,49 +90,70 @@
           </div>
         </div>
         <div class="ttsme" v-else-if="selectedMenu == 'tts'">
-          <button class="submit-btn" @click="addTts()">추가</button>
-          <div>
-            <img src="@/assets/people.png" alt="나라"><p></p>
-            <input type="radio" name="myRadio" value="nara" @change="handleTtsChange">
-            <label for="nara">나라</label><p></p>
+            <button class="submit-btn" @click="addTts()">추가</button>
+            <p></p><p></p>
+          <div class="ttsbtbox">
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="다인"><p></p>
+              <input type="radio" name="myRadio" value="ndain" @change="handleTtsChange">
+              <label for="ndain">다인</label><p></p>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="마녀 사바나" ><p></p>
+              <input type="radio" name="myRadio" value="nsabina" @change="handleTtsChange">
+              <label for="nsabina">마녀 사바나</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="아라"><p></p>
+              <input type="radio" name="myRadio" value="dara_ang" @change="handleTtsChange">
+              <label for="dara_ang">아라</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="민영"><p></p>
+              <input type="radio" name="myRadio" value="nminyoung" @change="handleTtsChange">
+              <label for="nminyoung">민영</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="샤샤"><p></p>
+              <input type="radio" name="myRadio" value="nshasha" @change="handleTtsChange">
+              <label for="nshasha">샤샤</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="미경"><p></p>
+              <input type="radio" name="myRadio" value="vmikyung" @change="handleTtsChange">
+              <label for="vmikyung">미경</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="하준"><p></p>
+              <input type="radio" name="myRadio" value="nhajun" @change="handleTtsChange">
+              <label for="nhajun">하준</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="기태"><p></p>
+              <input type="radio" name="myRadio" value="nkitae" @change="handleTtsChange">
+              <label for="nkitae">기태</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="기효"><p></p>
+              <input type="radio" name="myRadio" value="nes_c_kihyo" @change="handleTtsChange">
+              <label for="nes_c_kihyo">기효</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="래원"><p></p>
+              <input type="radio" name="myRadio" value="nraewon" @change="handleTtsChange">
+              <label for="nraewon">래원</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="악마 마몬"><p></p>
+              <input type="radio" name="myRadio" value="nmammon" @change="handleTtsChange">
+              <label for="nmammon">악마 마몬</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="영일"><p></p>
+              <input type="radio" name="myRadio" value="nyoungil" @change="handleTtsChange">
+              <label for="nyoungil">영일</label>
+            </div>
           </div>
-          <div>
-            <img src="@/assets/people.png" alt="민영"><p></p>
-            <input type="radio" name="myRadio" value="nminyoung" @change="handleTtsChange">
-            <label for="nara">민영</label>
-          </div>
-          <div>
-            <img src="@/assets/people.png" alt="예진"><p></p>
-            <input type="radio" name="myRadio" value="nyejin" @change="handleTtsChange">
-            <label for="nyejin">예진</label>
-          </div>
-          <div>
-            <img src="@/assets/people.png" alt="미진"><p></p>
-            <input type="radio" name="myRadio" value="mijin" @change="handleTtsChange">
-            <label for="mijin">미진</label>
-          </div>
-          <div>
-            <img src="@/assets/people.png" alt="진호"><p></p>
-            <input type="radio" name="myRadio" value="jinho" @change="handleTtsChange">
-            <label for="jinho">진호</label>
-          </div>
-          <div>
-            <img src="@/assets/people.png" alt="민상"><p></p>
-            <input type="radio" name="myRadio" value="nminsang" @change="handleTtsChange">
-            <label for="nminsang">민상</label>
-          </div>
-          <div>
-            <img src="@/assets/people.png" alt="신우"><p></p>
-            <input type="radio" name="myRadio" value="nsinu" @change="handleTtsChange">
-            <label for="nsinu">신우</label>
-          </div>
-          <div>
-            <img src="@/assets/people.png" alt="하준"><p></p>
-            <input type="radio" name="myRadio" value="nhajun" @change="handleTtsChange">
-            <label for="nhajun">하준</label>
-          </div>
-
-
         </div>
         <div class="record" v-else-if="selectedMenu == 'recode'">
           <div v-if="!recordingStarted">
@@ -670,13 +691,27 @@ input[type=file]::file-selector-button:hover {
 }
 .ttsme{
   flex-wrap: wrap;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .ttsme img{
   width: 100%;
   max-width: 70px;
 }
 
+.ttsbtbox{
+  flex-wrap: wrap;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ttsbt {
+  width: 100px;
+  height : 150px;
+  overflow: auto;
+  float: left;
+
+}
 .record img {
   width: 100%;
   max-width: 30px;

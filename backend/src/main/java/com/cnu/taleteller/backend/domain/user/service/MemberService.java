@@ -32,7 +32,7 @@ import java.util.List;
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final JavaMailSender mailSender;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -42,12 +42,12 @@ public class MemberService implements UserDetailsService {
     }
 
 
-    public Member loadUserByPassword(String memberPassword) throws UsernameNotFoundException {
-        String encodedPassword = passwordEncoder.encode(memberPassword);
-        System.out.println(encodedPassword);
-        return memberRepository.findByMemberPassword(memberPassword)
-                .orElseThrow(() -> new UsernameNotFoundException(memberPassword));
-    }
+//    public Member loadUserByPassword(String memberPassword) throws UsernameNotFoundException {
+//        String encodedPassword = passwordEncoder.encode(memberPassword);
+//        System.out.println(encodedPassword);
+//        return memberRepository.findByMemberPassword(memberPassword)
+//                .orElseThrow(() -> new UsernameNotFoundException(memberPassword));
+//    }
 
 
     public Boolean loginDropCheck(String email) {
@@ -129,7 +129,7 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Member not found with email: " + memberEmail));
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String EncodePassword = passwordEncoder.encode(newPassword);
-        member.setPassword(newPassword);
+        member.setPassword(EncodePassword);
         memberRepository.save(member);
     }
 

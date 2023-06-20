@@ -15,6 +15,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -31,12 +32,23 @@ import java.util.List;
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final JavaMailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public Member loadUserByUsername(String memberEmail) throws UsernameNotFoundException {
         return memberRepository.findByMemberEmail(memberEmail)
                 .orElseThrow(() -> new UsernameNotFoundException((memberEmail)));
     }
+
+
+    public Member loadUserByPassword(String memberPassword) throws UsernameNotFoundException {
+        String encodedPassword = passwordEncoder.encode(memberPassword);
+        System.out.println(encodedPassword);
+        return memberRepository.findByMemberPassword(memberPassword)
+                .orElseThrow(() -> new UsernameNotFoundException(memberPassword));
+    }
+
 
     public Boolean loginDropCheck(String email) {
         Member findMember = memberRepository.findDistinctByMemberEmail(email);
@@ -117,7 +129,7 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Member not found with email: " + memberEmail));
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String EncodePassword = passwordEncoder.encode(newPassword);
-        member.setPassword(EncodePassword);
+        member.setPassword(newPassword);
         memberRepository.save(member);
     }
 

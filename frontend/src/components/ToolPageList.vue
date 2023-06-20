@@ -1,16 +1,16 @@
 <template>
   <div class="left-side-bar">
     <div class="page-all">
-      <draggable @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
-        class="page-list">
+      <draggable @start="onDragStart" @end="onDragEnd" @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
+        class="page-list" ref="pageList">
         <li v-for="page, index in pageList" :key="index" class="one-page">
-          <div class="page-body" @click="clickPage(index)">
+          <div class="page-body" @click="clickPage(index, $event)" :class="{ 'selected': index === currentPageIndexNo }">
             <!-- 썸네일 부분 -->
             <img v-if="page.thumbnail !== '' && page.thumbnail !== null" :src="page.thumbnail"
               style="width:100%; height: 100%">
           </div>
           <label>
-            {{ page.pageId }}
+            {{ index + 1 }}
           </label>
         </li>
       </draggable>
@@ -61,6 +61,9 @@ export default {
     allPageList: {
       handler: function (newPageList, oldPageList) {
         if (!this.isStackChange && newPageList) {
+
+          //페이지 리스트의 currentPageIndexNo 부분을 css 속성 변경
+
           const newPageLists = JSON.parse(JSON.stringify(newPageList));
 
           //pageList 첫번째 변경이 된지 확인하는 부분
@@ -163,6 +166,15 @@ export default {
     if (this.$route.path === '/tool') {
       document.addEventListener('keydown', this.ctrlZandY);
     }
+
+    const pageListElement = this.$refs.pageList.$el;
+    
+    const previousSelectedElement = pageListElement.querySelector('.page-body.selected');
+
+    if(previousSelectedElement) {
+      previousSelectedElement.style.outline = '1px solid rgb(39, 186, 255)';
+    };
+
   },
   beforeDestroy() {
     if (this.$route.path === '/tool') {
@@ -213,12 +225,14 @@ export default {
     },
     //페이지 변경 시 그 페이지의 내용들을 보냄
     clickPage(index) {
+      this.destroyPageOutLine();
       this.isRecentChange = true;
       this.currentPageIndexNo = index;
-      this.$emit('currentPageList', this.pageList[index]);
+      this.toEmitCurrentPageList(index);
     },
     //페이지 추가부분
     addPage() {
+      this.destroyPageOutLine();
       this.isAdd = true;
       let current = this.currentPageIndexNo;
       let self = this;
@@ -250,13 +264,14 @@ export default {
           layerList: [],
         }
       );
-      this.$emit('currentPageList', this.pageList[current + 1]);
+      this.toEmitCurrentPageList(current + 1);
       this.saveSession();
     },
     saveSession() {
       sessionStorage.setItem(this.book_id, JSON.stringify(this.pageList));
     },
     deletePage() {
+      this.destroyPageOutLine();
       this.isDelete = true;
       //리스트에 전 후 값이 있나 확인 다음이 있으면 다음으로 넘김 아니면 전으로 만약에 페이지가 1개뿐이다 이러면 삭제되고 바로 빈리스트 추가 //this.pageList[]
       if(this.pageList[this.currentPageIndexNo + 1] === undefined) {
@@ -292,16 +307,62 @@ export default {
               layerList: [],
             }
           );
-          this.$emit('currentPageList', this.pageList[current]);
+          this.toEmitCurrentPageList(current);
           return;
         }
         this.isNoHaveNext = true;
         this.currentPageIndexNo -= 1;
-        this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
+        this.toEmitCurrentPageList(this.currentPageIndexNo);
       } else if(this.pageList[this.currentPageIndexNo + 1] !== undefined) {
         this.isHavaNext = true;
         this.pageList.splice(this.currentPageIndexNo, 1);
-        this.$emit('currentPageList', this.pageList[this.currentPageIndexNo]);
+        this.toEmitCurrentPageList(this.currentPageIndexNo);
+      }
+    },
+    onDragEnd(event) {
+      this.destroyPageOutLine();
+      const newIndex = event.newIndex;
+      this.currentPageIndexNo = newIndex;
+      this.$nextTick(() => {
+        const previousSelectedElement = this.$refs.pageList.$el.querySelector('.page-body.selected');
+        if(previousSelectedElement) {
+          previousSelectedElement.style.outline = '1px solid rgb(39, 186, 255)';
+        }
+      });
+    },
+
+    onDragStart(event) {
+      this.destroyPageOutLine();
+      const startIndex = event.oldIndex;
+      this.currentPageIndexNo = startIndex;
+      this.toEmitCurrentPageListForDrag(this.currentPageIndexNo);
+    },
+
+    toEmitCurrentPageList(currentPageIndexNo) {
+      this.$emit('currentPageList', this.pageList[currentPageIndexNo]);
+      this.$nextTick(() => {
+        const previousSelectedElement = this.$refs.pageList.$el.querySelector('.page-body.selected');
+        if(previousSelectedElement) {
+          previousSelectedElement.style.outline = '1px solid rgb(39, 186, 255)';
+        }
+      });
+    },
+
+    toEmitCurrentPageListForDrag(currentPageIndexNo) {
+      this.$emit('currentPageList', this.pageList[currentPageIndexNo]);
+      const previousSelectedElement = this.$refs.pageList.$el.querySelector('.sortable-chosen');
+      
+      if(previousSelectedElement) {
+        const childElement = previousSelectedElement.querySelector('.page-body');
+        if(childElement) { childElement.style.outline = '1px solid rgb(39, 186, 255)'; }
+      }
+
+    },
+
+    destroyPageOutLine() {
+      const previousSelectedElement = this.$refs.pageList.$el.querySelector('.page-body.selected');
+      if(previousSelectedElement) {
+        previousSelectedElement.style.outline = '';
       }
     },
   },
@@ -356,6 +417,7 @@ export default {
   height: 7vw;
   background-color: white;
   box-shadow: 1px 1px 5px rgba(139, 139, 139, 0.1);
+  margin: 5px;
 }
 
 label {

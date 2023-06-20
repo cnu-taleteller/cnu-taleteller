@@ -9,8 +9,7 @@
       <img class="header-btn" @click="editBookName()" src="@/assets/check.png">
     </div>
     <div class="header-menu" v-if="toolState != 'new' && toolState != 'gpt'">
-      <!-- <button @click="preview()">미리보기</button> -->
-      <button @click="preview2()">미리보기2</button>
+      <button @click="preview2()">미리보기</button>
       <button @click="saveTmp('temp')">임시저장</button>
       <button @click="saveBook()">제출</button>
     </div>
@@ -266,29 +265,6 @@ export default {
           });
       }
 
-    },
-
-    preview() {
-      const chk = confirm('임시저장 후 이용하실 수 있습니다. 저장하시겠습니까?');
-      if (!chk) return;
-      try {
-        this.saveTmp('temp');
-      } catch {
-        alert('서버 오류로 저장에 실패하였습니다. 잠시 후 이용해주세요.🥲')
-        return;
-      }
-
-      setTimeout(() => {
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        const windowWidth = 1000;
-        const windowHeight = 700;
-        const left = (screenWidth - windowWidth) / 2;
-        const top = (screenHeight - windowHeight) / 2;
-
-        const queryString = `pageList=${encodeURIComponent(JSON.stringify(this.pageList))}`;
-        window.open(`/preview?${queryString}`, 'previewWindow', `width=${windowWidth}, height=${windowHeight}, left=${left}, top=${top}`);
-      }, 2000);
     },
 
     preview2() {

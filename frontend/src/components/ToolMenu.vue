@@ -89,25 +89,83 @@
             <button class="submit-btn select-btn" :disabled="isDisabled2" @click="setScenario()">이 시나리오 선택하기</button>
           </div>
         </div>
-        <div v-else-if="selectedMenu == 'tts'">
-          <input type="radio" name="myRadio" value="male" @change="handleTtsChange">
-          <label for="maleVoice1">남성</label>
-          <input type="radio" name="myRadio" value="female" @change="handleTtsChange">
-          <label for="femaleVoice1">여성</label>
-          <button class="submit-btn" @click="addTts()">추가</button>
-<!--          <button class="submit-btn" @click="addTts()">미리 듣기</button>-->
-        </div>
-        <div v-else-if="selectedMenu == 'recode'">
-          <div v-if="!recordingStarted">
-            <button @click="startRecording()">녹음 시작</button>
+        <div class="ttsme" v-else-if="selectedMenu == 'tts'">
+            <button class="submit-btn" @click="addTts()">추가</button>
+            <p></p><p></p>
+          <div class="ttsbtbox">
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="다인"><p></p>
+              <input type="radio" name="myRadio" value="ndain" @change="handleTtsChange">
+              <label for="ndain">다인</label><p></p>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="마녀 사바나" ><p></p>
+              <input type="radio" name="myRadio" value="nsabina" @change="handleTtsChange">
+              <label for="nsabina">마녀 사바나</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="아라"><p></p>
+              <input type="radio" name="myRadio" value="dara_ang" @change="handleTtsChange">
+              <label for="dara_ang">아라</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="민영"><p></p>
+              <input type="radio" name="myRadio" value="nminyoung" @change="handleTtsChange">
+              <label for="nminyoung">민영</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="샤샤"><p></p>
+              <input type="radio" name="myRadio" value="nshasha" @change="handleTtsChange">
+              <label for="nshasha">샤샤</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="미경"><p></p>
+              <input type="radio" name="myRadio" value="vmikyung" @change="handleTtsChange">
+              <label for="vmikyung">미경</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="하준"><p></p>
+              <input type="radio" name="myRadio" value="nhajun" @change="handleTtsChange">
+              <label for="nhajun">하준</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="기태"><p></p>
+              <input type="radio" name="myRadio" value="nkitae" @change="handleTtsChange">
+              <label for="nkitae">기태</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="기효"><p></p>
+              <input type="radio" name="myRadio" value="nes_c_kihyo" @change="handleTtsChange">
+              <label for="nes_c_kihyo">기효</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="래원"><p></p>
+              <input type="radio" name="myRadio" value="nraewon" @change="handleTtsChange">
+              <label for="nraewon">래원</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="악마 마몬"><p></p>
+              <input type="radio" name="myRadio" value="nmammon" @change="handleTtsChange">
+              <label for="nmammon">악마 마몬</label>
+            </div>
+            <div class="ttsbt">
+              <img src="@/assets/people.png" alt="영일"><p></p>
+              <input type="radio" name="myRadio" value="nyoungil" @change="handleTtsChange">
+              <label for="nyoungil">영일</label>
+            </div>
           </div>
-          <div v-else>
+        </div>
+        <div class="record" v-else-if="selectedMenu == 'recode'">
+          <div v-if="!recordingStarted">
+            <button @click="startRecording()"><img src="@/assets/play.png" alt="녹음 시작"></button>
+          </div>
+          <div class="record" v-else>
             <div>{{ timerDisplay }}</div>
-            <button @click="stopRecording()">멈춤</button>
+            <button @click="stopRecording()"><img src="@/assets/stop.png" alt="녹음 시작"></button>
           </div>
           <div>
-            <div v-for="(audioUrl, index) in this.voiceList" :key="index">
-              <audio :src="audioUrl" controls></audio>
+            <div v-for="(audioUrl, index) in this.currentPageList.caption.voiceList" :key="index">
+              <audio :src="audioUrl" controls></audio><p></p>
               <label>
                 <input type="radio" :value="audioUrl" v-model="selectedAudio">선택하기
               </label>
@@ -173,7 +231,6 @@ export default {
       selectScenario: [], // 선택한 시나리오
       resultScenario: [],  // [도입], [전개] 등 다 있는 시나리오 - session 저장용
       isReScenario: false,
-      voiceList: [], //TTS나 음성녹음 리스트
 
       uploadBackList: [],
       uploadCharList: [],
@@ -194,7 +251,6 @@ export default {
       timer: null,
       elapsedTime: 0,
       selectedAudio: null,
-
     }
   },
   props: {
@@ -396,11 +452,19 @@ export default {
           const selectedValue = event.target.value;
           this.$emit('ttsValueChange', selectedValue);
       },
+      playAudio(audioPath){
+        const audio = new Audio(audioPath);
+        audio.play();
+      },
       addTts() {
           const text = this.currentPageList.caption.content;
           const voice = this.currentPageList.caption.ttsVoice;
           const language = "ko-KR";
           console.log(text);
+          if(text==""){
+            alert("자막을 입력해주세요");
+            stop();
+          }
 
           axios.post('/api/v1/tool/tts', {
                   text,
@@ -413,7 +477,7 @@ export default {
               this.currentPageList.caption.ttsName = `${process.env.VUE_APP_S3_PATH}/${response.data.encodedFileName}`;
               console.log(this.currentPageList.caption.ttsName);
 
-              this.voiceList.push(this.currentPageList.caption.ttsName);
+              //this.voiceList.push(this.currentPageList.caption.ttsName);
               //sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
              // console.log(this.voiceList);
 
@@ -472,7 +536,7 @@ export default {
                   this.currentPageList.caption.ttsName = fileName;
                   console.log('음성 녹음이 S3 서버로 전송되었습니다.');
                   console.log(this.currentPageList.caption.ttsName);
-                  this.voiceList.push(this.currentPageList.caption.ttsName);
+                  this.currentPageList.caption.voiceList.push(this.currentPageList.caption.ttsName);
               })
               .catch(error => {
                   console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);
@@ -624,6 +688,33 @@ input[type=file]::file-selector-button:hover {
 .menu-btn.active {
   background-color: gray;
   color: white;
+}
+.ttsme{
+  flex-wrap: wrap;
+  overflow-y: auto;
+}
+.ttsme img{
+  width: 100%;
+  max-width: 70px;
+}
+
+.ttsbtbox{
+  flex-wrap: wrap;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ttsbt {
+  width: 100px;
+  height : 150px;
+  overflow: auto;
+  float: left;
+
+}
+.record img {
+  width: 100%;
+  max-width: 30px;
 }
 
 .story-input {

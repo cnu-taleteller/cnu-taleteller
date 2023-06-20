@@ -1,6 +1,8 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
+import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.Repository.PaymentRepository;
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.entity.Payment;
 import com.cnu.taleteller.backend.domain.user.dto.KakaopayApprovalVO;
 import com.cnu.taleteller.backend.domain.user.dto.KakaopayReadyVO;
@@ -26,37 +28,54 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final MemberRepository memberRepository;
     PaymentDto paymentDto = new PaymentDto();
 
     private static final String HOST = "https://kapi.kakao.com";
     private KakaopayReadyVO kakaopayReadyVO;
     private KakaopayApprovalVO kakaopayApprovalVO;
 
-    public void pointChargeSet(int point, String method) {
+
+    public void pointChargeSet(int point, String method, String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
         paymentDto.setPayCount(point);
         paymentDto.setPaySort("충전");
         paymentDto.setPayType(method);
+        paymentDto.setMemberId(memId);
         paymentDto.setChargeCheck(true);
+
     }
 
     public void pointChargeSave() {
         if(paymentDto.chargeCheck==true) {
-            System.out.println(paymentDto.getPayCount());
-            System.out.println(paymentDto.getPaySort());
-            Payment payment = Payment.toPayment(paymentDto);
-            paymentRepository.save(payment);
+            System.out.println(paymentDto.getPaySort()+" : "+paymentDto.getPayCount()+"개");
+
+            //Dto에 저장된 id값으로 Member 객체를 직업 찾아 넣음
+            Member member = memberRepository.findById(paymentDto.getMemberId())
+                            .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다. id=" + paymentDto.getMemberId()));
+
+            paymentRepository.save(paymentDto.toEntity(member)).getPayId();
             paymentDto.setChargeCheck(false);
         }else{
             System.out.println("중복 충전 방지");
         }
     }
 
-    public void pointReturnSave(int point) {
+    public void pointReturnSave(int point, String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
         paymentDto.setPayCount(point);
         paymentDto.setPaySort("환급");
         paymentDto.setPayType("-");
-        Payment payment = Payment.toPayment(paymentDto);
-        paymentRepository.save(payment);
+        paymentDto.setMemberId(memId);
+        
+        Member member = memberRepository.findById(paymentDto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다. id=" + paymentDto.getMemberId()));
+
+        paymentRepository.save(paymentDto.toEntity(member)).getPayId();
         System.out.println("환급 완료");
     }
 
@@ -69,10 +88,11 @@ public class PaymentService {
         System.out.println("상품 결제 완료");
     }
 
-    public List<Payment> findAll() {
-        //List<Payment> list = paymentRepository.findAll();
-        //List<PaymentDto> resultList = Arrays.asList((PaymentDto) list);
-        return paymentRepository.findAll();
+    public List<Payment> findAllMyPayList(String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
+        return paymentRepository.findAllMyPayList(memId);
     }
 
     public List<Payment> findByLast() {

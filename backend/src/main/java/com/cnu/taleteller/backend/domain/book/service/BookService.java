@@ -133,6 +133,13 @@ public class BookService {
         return bookRepository.findAllMyBookmark(memId);
     }
 
+    public List<Book> findAllMyPaywork(String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
+        return bookRepository.findAllMyPaywork(memId);
+    }
+
     @Transactional(readOnly = true)
     public List<Long> findUserBookList(String userEmail) {
         List<Long> bookList = bookRepository.findMyBookList(userEmail);

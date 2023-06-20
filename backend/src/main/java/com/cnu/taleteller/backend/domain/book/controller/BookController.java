@@ -104,6 +104,13 @@ public class BookController {
         List<Book> mybookmarkSearch = bookService.findAllMyBookmark(email);
         return ResponseEntity.ok(mybookmarkSearch);
     }
+
+    @GetMapping("/mypaywork/{email}")
+    public ResponseEntity<List<Book>> mypayworkSearch(@PathVariable String email) {
+        System.out.println("결제작품 : "+email);
+        List<Book> mypayworkSearch = bookService.findAllMyPaywork(email);
+        return ResponseEntity.ok(mypayworkSearch);
+    }
         
     @PostMapping("/userBookList")
     public List<Long> userBookList(@RequestBody String userEmail) throws UnsupportedEncodingException {

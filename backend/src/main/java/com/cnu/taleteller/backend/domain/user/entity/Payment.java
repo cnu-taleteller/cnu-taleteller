@@ -9,7 +9,6 @@ import javax.persistence.*;
 @Table(name = "payment")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Payment extends BaseTimeEntity{
 
@@ -31,11 +30,22 @@ public class Payment extends BaseTimeEntity{
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member memberId;
 
     @ManyToOne
     @JoinColumn(name = "book_id")
-    private Book book;
+    private Book bookId;
+
+    @Builder
+    public Payment(Long payId, String paySort, int payCount, String payType, String payDetails, Member memberId, Book bookId) {
+        this.payId = payId;
+        this.paySort = paySort;
+        this.payCount = payCount;
+        this.payType = payType;
+        this.payDetails = payDetails;
+        this.memberId = memberId;
+        this.bookId = bookId;
+    }
 
     public static Payment toPayment(PaymentDto paymentDto) {
         Payment payment = new Payment();
@@ -44,6 +54,8 @@ public class Payment extends BaseTimeEntity{
         payment.setPayDate(paymentDto.getPayDate());
         payment.setPaySort(paymentDto.getPaySort());
         payment.setPayType(paymentDto.getPayType());
+//        payment.setBookId(paymentDto.getBookId());
+//        payment.setMemberId(paymentDto.getMemberId());
         return payment;
     }
 

@@ -33,6 +33,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     //3개 테이블 left join(books, bookmarks, members) : 해당 회원이 즐겨찾기한 작품
     @Query("SELECT b FROM Book b LEFT JOIN BookMark bm ON b.bookId = bm.book.bookId " +
-            "LEFT JOIN Member m ON b.member.memberId = m.memberId WHERE bm.member.memberId = :memberId")
+            "LEFT JOIN Member m ON b.member.memberId = m.memberId " +
+            "WHERE bm.member.memberId = :memberId")
     List<Book> findAllMyBookmark(Long memberId);
+
+    //3개 테이블 left join(books, payment, members) : 해당 회원이 결제한 작품
+    @Query("SELECT b FROM Book b LEFT JOIN Payment p ON b.bookId = p.bookId.bookId " +
+            "LEFT JOIN Member m ON b.member.memberId = m.memberId " +
+            "WHERE p.memberId.memberId = :memberId AND p.paySort = '결제'")
+    List<Book>findAllMyPaywork(Long memberId);
 }

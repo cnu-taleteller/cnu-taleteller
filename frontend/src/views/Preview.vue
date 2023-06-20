@@ -165,7 +165,7 @@ export default {
         addDiv.style.top = caption.top;
         textDiv.style.height = "100%";
         textDiv.style.fontWeight = "bold";
-        textDiv.style.fontSize = caption.fontSize + 'px';
+        textDiv.style.fontSize = caption.fontSize;
         textDiv.style.color = caption.fontColor;
         textDiv.innerText = caption.content;
         addDiv.style.position = "absolute";

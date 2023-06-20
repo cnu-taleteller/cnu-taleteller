@@ -58,6 +58,7 @@ export default {
       result: null,
       isDisabled: true,
       isCaptionChange: false,
+      isResizable: false,
     }
   },
   mounted() {
@@ -120,11 +121,12 @@ export default {
     let currentObjId = null;
     let currentObj;
     let result;
-    let targetObj;
+    let targetObjId;
     let target;
     let parentDiv;
     let resizableElement;
     let contentText;
+    let currentPageList;
 
     this.imageEventDrop(imageArea);
     this.imageEventDragOver(imageArea);
@@ -140,6 +142,7 @@ export default {
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       target = e.target;
+      currentPageList = toolMenu.currentPageList;
 
       if (target.id.includes('background') || target.dataset.textContent === 'true') {
         toolMenu.isDisabled = true;
@@ -168,24 +171,24 @@ export default {
       if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
         toolMenu.removeResizableElement(resizableElement, e);
         target.style.outline = '#27BAFF solid 1px';
-        toolMenu.resizableElement(resizableElement, target);
+        toolMenu.resizableElement(currentPageList, resizableElement, target);
       }
     });
 
-    document.addEventListener("mousedown", function (e) {
+    document.addEventListener("mousedown", (e) => {
       e.stopPropagation();
       toolMenu.inputValue = false;
       const textDiv = document.querySelector('[data-text-content="true"]');
       if (textDiv) {
         textDiv.contentEditable = false;
-        if(contentText && toolMenu.isCaptionChange) {
+        if (contentText && toolMenu.isCaptionChange && currentPageList) {
           toolMenu.canvas().then((todataUrl) => {
-            toolMenu.currentPageList.caption.content = contentText;
-            toolMenu.currentPageList.thumbnail = todataUrl;
+            currentPageList.caption.content = contentText;
+            currentPageList.thumbnail = todataUrl;
             toolMenu.isCaptionChange = false;
           });
         }
-      }
+      };
       if (e.target.dataset.objType !== "character" && e.target.dataset.objType !== "background" && e.target.dataset.objType !== "caption" && e.target.dataset.objType !== 'popupMenu') {
         popupMenu.style.display = "none";
         toolMenu.removeResizableElement(resizableElement, e);
@@ -207,42 +210,44 @@ export default {
     //드래그 시작부분(selected page)
     function dragStart(e) {
       e.stopPropagation();
+
       target = e.target;
       parentDiv = target.closest('#textArea');
-      const textDiv = document.querySelector('[data-text-content="true"]');
+
+      currentPageList = toolMenu.currentPageList;
 
       if (parentDiv) {
         target = parentDiv;
       } else {
+        const textDiv = document.querySelector('[data-text-content="true"]');
         if (textDiv) {
           textDiv.contentEditable = false;
           toolMenu.inputValue = false;
         }
-      }
+      };
 
       if (e.button === 0 && !toolMenu.inputValue && !e.target.classList.contains('ui-resizable-handle')) {
         toolMenu.removeResizableElement(resizableElement, e);
         popupMenu.style.display = "none";
         target.style.outline = '#27BAFF solid 1px';
 
-        targetObj = target.id;
-        if (parentDiv) targetObj = parentDiv.id;
+        targetObjId = target.id;
+        if (parentDiv) targetObjId = parentDiv.id;
 
-        if (targetObj === 'textArea') {
-          result = toolMenu.currentPageList.caption;
-        } else {
-          result = toolMenu.currentPageList.layerList.find(el => el.id === targetObj);
-        }
+        if (targetObjId === 'textArea') { result = currentPageList.caption; }
+        else { result = currentPageList.layerList.find(el => el.id === targetObjId); };
 
         if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
-          toolMenu.resizableElement(resizableElement, target);
+          toolMenu.resizableElement(currentPageList, resizableElement, target);
         }
-        currentObjId = targetObj;
+
+        currentObjId = targetObjId;
         currentObj = target;
         currentX = e.pageX - dragArea.offsetLeft;
         currentY = e.pageY - dragArea.offsetTop;
         currentXOffset = e.pageX - dragArea.offsetLeft - e.offsetX;
         currentYOffset = e.pageY - dragArea.offsetTop - e.offsetY;
+
         if (parentDiv) currentObj = parentDiv;
         currentObj.style.opacity = '0.5';
         active = true;
@@ -254,7 +259,8 @@ export default {
     function drag(e) {
       e.stopPropagation();
       e.preventDefault();
-      if (active && currentObjId === e.target.id && e.target.dataset.objType == 'character' || 'background') {
+
+      if (active) {
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
         requestAnimationFrame(() => {
@@ -265,25 +271,27 @@ export default {
     };
 
     //드래그 끝내는 부분 (selected page)
-    function dragEnd(e) {
-      if (active) {
-        currentObj.style.opacity = '1';
-        if (targetObj === 'textArea') {
-          toolMenu.canvas().then((todataUrl) => {
-            result.left = currentObj.style.left;
-            result.top = currentObj.style.top;
-            toolMenu.currentPageList.thumbnail = todataUrl;
-          });
-        } else {
-          toolMenu.canvas().then((todataUrl) => {
-            result.style.left = currentObj.style.left;
-            result.style.top = currentObj.style.top;
-            toolMenu.currentPageList.thumbnail = todataUrl;
-          });
-        }
-        active = false;
-        document.removeEventListener('mousemove', drag);
+    function dragEnd() {
+      if (!active) return;
+
+      currentObj.style.opacity = '1';
+
+      if (targetObjId === 'textArea') {
+        toolMenu.canvas().then((todataUrl) => {
+          result.left = currentObj.style.left;
+          result.top = currentObj.style.top;
+          currentPageList.thumbnail = todataUrl;
+        });
+      } else {
+        toolMenu.canvas().then((todataUrl) => {
+          result.style.left = currentObj.style.left;
+          result.style.top = currentObj.style.top;
+          currentPageList.thumbnail = todataUrl;
+        });
       }
+
+      active = false;
+      document.removeEventListener('mousemove', drag);
     };
 
     //자막 입력 부분
@@ -380,41 +388,38 @@ export default {
       try {
         this.$store.commit('setCanvasCompleted', false);
         const imageArea = this.$refs.dragImage;
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
 
         const reductionRatioPageSize = 0.5;
         const reductionRatio = 0.8;
 
-        const resizableElements = Array.from(imageArea.querySelectorAll('.ui-resizable-handle'));
-        const resizableElementSet = new Set(resizableElements);
-        const ignoreElements = element => resizableElementSet.has(element);
+        let ignoreElements = null;
+
+        if (this.isResizable) {
+          ignoreElements = element =>
+            element.classList.contains('ui-resizable-handle');
+          this.isResizable = false;
+        }
 
         const canvas = await html2canvas(imageArea, { useCORS: true, ignoreElements });
-        const ctx = canvas.getContext('2d');
 
-        await new Promise((resolve, reject) => {
-          const dataUrl = canvas.toDataURL('image/png', reductionRatio);
-          img.src = dataUrl;
-          img.onload = () => resolve();
-          img.onerror = reject;
-        });
+        const reducedWidth = Math.round(canvas.width * reductionRatioPageSize);
+        const reducedHeight = Math.round(canvas.height * reductionRatioPageSize);
 
-        const reducedWidth = Math.floor(img.width * reductionRatioPageSize);
-        const reducedHeight = Math.floor(img.height * reductionRatioPageSize);
+        const resizedCanvas = document.createElement('canvas');
+        resizedCanvas.width = reducedWidth;
+        resizedCanvas.height = reducedHeight;
 
-        canvas.width = reducedWidth;
-        canvas.height = reducedHeight;
+        const resizedCtx = resizedCanvas.getContext('2d');
+        resizedCtx.drawImage(canvas, 0, 0, reducedWidth, reducedHeight);
 
-        ctx.drawImage(img, 0, 0, reducedWidth, reducedHeight);
-        const todataUrl = canvas.toDataURL('image/png', reductionRatio);
+        const todataUrl = resizedCanvas.toDataURL('image/png', reductionRatio);
 
         this.$store.commit('setCanvasCompleted', true);
-        return Promise.resolve(todataUrl);
+        return todataUrl;
       } catch (err) {
         this.$store.commit('setCanvasCompleted', true);
         console.log(err);
-        return Promise.reject(err);
+        return err;
       }
     },
 
@@ -589,37 +594,53 @@ export default {
 
     //toolmenu 에서 selectedPage 로 드롭하는 부분
     imageEventDrop(element) {
+
+      const toolSelectedPageDrag = this.$refs.pageForm;
       let nextId = this.nextId;
-      let toolSelectedPageDrag = this.$refs.pageForm;
 
       element.addEventListener("drop", (e) => {
         e.preventDefault();
         e.stopPropagation();
 
+        const currentPage = this.currentPageList;
+
+        const dragImageWidth = toolSelectedPageDrag.offsetWidth;
+        const dragImageHeight = toolSelectedPageDrag.offsetHeight;
+
         let rX = e.pageX - toolSelectedPageDrag.offsetLeft;
         let rY = e.pageY - toolSelectedPageDrag.offsetTop;
 
         let [data, x, y] = e.dataTransfer.getData("text/plain").split(',');
+
         if (data == null || x == null || y == null) {
           return;
         }
 
-        let imageElement = document.querySelector(`.menu .image-list #item #${data}`);
+        const imageElement = document.querySelector(`.menu .image-list #item #${data}`);
 
         let newDiv = document.createElement('div');
+
+        //캐릭터 배경 공통
         newDiv.setAttribute("draggable", "false");
         newDiv.setAttribute('data-obj-type', this.selectedMenu);
         newDiv.id = this.selectedMenu + nextId++;
+
         newDiv.style.position = "absolute";
         newDiv.style.zIndex = 1;
 
+        //배경일 때
         if (this.selectedMenu == 'background') {
-          const dragImageWidth = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('width');
-          const dragImageHeight = window.getComputedStyle(toolSelectedPageDrag).getPropertyValue('height');
+
+          const maxWidth = Math.max(dragImageWidth, 800);
+          const maxHeight = Math.max(dragImageHeight, 550);
+
           newDiv.style.left = "0px";
           newDiv.style.top = "0px";
-          newDiv.style.width = dragImageWidth > 800 ? dragImageWidth : "800px";
-          newDiv.style.height = dragImageHeight > 550 ? dragImageHeight : "550px";
+          newDiv.style.width = `${maxWidth}px`;
+          newDiv.style.height = `${maxHeight}px`;
+          newDiv.style.backgroundImage = `url(${imageElement.src})`;
+          newDiv.style.backgroundRepeat = 'no-repeat';
+          newDiv.style.backgroundSize = 'cover';
 
           let newImage = {
             fileId: imageElement.src,
@@ -634,27 +655,23 @@ export default {
             },
           };
 
-          newDiv.style.backgroundImage = `url(${imageElement.src})`;
-          newDiv.style.backgroundRepeat = 'no-repeat';
-          newDiv.style.backgroundSize = 'cover';
-
           let elementToRemove = Array.from(document.querySelectorAll(`.object div`))
             .find(el => el.id.includes('background'));
-
           document.querySelector('.object').insertBefore(newDiv, document.querySelector('.object').firstChild);
-          
+
           if (elementToRemove) {
             elementToRemove.parentNode.removeChild(elementToRemove);
             this.canvas().then((todataUrl) => {
-              this.currentPageList.layerList.splice(0, 1, newImage);
-              this.currentPageList.thumbnail = todataUrl;
+              currentPage.layerList.splice(0, 1, newImage);
+              currentPage.thumbnail = todataUrl;
             });
           } else {
             this.canvas().then((todataUrl) => {
-              this.currentPageList.layerList.unshift(newImage);
-              this.currentPageList.thumbnail = todataUrl;
+              currentPage.layerList.unshift(newImage);
+              currentPage.thumbnail = todataUrl;
             });
           };
+          //캐릭터 일 때
         } else {
           newDiv.style.left = (rX - x) + "px";
           newDiv.style.top = (rY - y) + "px";
@@ -680,48 +697,55 @@ export default {
           newDiv.style.backgroundSize = 'contain';
 
           document.querySelector('.object').appendChild(newDiv);
-          this.imageIndex = this.currentPageList.layerList.length;
+          this.imageIndex = currentPage.layerList.length;
 
           this.canvas().then((todataUrl) => {
-            this.currentPageList.layerList[this.imageIndex] = newImage;
-            this.currentPageList.thumbnail = todataUrl;
+            currentPage.layerList[this.imageIndex] = newImage;
+            currentPage.thumbnail = todataUrl;
           });
         };
       });
     },
+
     removeResizableElement(resizableElement, e) {
       const resizableElements = document.querySelectorAll('.ui-resizable');
+
       resizableElements.forEach(element => {
         if (element !== resizableElement && !element.contains(e.target)) {
           $(element).resizable('destroy');
           element.style.outline = '';
         };
       });
+
     },
-    resizableElement(resizableElement, target) {
+    resizableElement(currentPageList, resizableElement, target) {
       let toolMenu = this;
+      toolMenu.isResizable = true;
+
       resizableElement = $(target).resizable({
         handles: 'n, e, s, w, ne, se, sw, nw',
         stop: () => {
           let targetId = target.id;
           let resizeTarget;
+          toolMenu.isResizable = true;
           if (targetId === 'textArea') {
             toolMenu.canvas().then((todataUrl) => {
-              resizeTarget = toolMenu.currentPageList.caption;
+              resizeTarget = currentPageList.caption;
               resizeTarget.left = target.style.left;
               resizeTarget.top = target.style.top;
               resizeTarget.width = target.style.width;
               resizeTarget.height = target.style.height;
-              toolMenu.currentPageList.thumbnail = todataUrl;
+              currentPageList.thumbnail = todataUrl;
             });
           } else {
+            toolMenu.isResizable = true;
             toolMenu.canvas().then((todataUrl) => {
-              resizeTarget = toolMenu.currentPageList.layerList.find(el => el.id === targetId);
+              resizeTarget = currentPageList.layerList.find(el => el.id === targetId);
               resizeTarget.style.left = target.style.left;
               resizeTarget.style.top = target.style.top;
               resizeTarget.style.width = target.style.width;
               resizeTarget.style.height = target.style.height;
-              toolMenu.currentPageList.thumbnail = todataUrl;
+              currentPageList.thumbnail = todataUrl;
             });
           }
         }
@@ -792,6 +816,7 @@ export default {
         'margin': '-5px 0 0 -10px',
       });
     },
+
     changeCaptionElement() {
       const colorPreview = this.$refs.colorPreview;
 
@@ -985,5 +1010,4 @@ textarea {
   border: none;
   outline: 0;
 }
-
 </style>

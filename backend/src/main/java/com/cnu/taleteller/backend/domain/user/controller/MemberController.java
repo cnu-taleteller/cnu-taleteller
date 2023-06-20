@@ -40,15 +40,15 @@ public class MemberController {
     @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
     public Boolean login(@RequestBody Map<String, String> loginInfo, HttpSession session) {
         String memberEmail = loginInfo.get("memberEmail");
-        String memberPassword = loginInfo.get("memberPassword");
+//        String memberPassword = loginInfo.get("memberPassword");
 
         try {
             UserDetails member = memberService.loadUserByUsername(memberEmail);
-            UserDetails memberpw = memberService.loadUserByPassword(memberPassword);
+//            UserDetails memberpw = memberService.loadUserByPassword(memberPassword);
             session.setAttribute("user", memberEmail);
             return memberService.loginDropCheck(memberEmail);
         } catch (UsernameNotFoundException e) {
-            return Boolean.valueOf("no");
+            return false;
         }
     }
     @PostMapping("/checkemail")

@@ -1,13 +1,7 @@
 <template>
   <div class="container">
     <hr>
-    <h2>작품 대쉬보드</h2>
-    <br>
-    <br>
-    <div class="row">
-      <h3 class="title" @click="selectAllBooks()">작품 모두 선택</h3>
       <h4 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">     새로운 동화책 만들기</h4>
-    </div>
 
     <div class="column">
       <button v-if="selectedBookList.length > 0" @click="deleteSelectedBooks()">삭제하기</button>
@@ -24,24 +18,15 @@
 
 <style scoped>
 
-.container .row {
-  display: flex;
-  align-items: center;
-}
-
-.container .title {
-  flex: 1;
-  border: none;
-}
 
 .container h4{
   width: 25%;
   height: 10%;
   margin: 5px;
-  background-color: #fceb6eb4;
+  /* background-color: #fceb6eb4; */
   font-weight: bold;
   color: rgb(51, 51, 51);
-  border-radius: 4px;
+  /* border-radius: 4px; */
   border: none;
   cursor: pointer;
   text-align: center;
@@ -52,9 +37,9 @@
   margin-top: 3%;
   margin-bottom: 3%;
 }
-.container{
-  text-align: left;
-}
+/* .container{
+  text-align: center;
+} */
 
 
 

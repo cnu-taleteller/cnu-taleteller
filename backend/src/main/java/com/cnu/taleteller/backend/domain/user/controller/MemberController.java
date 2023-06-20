@@ -43,11 +43,12 @@ public class MemberController {
         String memberPassword = loginInfo.get("memberPassword");
 
         try {
-            UserDetails member = memberDetailsService.loadUserByUsername(memberEmail);
+            UserDetails member = memberService.loadUserByUsername(memberEmail);
+            UserDetails memberpw = memberService.loadUserByPassword(memberPassword);
             session.setAttribute("user", memberEmail);
             return memberService.loginDropCheck(memberEmail);
         } catch (UsernameNotFoundException e) {
-            return false; // 해당 이메일을 가진 회원이 존재하지 않음
+            return Boolean.valueOf("no");
         }
     }
     @PostMapping("/checkemail")

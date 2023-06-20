@@ -1,21 +1,21 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import ToolView from '../views/ToolView.vue'
-import MyPageWork from '../views/MypageViewWork.vue'
-import MyPagePoint from '../views/MypageViewPoint.vue'
-import MyPageChargeResult from '../views/MypageViewChargeResult.vue'
-import MyPageMemInfo from '../views/MypageViewMemInfo.vue'
-import ToolSubmitView from '../views/ToolSubmitView.vue'
-//import SearchView from "../views/SearchView.vue";
-import DummySearchView from "../views/DummySearchView.vue";
-import DummyDetailView from "../views/DummyDetailView.vue";
-//import BookDetailView from "../views/BookDetailView.vue";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import ToolView from '../views/ToolView.vue';
+import MyPageWork from '../views/MypageViewWork.vue';
+import MyPagePoint from '../views/MypageViewPoint.vue';
+import MyPageChargeResult from '../views/MypageViewChargeResult.vue';
+import MyPageMemInfo from '../views/MypageViewMemInfo.vue';
+import ToolSubmitView from '../views/ToolSubmitView.vue';
+import SearchView from "../views/SearchView.vue";
+import BookDetailView from "../views/BookDetailView.vue";
 import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
 import Preview from '../views/Preview.vue'
 import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
 import ModalPassword from '../views/ModalPassword.vue'
+import GoingTool from '../components/GoingTool.vue';
+import AdminView from "@/views/AdminView.vue";
 
 
 Vue.use(VueRouter)
@@ -69,12 +69,12 @@ const routes = [
   {
     path: '/search',
     name: 'Search',
-    component: DummySearchView
+    component: SearchView
   },
   {
     path: '/detail/:id',
     name: 'BookDetail',
-    component: DummyDetailView
+    component: BookDetailView
   },
   {
     path: '/loginview',
@@ -90,6 +90,16 @@ const routes = [
     path: '/modalpassword',
     name: 'ModalPassword',
     component: ModalPassword
+  },
+  {
+    path: '/goingTool',
+    name: 'GoingTool',
+    component: GoingTool
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminView
   },
 ]
 

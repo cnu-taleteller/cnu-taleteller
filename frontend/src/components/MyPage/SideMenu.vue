@@ -22,7 +22,6 @@
           {content: '회원 정보', link: '/mypage/member'},
           {content: '작품 관리', link: '/mypage/workmanage'},
           {content: '엽전 관리', link: '/mypage/pointmanage'},
-          {content: '즐겨찾기', link: '/mypage/bookmark'}
         ],
       }
     },

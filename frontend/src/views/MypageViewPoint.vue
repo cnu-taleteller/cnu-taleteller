@@ -74,7 +74,8 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
       },
 
       getDetails(){
-        axios.get("/api/point/wallet")
+        this.memberEmail = sessionStorage.getItem('user')
+        axios.get(`/api/point/wallet/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.detailsResult = res.data;
@@ -86,15 +87,22 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
 
       pointReturn(returnValue){
         if(confirm("환급하시겠습니까?")){
-          axios.post("/api/point/return", {
-            returnPoint: returnValue,
-          })
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-          });  
+          if(this.pointTotal==0){
+            alert("환급할 엽전이 없습니다.")
+          }
+          else{
+            this.memberEmail = sessionStorage.getItem('user')
+            axios.post(`/api/point/return/${this.memberEmail}`, {
+              returnPoint: returnValue,
+            })
+            .then((res) => {
+              alert("환급 완료 : 엽전 "+res.data+"개");
+              window.location.reload(true);
+            })
+            .catch((err) => {
+              console.log(err);
+            }); 
+          }
         }
       },
       

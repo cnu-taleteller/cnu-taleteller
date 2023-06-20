@@ -49,7 +49,8 @@ export default {
   },
   methods: {
     pointCharge(method, amount) {
-      axios.post("/api/point/chargeSet", {
+      this.memberEmail = sessionStorage.getItem('user')
+      axios.post(`/api/point/chargeSet/${this.memberEmail}`, {
         chargePoint: amount,
         paymentMethod: method,
       })
@@ -66,7 +67,8 @@ export default {
     },
 
     tossPayments(method, amount) {
-      axios.post("/api/point/chargeSet", {
+      this.memberEmail = sessionStorage.getItem('user')
+      axios.post(`/api/point/chargeSet/${this.memberEmail}`, {
         chargePoint: amount,
         paymentMethod: method,
       });

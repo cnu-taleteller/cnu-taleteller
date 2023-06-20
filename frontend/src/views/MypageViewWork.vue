@@ -10,8 +10,13 @@
             <button type="submit" @click="search">&#x1F50D;</button>
           </div>
         </form>
+        <div class="tab-button">
+          <button @click="changeTab('mywork')">내 작품</button>
+          <button @click="changeTab('bookmark')">즐겨찾기</button>
+          <button @click="changeTab('paywork')">결제작품</button>
+        </div>
       </div>
-      <div v-if="this.searchCheck == false" class="mypage-content">
+      <div v-if="this.searchCheck == false && this.workList == 'mywork'" class="mypage-content">
         <div v-for="result in myWorkResult" :key="result.bookId" class="thumbnail">
             <table @click="goToDetail(1)">
                 <thead>
@@ -33,8 +38,96 @@
             </table>
         </div>
       </div>
-      <div v-else-if="this.searchCheck == true" class="mypage-content">
+      <div v-else-if="this.searchCheck == false && this.workList == 'bookmark'" class="mypage-content">
+        <div v-for="result in bookMarkResult" :key="result.bookId" class="thumbnail">
+            <table @click="goToDetail(1)">
+                <thead>
+                    <tr>
+                        <td>
+                            <!--동화책 썸네일 대체-->
+                            <img v-if="result.bookThumbnail == null" src='@/assets/book1.png'>
+                            <img v-else v-bind:src='result.bookThumbnail'>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          {{ result.bookName }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div v-else-if="this.searchCheck == false && this.workList == 'paywork'" class="mypage-content">
+        <div v-for="result in payWorkResult" :key="result.bookId" class="thumbnail">
+            <table @click="goToDetail(1)">
+                <thead>
+                    <tr>
+                        <td>
+                            <!--동화책 썸네일 대체-->
+                            <img v-if="result.bookThumbnail == null" src='@/assets/book1.png'>
+                            <img v-else v-bind:src='result.bookThumbnail'>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          {{ result.bookName }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div v-else-if="this.searchCheck == true && this.workList == 'mywork'" class="mypage-content">
         <div v-for="result in myWorkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
+            <table @click="goToDetail(1)">
+                <thead>
+                    <tr>
+                        <td>
+                            <!--동화책 썸네일 대체-->
+                            <img v-if="result.bookThumbnail == null" src='@/assets/book1.png'>
+                            <img v-else v-bind:src='result.bookThumbnail'>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          {{ result.bookName }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div v-else-if="this.searchCheck == true && this.workList == 'bookmark'" class="mypage-content">
+        <div v-for="result in bookMarkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
+            <table @click="goToDetail(1)">
+                <thead>
+                    <tr>
+                        <td>
+                            <!--동화책 썸네일 대체-->
+                            <img v-if="result.bookThumbnail == null" src='@/assets/book1.png'>
+                            <img v-else v-bind:src='result.bookThumbnail'>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          {{ result.bookName }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div v-else-if="this.searchCheck == true && this.workList == 'paywork'" class="mypage-content">
+        <div v-for="result in payWorkResult.filter((result) => result.bookName.includes(searchKeyword))" :key="result.bookId" class="thumbnail">
             <table @click="goToDetail(1)">
                 <thead>
                     <tr>
@@ -75,7 +168,10 @@ export default {
         { content: '즐겨찾기', link: '/mypage/bookmark' }
       ],
       myWorkResult: [],
+      bookMarkResult: [],
+      payWorkResult: [],
       searchKeyword: "",
+      workList: "mywork",
       searchCheck: false,
     }
   },
@@ -97,6 +193,34 @@ export default {
         });
       },
 
+      getBookMark() {
+      this.memberEmail = sessionStorage.getItem('user')
+      axios.get(`/api/v1/book/mybookmark/${this.memberEmail}`)
+        .then((res) => {
+          console.log(res);
+          this.bookMarkResult = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      },
+
+      getPayWork() {
+      this.memberEmail = sessionStorage.getItem('user')
+      axios.get(`/api/v1/book/mypaywork/${this.memberEmail}`)
+        .then((res) => {
+          console.log(res);
+          this.payWorkResult = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      },
+
+      changeTab(tab){
+        this.workList = tab;
+      },
+
       goToDetail(id) {
         this.$router.push({ path: `/detail/${id}` });
       },
@@ -113,6 +237,8 @@ export default {
     },
   created() {
     this.getWorkInfo()
+    this.getBookMark()
+    this.getPayWork()
   },
   components: {
     SideMenu: sideMenu,
@@ -168,7 +294,7 @@ export default {
   /* background:rgba(210, 210, 210, 0.6);    */
   overflow: hidden;
   display: flex;
-  margin: 5px 10px 10px 0;
+  margin-top: 10px;
   border-radius: 15px;
   
 }
@@ -270,6 +396,26 @@ button[type="submit"] {
   cursor: pointer;
   margin-right: -10px;
   transition: color .2s ease-in-out;
+}
+
+.tab-button {
+  margin-left: 30px;
+  align-self : center;
+}
+
+.tab-button button {
+  margin: 5px;
+  padding: 10px 20px;
+  background-color: #fceb6e;
+  font-weight: bold;
+  color: rgb(51, 51, 51);
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-button button:hover {
+  opacity: 0.7;
 }
 
 </style>

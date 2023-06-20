@@ -1,5 +1,6 @@
 package com.cnu.taleteller.backend.domain.user.controller;
 
+import com.cnu.taleteller.backend.domain.user.entity.Member;
 import com.cnu.taleteller.backend.domain.user.entity.Payment;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import com.cnu.taleteller.backend.domain.user.service.PaymentService;
@@ -20,19 +21,20 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @GetMapping(value = {"/wallet", "/details"})
-    public ResponseEntity<List<Payment>> pointDetails(Model model) {
-        List<Payment> pointDetails = paymentService.findAll();
+    @GetMapping(value = {"/wallet/{email}", "/details/{email}"})
+    public ResponseEntity<List<Payment>> pointDetails(Model model, @PathVariable String email) {
+        List<Payment> pointDetails = paymentService.findAllMyPayList(email);
         return ResponseEntity.ok(pointDetails);
     }
 
-    @PostMapping("/chargeSet")
-    public String chargeSet(@RequestBody Map<String, String> chargeInfo) {
+    @PostMapping("/chargeSet/{email}")
+    public String chargeSet(@RequestBody Map<String, String> chargeInfo, @PathVariable String email) {
+
         System.out.println("충전포인트 = " + chargeInfo.get("chargePoint"));
         System.out.println("결제수단 = " + chargeInfo.get("paymentMethod"));
         int chargePoint = Integer.parseInt(chargeInfo.get("chargePoint"));
         String paymentMethod = chargeInfo.get("paymentMethod");
-        paymentService.pointChargeSet(chargePoint,paymentMethod);
+        paymentService.pointChargeSet(chargePoint,paymentMethod,email);
 
         log.info("kakaoPay post............................................");
         String kakaopayUrl = paymentService.kakaopayReady();
@@ -53,10 +55,12 @@ public class PaymentController {
         paymentService.bookPaymentSave(paymentPoint);
     }
 
-    @PostMapping("/return")
-    public void returnPoint(@RequestBody PaymentDto point){
+    @PostMapping("/return/{email}")
+    public int returnPoint(@RequestBody PaymentDto point, @PathVariable String email){
         System.out.println("포인트환급 = " + point.returnPoint);
-        paymentService.pointReturnSave(point.returnPoint);
+        paymentService.pointReturnSave(point.returnPoint, email);
+
+        return Math.abs(point.returnPoint);
     }
 
 //    @GetMapping("/kakaoPay")

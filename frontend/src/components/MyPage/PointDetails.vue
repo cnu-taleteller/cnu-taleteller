@@ -9,6 +9,7 @@
           <th>수량</th>
           <th>결제수단</th>
           <th>금액</th>
+          <th>상세</th>
         </thead>
         <tr v-for="result in detailsResult" :key="result.payId">
           <td>{{ result.paySort }}</td>
@@ -16,6 +17,7 @@
           <td>{{ result.payCount }}</td>
           <td>{{ result.payType }}</td>
           <td>{{ Math.abs(result.payCount * 100) }}</td>
+          <td>{{ result.payDetails }}</td>
         </tr>
       </table>
     </div>
@@ -41,7 +43,8 @@ export default {
   },
   methods: {
     getDetails() {
-      axios.get("/api/point/details")
+      this.memberEmail = sessionStorage.getItem('user')
+      axios.get(`/api/point/details/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.detailsResult = res.data;

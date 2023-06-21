@@ -2,6 +2,7 @@
 
 PROJECT_NAME="backend"
 JAR_PATH="/home/ubuntu/app/$PROJECT_NAME/build/libs/*.jar"
+DEPLOY_PATH=/home/ubuntu/app/$PROJECT_NAME/
 DEPLOY_LOG_PATH="/home/ubuntu/app/$PROJECT_NAME/deploy.log"
 DEPLOY_ERR_LOG_PATH="/home/ubuntu/app/$PROJECT_NAME/deploy_err.log"
 APPLICATION_LOG_PATH="/home/ubuntu/app/$PROJECT_NAME/application.log"

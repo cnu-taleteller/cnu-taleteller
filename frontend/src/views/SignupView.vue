@@ -94,7 +94,7 @@
         // }
         const memberAccount = this.accountPart1;
 
-        axios.post("/api/member/signup", {
+        axios.post(`${process.env.VUE_APP_API_PATH}/api/member/signup`, {
           memberEmail: this.memberEmail,
           memberPassword: this.memberPassword,
           memberName: this.memberName,
@@ -123,7 +123,7 @@
           return;
         }
         this.IdMsg = "중복 체크 중...";
-        axios.post("/api/member/checkemail", {
+        axios.post(`${process.env.VUE_APP_API_PATH}/api/member/checkemail`, {
           memberEmail: this.memberEmail,
         })
       .then((response) => {

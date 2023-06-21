@@ -183,7 +183,7 @@ export default {
 
       getWorkInfo() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get(`/api/v1/book/mywork/${this.memberEmail}`)
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/book/mywork/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.myWorkResult = res.data;
@@ -195,7 +195,7 @@ export default {
 
       getBookMark() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get(`/api/v1/book/mybookmark/${this.memberEmail}`)
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/book/mybookmark/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.bookMarkResult = res.data;
@@ -207,7 +207,7 @@ export default {
 
       getPayWork() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get(`/api/v1/book/mypaywork/${this.memberEmail}`)
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/book/mypaywork/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.payWorkResult = res.data;

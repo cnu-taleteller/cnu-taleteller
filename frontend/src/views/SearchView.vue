@@ -29,7 +29,7 @@ export default {
     const searchKeyword = this.$route.query.searchKeyword;
 
     axios
-        .get("/api/v1/book/search", {
+        .get(`${process.env.VUE_APP_API_PATH}/api/v1/book/search`, {
           params: {
             searchType: searchType,
             searchKeyword: searchKeyword,
@@ -81,8 +81,8 @@ li {
 }
 
 .book-image {
-  //width: 80%;
-  //height: auto;
+  /* width: 80%;
+  height: auto; */
   object-fit: contain;
 }
 

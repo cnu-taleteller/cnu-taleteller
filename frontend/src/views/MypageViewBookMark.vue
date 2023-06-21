@@ -87,7 +87,7 @@ export default {
 
       getBookMark() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get(`/api/v1/book/mybookmark/${this.memberEmail}`)
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/book/mybookmark/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.bookMarkResult = res.data;

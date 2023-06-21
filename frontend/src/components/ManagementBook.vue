@@ -46,7 +46,7 @@ export default {
   methods: {
     fetchBooks() {
       axios
-          .get('/api/admin/book')
+          .get(`${process.env.VUE_APP_API_PATH}/api/admin/book`)
           .then((response) => {
             this.books = response.data;
             this.books.forEach((book) => {
@@ -63,7 +63,7 @@ export default {
         if (book.bookPublic === "1") {
           if (confirm("해당 작품을 비공개 처리하시겠습니까?")) {
             axios
-                .post(`/api/admin/book/public/${bookId}`, {
+                .post(`${process.env.VUE_APP_API_PATH}/api/admin/book/public/${bookId}`, {
                   bookPublic: "0",
                 })
                 .then((response) => {
@@ -83,7 +83,7 @@ export default {
         } else {
           if (confirm("해당 작품을 공개 처리하시겠습니까?")) {
             axios
-                .post(`/api/admin/book/public/${bookId}`, {
+                .post(`${process.env.VUE_APP_API_PATH}/api/admin/book/public/${bookId}`, {
                   bookPublic: "1",
                 })
                 .then((response) => {

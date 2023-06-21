@@ -75,7 +75,7 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
 
       getDetails(){
         this.memberEmail = sessionStorage.getItem('user')
-        axios.get(`/api/point/wallet/${this.memberEmail}`)
+        axios.get(`${process.env.VUE_APP_API_PATH}/api/point/wallet/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.detailsResult = res.data;
@@ -92,7 +92,7 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
           }
           else{
             this.memberEmail = sessionStorage.getItem('user')
-            axios.post(`/api/point/return/${this.memberEmail}`, {
+            axios.post(`${process.env.VUE_APP_API_PATH}/api/point/return/${this.memberEmail}`, {
               returnPoint: returnValue,
             })
             .then((res) => {

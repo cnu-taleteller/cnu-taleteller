@@ -111,7 +111,7 @@ export default {
         }
         else {
           if (saveState) {
-            await axios.post("/api/v1/book/" + this.bookId, {
+            await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/book/` + this.bookId, {
               bookName: this.bookName,
               bookStatus: 'temp',
               pageList: this.pageList,
@@ -148,7 +148,7 @@ export default {
 
         const fileName = `${this.bookId}_thumbnail.png`;
         try {
-          const res = await axios.get('/api/v1/tool/s3/image', {
+          const res = await axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/tool/s3/image`, {
             params: { fileName: fileName }
           });
           const preSignedUrl = res.data.preSignedUrl;
@@ -164,7 +164,7 @@ export default {
           }
           console.log("썸네일 처리 완료");
 
-          await axios.post('/api/v1/book/thumbnailScenario', {
+          await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/book/thumbnailScenario`, {
             bookId: this.bookId,
             bookThumbnail: this.s3.uploadedUrl,
             scenario: scenario
@@ -215,7 +215,7 @@ export default {
       if (uploadBackList === null && uploadCharList === null) return;
 
       else if (uploadBackList === null) {
-        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+        await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/uploadFile/` + this.bookId, {
           uploadCharList,
         })
           .then((res) => {
@@ -226,7 +226,7 @@ export default {
           });
       }
       else if (uploadCharList === null) {
-        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+        await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/uploadFile/` + this.bookId, {
           uploadBackList,
         })
           .then((res) => {
@@ -237,7 +237,7 @@ export default {
           });
       }
       else {
-        await axios.post("/api/v1/tool/uploadFile/" + this.bookId, {
+        await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/uploadFile/` + this.bookId, {
           uploadBackList, uploadCharList
         })
           .then((res) => {
@@ -254,7 +254,7 @@ export default {
       if (voiceList === null) {
         return;
       } else {
-        await axios.post("/api/v1/tool/uploadVoice/" + this.bookId, {
+        await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/uploadVoice/` + this.bookId, {
           voiceList,
         })
           .then((res) => {

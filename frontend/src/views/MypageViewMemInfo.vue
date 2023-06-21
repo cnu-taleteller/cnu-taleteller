@@ -91,7 +91,7 @@
               return;
             }
             this.memberEmail = sessionStorage.getItem('user')
-            axios.get("/api/member/pwcheck", {
+            axios.get(`${process.env.VUE_APP_API_PATH}/api/member/pwcheck`, {
               params: {
                 memberEmail: this.memberEmail,
                 memberPassword: this.memberPassword,

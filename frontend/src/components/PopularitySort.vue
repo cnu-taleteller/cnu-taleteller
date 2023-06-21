@@ -28,7 +28,7 @@ export default {
       this.$router.push({ path: `/detail/${id}` });
     },
     fetchBooks() {
-      axios.get('/api/v1/book/list')
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/book/list`)
           .then(response => {
             this.books = response.data;
             return this.books = response.data.sort((a, b) => b.bookRecommend - a.bookRecommend);

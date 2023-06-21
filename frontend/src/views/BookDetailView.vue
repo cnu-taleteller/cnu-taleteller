@@ -47,7 +47,7 @@ export default {
     const id = this.$route.params.id;
 
     axios
-        .get(`/api/v1/book/detail/${id}`)
+        .get(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/${id}`)
         .then((response) => {
           this.book = response.data.book;
           this.bookName = this.book.bookName;
@@ -71,7 +71,7 @@ export default {
       const id = this.$route.params.id;
 
       axios
-          .post("/api/v1/book/detail/reply", {
+          .post(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/reply`, {
             bookId: this.book.bookId,
             memberEmail: sessionStorage.getItem('user'),
             replyContent: replyContent,
@@ -90,7 +90,7 @@ export default {
       const id = this.$route.params.id;
 
       axios
-          .put(`/api/v1/book/detail/reply/${replyId}`, {
+          .put(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/reply/${replyId}`, {
             replyContent: replyContent,
           })
           .then((response) => {
@@ -107,7 +107,7 @@ export default {
     },
     deleteReply(replyId) {
       axios
-          .delete(`/api/v1/book/detail/reply/${replyId}`)
+          .delete(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/reply/${replyId}`)
           .then(() => {
             const index = this.replies.findIndex((reply) => reply.replyId === replyId);
             if (index !== -1) {
@@ -131,7 +131,7 @@ export default {
       const id = this.$route.params.id;
 
       axios
-          .post(`/api/v1/book/detail/${id}/recommend`, {
+          .post(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/${id}/recommend`, {
             bookId: this.book.bookId,
             memberEmail: sessionStorage.getItem('user')
           })
@@ -149,7 +149,7 @@ export default {
       const id = this.$route.params.id;
 
       axios
-          .delete(`/api/v1/book/detail/${id}/recommend`, {
+          .delete(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/${id}/recommend`, {
             data: {
               bookId: this.book.bookId,
               memberEmail: sessionStorage.getItem('user')
@@ -178,7 +178,7 @@ export default {
 
       if (confirm("즐겨찾기하시겠습니까?")) {
         axios
-            .post(`/api/v1/book/detail/${id}/bookmark`, {
+            .post(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/${id}/bookmark`, {
               bookId: this.book.bookId,
               memberEmail: sessionStorage.getItem('user')
             })
@@ -202,7 +202,7 @@ export default {
       const id = this.$route.params.id;
 
       axios
-          .delete(`/api/v1/book/detail/${id}/bookmark`, {
+          .delete(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/${id}/bookmark`, {
             data: {
               bookId: this.book.bookId,
               memberEmail: sessionStorage.getItem('user')
@@ -220,7 +220,7 @@ export default {
 
     fetchBookDetail(id) {
       axios
-          .get(`/api/v1/book/detail/${id}`)
+          .get(`${process.env.VUE_APP_API_PATH}/api/v1/book/detail/${id}`)
           .then((response) => {
             this.book = response.data.book;
             this.bookName = this.book.bookName;
@@ -248,7 +248,7 @@ export default {
     bookPayment() {
       if (confirm("결제하시겠습니까?")) {
         const id = this.$route.params.id;
-        axios.post(`/api/point/bookPayment/${id}`, {
+        axios.post(`${process.env.VUE_APP_API_PATH}/api/point/bookPayment/${id}`, {
           bookId: this.book.bookId,
           memberEmail: sessionStorage.getItem('user')
         })
@@ -266,7 +266,7 @@ export default {
     bookPreview() {
       const id = this.$route.params.id;
       axios
-          .post(`/api/v1/tool/firstAccess/${id}`)
+          .post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/firstAccess/${id}`)
           .then((response) => {
             const pageLists = response.data;
             console.log(pageLists);

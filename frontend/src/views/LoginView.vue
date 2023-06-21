@@ -54,7 +54,7 @@ export default {
         return;
       }
 
-      axios.post("/api/member/login", {
+      axios.post(`${process.env.VUE_APP_API_PATH}/api/member/login`, {
         memberEmail: this.memberEmail,
          memberPassword: this.memberPassword,
       })

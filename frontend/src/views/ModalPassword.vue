@@ -42,7 +42,7 @@
         formData.append('memberEmail', this.userEmail);
   
         axios
-          .post('/api/member/sendEmail', formData)
+          .post(`${process.env.VUE_APP_API_PATH}/api/member/sendEmail`, formData)
           .then((response) => {
             if (response.data === 'yes') {
               alert('임시 비밀번호를 전송했습니다.');

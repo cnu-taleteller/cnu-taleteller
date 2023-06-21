@@ -78,7 +78,9 @@
           .then((res) => {
             if (res.data) {
               console.log("회원 탈퇴 : "+res.data);
-              alert("탈퇴되었습니다.")
+              alert("탈퇴되었습니다.");
+              sessionStorage.removeItem("user");
+              window.location.href = "/";
             } 
           })
           .catch((err) => {

@@ -3,8 +3,6 @@ name: taleteller deploy
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 env:
   BACKEND_S3_BUCKET_NAME: api.taleteller.site

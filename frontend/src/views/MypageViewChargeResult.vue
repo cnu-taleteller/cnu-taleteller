@@ -35,7 +35,7 @@ export default {
     },
     methods: {
         pointCharge(){
-          axios.get("/api/point/chargeExecution")
+          axios.get(`${process.env.VUE_APP_API_PATH}/api/point/chargeExecution`)
           .then((res) => {
             console.log(res);
             this.paymentResult = res.data;

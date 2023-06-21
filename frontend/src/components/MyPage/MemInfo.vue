@@ -55,7 +55,7 @@
     methods: {
       getMemberInfo() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get("/api/member/details", {
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/member/details`, {
         params: {
           memberEmail: this.memberEmail,
         },
@@ -72,7 +72,7 @@
       memDropout() {
         if(confirm("탈퇴하시겠습니까?")){
           this.memberEmail = sessionStorage.getItem('user')
-          axios.patch(`/api/member/dropout/${this.memberEmail}`, { 
+          axios.patch(`${process.env.VUE_APP_API_PATH}/api/member/dropout/${this.memberEmail}`, { 
             memberAuth: "Drop",
           })
           .then((res) => {
@@ -92,7 +92,7 @@
       memModify() {
         if(confirm("수정하시겠습니까?")){
           this.memberEmail = sessionStorage.getItem('user')
-          axios.patch(`/api/member/modify/${this.memberEmail}`, { 
+          axios.patch(`${process.env.VUE_APP_API_PATH}/api/member/modify/${this.memberEmail}`, { 
             memberPassword: this.memberPassword,
             memberPhone: document.getElementById("phone").value,
             memberAccount: document.getElementById("account").value,

@@ -84,7 +84,7 @@ export default {
       this.$router.push('/login');
     }
 
-    const bookList = await axios.post('api/v1/book/userBookList', userEmail);
+    const bookList = await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/book/userBookList`, userEmail);
     this.bookList = bookList.data;
   },
   methods: {
@@ -112,7 +112,7 @@ export default {
     },
     //기존 작품 접근 할 때
     async updateExistingBook(bookId) {
-      await axios.get('/api/v1/tool/scenario', {
+      await axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario`, {
         params: {
           bookId: bookId
         }
@@ -129,7 +129,7 @@ export default {
       });
     },
     async deleteSelectedBooks() { 
-      await axios.delete('api/v1/book/deleteBookList', { data : this.selectedBookList }).then(response => {
+      await axios.delete(`${process.env.VUE_APP_API_PATH}/api/v1/book/deleteBookList`, { data : this.selectedBookList }).then(response => {
         console.log(response);
         sessionStorage.setItem('goingtool','go');
         this.$router.go();

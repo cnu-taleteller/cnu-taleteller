@@ -166,7 +166,7 @@ export default {
       this.gpt = true;
       this.goTool();
       console.log("axios 통신 요청");
-      axios.post("/api/v1/tool/scenario/", {
+      axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/`, {
         who: this.scenarioKeyword.who,
         when: this.scenarioKeyword.when,
         where: this.scenarioKeyword.where,

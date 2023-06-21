@@ -146,7 +146,7 @@ export default {
   methods: {
     async firstLoadData(bookId) {
       if (bookId !== null) {
-        const selPageLists = await axios.post('api/v1/tool/firstAccess/' + this.bookId);
+        const selPageLists = await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/firstAccess/` + this.bookId);
         this.pageList = selPageLists.data.bookData.pageList;
         this.$emit('currentPageList', this.pageList[0]);
         this.$store.commit('setPageList', this.pageList);

@@ -50,7 +50,7 @@ export default {
   methods: {
     pointCharge(method, amount) {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.post(`/api/point/chargeSet/${this.memberEmail}`, {
+      axios.post(`${process.env.VUE_APP_API_PATH}/api/point/chargeSet/${this.memberEmail}`, {
         chargePoint: amount,
         paymentMethod: method,
       })
@@ -68,7 +68,7 @@ export default {
 
     tossPayments(method, amount) {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.post(`/api/point/chargeSet/${this.memberEmail}`, {
+      axios.post(`${process.env.VUE_APP_API_PATH}/api/point/chargeSet/${this.memberEmail}`, {
         chargePoint: amount,
         paymentMethod: method,
       });

@@ -43,7 +43,7 @@ export default {
   methods: {
     fetchMembers() {
       axios
-          .get("/api/admin/member")
+          .get(`${process.env.VUE_APP_API_PATH}/api/admin/member`)
           .then((response) => {
             this.members = response.data;
             console.log(response.data);
@@ -58,7 +58,7 @@ export default {
         if (member.memberAuth === "User") {
           if (confirm("해당 회원을 활동 정지시키겠습니까?")) {
             axios
-                .post(`/api/admin/member/suspend/${memberId}`, {
+                .post(`${process.env.VUE_APP_API_PATH}/api/admin/member/suspend/${memberId}`, {
                   memberAuth: "Suspended",
                 })
                 .then((response) => {
@@ -77,7 +77,7 @@ export default {
         } else {
           if (confirm("활동 정지를 해제하시겠습니까?")) {
             axios
-                .post(`/api/admin/member/suspend/${memberId}`, {
+                .post(`${process.env.VUE_APP_API_PATH}/api/admin/member/suspend/${memberId}`, {
                   memberAuth: "User",
                 })
                 .then((response) => {

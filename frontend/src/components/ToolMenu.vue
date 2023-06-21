@@ -350,7 +350,7 @@ export default {
           }
 
           this.file = this.$refs.file.files[0];
-          await axios.get("/api/v1/tool/s3/image", {params: {fileName: this.file.name}},)
+          await axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/tool/s3/image`, {params: {fileName: this.file.name}},)
               .then((res) => {
                   this.s3.preSignedUrl = res.data.preSignedUrl
                   this.s3.encodedFileName = res.data.encodedFileName
@@ -486,7 +486,7 @@ export default {
           const captions = this.allCaption;
 
           console.log("axios 통신 요청");
-          axios.post("/api/v1/tool/scenario/flow", {
+          axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/flow`, {
               story, captions
 
           })
@@ -522,7 +522,7 @@ export default {
             stop();
           }
 
-          axios.post('/api/v1/tool/tts', {
+          axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/tts`, {
                   text,
                   language,
                   voice,
@@ -586,7 +586,7 @@ export default {
               },
           };
 
-          axios.post('/api/v1/tool/audio', formData, config)
+          axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/audio`, formData, config)
               .then(response => {
                   const fileName = `${process.env.VUE_APP_S3_PATH}/` + response.data;
                   this.currentPageList.caption.ttsName = fileName;
@@ -613,7 +613,7 @@ export default {
           this.isReScenario = true;
           this.isDisabled2 = true;
           console.log("axios 통신 요청");
-          axios.post("/api/v1/tool/scenario/", {
+          axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/`, {
               who: this.scenarioKeyword.who,
               when: this.scenarioKeyword.when,
               where: this.scenarioKeyword.where,

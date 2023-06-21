@@ -44,7 +44,7 @@ export default {
   methods: {
     getDetails() {
       this.memberEmail = sessionStorage.getItem('user')
-      axios.get(`/api/point/details/${this.memberEmail}`)
+      axios.get(`${process.env.VUE_APP_API_PATH}/api/point/details/${this.memberEmail}`)
         .then((res) => {
           console.log(res);
           this.detailsResult = res.data;

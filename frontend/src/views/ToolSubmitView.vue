@@ -64,7 +64,7 @@ export default {
         alert("입력하지 않거나, 선택하지 않은 값이 있습니다.");
         return;
       }
-      await axios.post("/api/v1/book", this.book)
+      await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/book`, this.book)
       .then((res) => {
         alert("제출 완료되었습니다");
         this.$store.dispatch('clearSession');

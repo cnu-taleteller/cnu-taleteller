@@ -47,4 +47,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "LEFT JOIN Member m ON b.member.memberId = m.memberId " +
             "WHERE p.memberId.memberId = :memberId AND p.paySort = '결제'")
     List<Book>findAllMyPaywork(Long memberId);
+
+    //회원이 결제한 작품중 해당 작품 유무 확인
+    @Query("SELECT b.bookId FROM Book b LEFT JOIN Payment p ON b.bookId = p.bookId.bookId " +
+            "LEFT JOIN Member m ON b.member.memberId = m.memberId " +
+            "WHERE p.memberId.memberId = :memberId " +
+            "AND (p.bookId.bookId = :bookId OR b.bookId = :bookId)")
+    Long findMyPayCheck(Long bookId, Long memberId);
+
+    //회원의 해당 작품 제작 여부 확인
+    @Query("SELECT b.bookId FROM Book b " +
+            "WHERE b.member.memberId = :memberId " +
+            "AND b.bookId = :bookId")
+    Long findMyBookCheck(Long bookId, Long memberId);
 }

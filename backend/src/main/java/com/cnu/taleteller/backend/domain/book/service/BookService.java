@@ -230,6 +230,22 @@ public class BookService {
         return bookRepository.findAllMyPaywork(memId);
     }
 
+    public boolean findMyPayCheck(Long bookId, String email) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+
+        if(bookRepository.findMyBookCheck(bookId, memId)!=null ){
+            System.out.println("결제확인 : "+ bookRepository.findMyBookCheck(bookId, memId));
+            System.out.println("본인 작품");
+            return true;
+        }else if(bookRepository.findMyPayCheck(bookId, memId)!=null ){
+            System.out.println("결제확인 : " + bookRepository.findMyPayCheck(bookId, memId));
+            System.out.println("결제된 작품");
+            return true;
+        }
+        return false;
+    }
+
     @Transactional(readOnly = true)
     public List<Book> findUserBookList(String userEmail) {
         List<Book> bookList = bookRepository.findMyBookList(userEmail);

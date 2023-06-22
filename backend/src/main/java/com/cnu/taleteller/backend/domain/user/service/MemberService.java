@@ -32,7 +32,7 @@ import java.util.List;
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final JavaMailSender mailSender;
-//    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -157,13 +157,13 @@ public class MemberService implements UserDetailsService {
             System.out.println("데이터 null");
             return false; //데이터 없으면 false
         }
-        if(!findMember.getMemberPassword().equals(psword)){
+        if(passwordEncoder.matches(psword,findMember.getMemberPassword())){
             System.out.println("실제패스워드 : "+findMember.getMemberPassword());
-            System.out.println("비번 불일치(비번 복호화 필요)");
+            System.out.println("비번 일치");
             return true; //해당 데이터가 입력한 비밀번호와 불일치 시 false
         }
-        System.out.println("비번 일치");
-        return true; //null이 아니거나 비밀번호 일치 시 true
+        System.out.println("비번 불일치");
+        return false;
     }
 
     public List<Member> findAllByMemberEmail(String email) {

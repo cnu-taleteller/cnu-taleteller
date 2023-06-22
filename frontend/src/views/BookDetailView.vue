@@ -41,6 +41,7 @@ export default {
       isPayment: false,
       bookThumbnail: null,
       bookData: null,
+      payResult: [],
     };
   },
   created() {
@@ -63,8 +64,17 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-  },
 
+    this.payCheck();
+    this.getWallet();
+    
+  },
+  computed: {
+    pointTotal() {
+      let sum = 0;
+      return this.payResult.reduce((sum, result) => sum + result.payCount, 0);
+    },
+  },
   methods: {
     // 댓글
     addReply(replyContent) {
@@ -241,25 +251,32 @@ export default {
       if (this.isPayment) {
         this.bookPreview();
       } else {
-        this.bookPayment(-20);
-        this.isPayment = true;
+        this.bookPayment();
       }
     },
     bookPayment() {
-      if (confirm("결제하시겠습니까?")) {
-        const id = this.$route.params.id;
-        axios.post(`${process.env.VUE_APP_API_PATH}/api/point/bookPayment/${id}`, {
-          bookId: this.book.bookId,
-          memberEmail: sessionStorage.getItem('user')
-        })
-            .then((res) => {
-              alert("상품이 결제되었습니다.")
-              this.paymentCheck = "감상"
-              console.log(res);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+      if(sessionStorage.getItem('user')==null){
+        alert("로그인이 필요합니다.");
+      }
+      else if (confirm("결제하시겠습니까?")) {
+        if(this.pointTotal<20){
+          alert("엽전 부족 : 현재 "+this.pointTotal+"개");
+        }else{
+          const id = this.$route.params.id;
+          axios.post(`${process.env.VUE_APP_API_PATH}/api/point/bookPayment/${id}`, {
+            bookId: this.book.bookId,
+            memberEmail: sessionStorage.getItem('user')
+          })
+          .then((res) => {
+            alert("상품이 결제되었습니다.")
+            this.paymentCheck = "감상"
+            this.isPayment = true
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        }
       }
     },
 
@@ -281,7 +298,44 @@ export default {
             console.error(error);
           });
         window.open('/preview', 'previewWindow', 'width=1100, height=600');
-    }
+    },
+
+    getWallet(){
+      if(this.memberEmail = sessionStorage.getItem('user')){
+        axios.get(`${process.env.VUE_APP_API_PATH}/api/point/wallet/${this.memberEmail}`)
+        .then((res) => {
+          console.log(res);
+          this.payResult = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+    },
+
+    payCheck() {
+      if(this.memberEmail = sessionStorage.getItem('user')) {
+        const id = this.$route.params.id;
+        axios.get(`${process.env.VUE_APP_API_PATH}/api/v1/book/paycheck/${id}`, {
+          params: {
+            memberEmail: this.memberEmail,
+          },
+        })
+        .then((response) => {
+          if(response.data) {
+            console.log("본인 작품 및 결제 여부 : "+response.data);
+            this.paymentCheck = "감상";
+            this.isPayment = true;
+          } else {
+            console.log("본인 작품 및 결제 여부 : "+response.data);
+          }
+        })
+        .catch((error) => {
+          console.log("확인 실패했습니다");
+          console.log(error);
+        });
+      }
+    },   
   },
 }
 </script>

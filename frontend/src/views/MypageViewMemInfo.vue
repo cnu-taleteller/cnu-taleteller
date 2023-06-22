@@ -103,7 +103,7 @@
                 console.log(sessionStorage.getItem('user'));
                 this.checkState = 'yes';
               } else {
-                alert("확인에 실패하였습니다.");
+                alert("유효한 비밀번호가 아닙니다.");
                 this.$router.go();
                 console.log(response.data);
                 // 실패 처리를 원하는 방식으로 구현

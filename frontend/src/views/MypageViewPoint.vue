@@ -87,7 +87,7 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
 
       pointReturn(returnValue){
         if(confirm("환급하시겠습니까?")){
-          if(this.pointTotal==0){
+          if(this.pointTotal<=0){
             alert("환급할 엽전이 없습니다.")
           }
           else{

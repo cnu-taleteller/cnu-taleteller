@@ -171,6 +171,12 @@ public class BookController {
         }
     }
 
+    @GetMapping("/paycheck/{bookId}")
+    public Boolean bookPaymentCheck(@PathVariable Long bookId, @RequestParam String memberEmail){
+
+        return bookService.findMyPayCheck(bookId, memberEmail);
+    }
+
     @GetMapping("/list")
     public List<Book> getBooks() {
         return bookRepository.findByBookStatusNotAndBookPublicNot("temp", "1");

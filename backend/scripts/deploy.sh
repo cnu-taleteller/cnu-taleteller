@@ -1,27 +1,37 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/app/backend
+PROJECT_NAME="backend"
+JAR_PATH="/home/ubuntu/app/$PROJECT_NAME/*.jar"
+DEPLOY_PATH="/home/ubuntu/app/$PROJECT_NAME/"
+DEPLOY_LOG_PATH="/home/ubuntu/app/$PROJECT_NAME/deploy.log"
+DEPLOY_ERR_LOG_PATH="/home/ubuntu/app/$PROJECT_NAME/deploy_err.log"
+APPLICATION_LOG_PATH="/home/ubuntu/app/$PROJECT_NAME/application.log"
+BUILD_JAR=$(ls $JAR_PATH)
+JAR_NAME=$(basename "$BUILD_JAR")
 
-echo "> 현재 구동 중인 애플리케이션 pid 확인"
+echo "===== 배포 시작 : $(date +%c) =====" >> "$DEPLOY_LOG_PATH"
 
-CURRENT_PID=$(pgrep -fla java | grep hayan | awk '{print $1}')
+echo "> build 파일명: $JAR_NAME" >> "$DEPLOY_LOG_PATH"
+echo "> build 파일 복사" >> "$DEPLOY_LOG_PATH"
+cp "$BUILD_JAR" "$DEPLOY_PATH"
 
-echo "현재 구동 중인 애플리케이션 pid: $CURRENT_PID"
+echo "> 현재 동작중인 어플리케이션 pid 체크" >> "$DEPLOY_LOG_PATH"
+CURRENT_PID=$(pgrep -f "$JAR_NAME")
 
 if [ -z "$CURRENT_PID" ]; then
-  echo "현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
+  echo "> 현재 동작중인 어플리케이션이 존재하지 않습니다." >> "$DEPLOY_LOG_PATH"
 else
-  echo "> kill -15 $CURRENT_PID"
-  kill -15 $CURRENT_PID
+  echo "> 현재 동작중인 어플리케이션 존재" >> "$DEPLOY_LOG_PATH"
+  echo "> 현재 동작중인 어플리케이션 강제 종료 진행" >> "$DEPLOY_LOG_PATH"
+  echo "> kill 15 $CURRENT_PID" >> "$DEPLOY_LOG_PATH"
+  sudo kill -15 "$CURRENT_PID"
   sleep 5
 fi
 
-echo "> 새 애플리케이션 배포"
+DEPLOY_JAR="$DEPLOY_PATH$JAR_NAME"
+echo "> DEPLOY_JAR 배포" >> "$DEPLOY_LOG_PATH"
+sudo nohup java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=local "$DEPLOY_JAR" --server.port=8080 >> "$APPLICATION_LOG_PATH" 2> "$DEPLOY_ERR_LOG_PATH" &
 
-JAR_NAME=$(ls -tr $REPOSITORY/*SNAPSHOT.jar | tail -n 1)
+sleep 3
 
-echo "> JAR NAME: $JAR_NAME"
-
-echo "> $JAR_NAME 에 실행권한 추가"
-
-chmod +x $JAR_NAME
+echo "> 배포 종료 : $(date +%c)" >> "$DEPLOY_LOG_PATH"

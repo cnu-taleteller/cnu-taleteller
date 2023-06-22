@@ -15,4 +15,7 @@ public class Caption {
     private String width;
     private String left;
     private String top;
+    private String ttsName;
+    private String[] voiceList;
+    private String[] recordedChunks;
 }

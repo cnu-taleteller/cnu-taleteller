@@ -89,7 +89,7 @@ export default {
       }
       else {
         if (this.isSave == false && saveState) {
-          await axios.post("/api/v1/book/tmp", {
+          await axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/book/tmp`, {
             bookName: this.bookName,
             bookStatus: 'temp',
             email: sessionStorage.getItem('user'),

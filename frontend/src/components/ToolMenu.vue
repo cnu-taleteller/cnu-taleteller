@@ -532,6 +532,7 @@ export default {
 
               this.currentPageList.caption.ttsName = `${process.env.VUE_APP_S3_PATH}/${response.data.encodedFileName}`;
               console.log(this.currentPageList.caption.ttsName);
+              alert("tts 생성이 완료되었습니다.");
 
               //this.voiceList.push(this.currentPageList.caption.ttsName);
               //sessionStorage.setItem('voiceList', JSON.stringify(this.voiceList));
@@ -560,6 +561,7 @@ export default {
                   this.currentPageList.caption.ttsVoice.start();
               })
               .catch(error => {
+                  alert("녹음 장치를 찾을 수 없습니다.");
                   console.error('녹음을 시작할 수 없습니다:', error);
               });
       },

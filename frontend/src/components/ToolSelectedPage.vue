@@ -579,6 +579,7 @@ export default {
             this.currentPageList.caption.left = '';
             this.currentPageList.caption.top = '';
             this.currentPageList.thumbnail = todataUrl;
+            this.currentPageList.caption.ttsName='';
           });
         }
       }

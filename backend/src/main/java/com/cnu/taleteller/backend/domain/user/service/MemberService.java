@@ -15,7 +15,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -32,7 +31,7 @@ import java.util.List;
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final JavaMailSender mailSender;
-//    private final PasswordEncoder passwordEncoder;
+//    private final BCryptPasswordEncoder passwordEncoder;
 
 
     @Override
@@ -42,11 +41,14 @@ public class MemberService implements UserDetailsService {
     }
 
 
-//    public Member loadUserByPassword(String memberPassword) throws UsernameNotFoundException {
-//        String encodedPassword = passwordEncoder.encode(memberPassword);
-//        System.out.println(encodedPassword);
-//        return memberRepository.findByMemberPassword(memberPassword)
-//                .orElseThrow(() -> new UsernameNotFoundException(memberPassword));
+//    public Member loadUserByPassword(String memberEmail, String memberPassword) throws UsernameNotFoundException {
+//        return memberRepository.findByMemberEmail(memberEmail)
+//                .orElseThrow(() -> new UsernameNotFoundException(memberEmail));
+//
+//        if (!passwordEncoder.matches(memberPassword, member.getMemberPassword())) {
+//            throw new UsernameNotFoundException(memberEmail);
+//        }
+//        return member;
 //    }
 
 

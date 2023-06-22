@@ -65,11 +65,10 @@ export default {
       sessionStorage.setItem('user', this.memberEmail);
       console.log(sessionStorage.getItem('user'));
       window.location.href = "/"; // 리다이렉트할 경로
-    } else if ('no'){
+    } else {
       alert("로그인에 실패하였습니다.\n아이디 비밀번호 확인 후 다시 진행해주세요.");
       this.$router.go();
       console.log(response.data);
-      // 실패 처리를 원하는 방식으로 구현
     }
       })
       .catch((error) => {

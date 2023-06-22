@@ -1,8 +1,13 @@
 <template>
   <div class="container">
     <hr>
-      <h4 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">     새로운 동화책 만들기</h4>
-
+     <h4 @click="makeNewBook()"><img src="@/assets/icon.png" class="icon">     새로운 동화책 만들기</h4>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <div class="column">
       <button v-if="selectedBookList.length > 0" @click="deleteSelectedBooks()">삭제하기</button>
       <div class="column-icon" v-for="bookData, index in bookList" :key=index>
@@ -23,10 +28,8 @@
   width: 25%;
   height: 10%;
   margin: 5px;
-  /* background-color: #fceb6eb4; */
   font-weight: bold;
   color: rgb(51, 51, 51);
-  /* border-radius: 4px; */
   border: none;
   cursor: pointer;
   text-align: center;
@@ -37,9 +40,7 @@
   margin-top: 3%;
   margin-bottom: 3%;
 }
-/* .container{
-  text-align: center;
-} */
+
 
 
 
@@ -60,7 +61,17 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-}</style>
+}
+
+.column-icon img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+</style>
 
 
 

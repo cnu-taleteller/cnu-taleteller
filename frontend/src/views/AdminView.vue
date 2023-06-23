@@ -22,6 +22,12 @@ export default {
       activeComponent: 'ManagementMember',
     };
   },
+  created() {
+    if(!sessionStorage.getItem('user')) {
+      alert('비정상적인 접근입니다.');
+      this.$router.push("/");
+    }
+  },
   methods: {
     showMemberManagement() {
       this.activeComponent = 'ManagementMember';

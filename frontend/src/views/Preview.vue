@@ -1,14 +1,16 @@
 <template>
-  <div id=list-wrapper>
+  <div id="list-wrapper">
     <div class="selected-page-form">
       <div id="page-form" ref="pageForm">
 
       </div>
     </div>
-    <div id="button-wrapper">
+    <div id="menu-wrapper">
       <audio :src="ttsUrl" controls autoplay></audio>
-      <button id="prev" @click="prev()">이전</button>
-      <button id="next" @click="next()">다음</button>
+      <div class="button-wrapper">
+      <button id="prev" class="menu-btn" @click="prev()">이전</button>
+      <button id="next" class="menu-btn" @click="next()">다음</button>
+      </div>
     </div>
   </div>
 </template>
@@ -199,35 +201,45 @@ export default {
 }
 .preview-menu {
   margin-top: 10px;
-}
+}*/
 .menu-btn {
   padding: 5px 10px;
-  background-color: white;
+  background-color: rgb(223, 223, 223);
   border: none;
   border-radius: 3px;
+  margin-left: 10px;
 }
 
 .menu-btn:hover {
-  background-color: rgb(223, 223, 223);
+  background-color: white;
   border: none;
 }
 
 .menu-btn.active {
   background-color: gray;
   color: white;
-} */
+} 
 #list-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#button-wrapper {
+#menu-wrapper {
+  width: 750px;
+  height: 50px;
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translate(-50%);
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+audio {
+  height: 40px;
 }
 
 #page-form {

@@ -95,6 +95,10 @@ export default {
     }
   },
   created() {
+    if(!sessionStorage.getItem('user')) {
+      alert('로그인 후 이용가능합니다!');
+      window.location.href = "/";
+    }
     if (sessionStorage.getItem('recentlyClickPageNo') != null) {
       this.selectPageNo = sessionStorage.getItem('recentlyClickPageNo');
     }

@@ -4,13 +4,14 @@
       <draggable @start="onDragStart" @end="onDragEnd" @change="saveSession()" v-model="pageList" :draggable-options="{ animation: 300, handle: '.page-body' }"
         class="page-list" ref="pageList">
         <li v-for="page, index in pageList" :key="index" class="one-page">
+          <p v-if="index == 0">1 페이지는 동화책 표지로 지정됩니다.</p>
           <div class="page-body" @click="clickPage(index, $event)" :class="{ 'selected': index === currentPageIndexNo }">
             <!-- 썸네일 부분 -->
             <img v-if="page.thumbnail !== '' && page.thumbnail !== null" :src="page.thumbnail"
               style="width:100%; height: 100%">
           </div>
           <label>
-            {{ index + 1 }}
+            {{ index == 0 ? '표지' : index+ 1 }}
           </label>
         </li>
       </draggable>

@@ -45,6 +45,10 @@ export default {
     };
   },
   created() {
+    if(!sessionStorage.getItem('user')) {
+      alert('로그인 후 이용해주세요!');
+      this.$router.push("/");
+    }
     const id = this.$route.params.id;
 
     axios

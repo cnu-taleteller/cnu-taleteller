@@ -49,6 +49,12 @@ export default {
       }
     };
   },
+  created() {
+    if(!sessionStorage.getItem('user')) {
+      alert('비정상적인 접근입니다. 로그인 후 이용 해주세요.');
+      this.$router.push("/");
+    }
+  },
   mounted() {
     this.book.bookName = sessionStorage.getItem("bookName");
     this.book.bookId = Number(sessionStorage.getItem("bookId"));

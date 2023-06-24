@@ -263,6 +263,9 @@ export default {
       timer: null,
       elapsedTime: 0,
       selectedAudio: null,
+      voicePageList: null,
+      mediaRecorder: null,
+      recordedChunks: [],
     }
   },
   props: {
@@ -510,7 +513,7 @@ export default {
       },
       handleTtsChange(event) {
           const selectedValue = event.target.value;
-          this.$emit('ttsValueChange', selectedValue);
+          this.currentPageList.caption.ttsVoice = selectedValue;
       },
       addTts() {
           const text = this.currentPageList.caption.content;
@@ -545,20 +548,22 @@ export default {
           })
       },
       startRecording() {
+        this.voicePageList = this.currentPageList.caption;
+        console.log(this.currentPageList);
           navigator.mediaDevices.getUserMedia({audio: true})
               .then(stream => {
                   this.recordingStarted = true;
                   this.timer = setInterval(() => {
                       this.elapsedTime++;
                   }, 1000);
-                  this.currentPageList.caption.ttsVoice = new MediaRecorder(stream);
-                  this.currentPageList.caption.ttsVoice.addEventListener('dataavailable', event => {
+                  this.mediaRecorder = new MediaRecorder(stream);
+                  this.mediaRecorder.addEventListener('dataavailable', event => {
                       if (event.data.size > 0) {
                           console.log(this.currentPageList);
-                          this.currentPageList.caption.recordedChunks.push(event.data);
+                        this.recordedChunks.push(event.data);
                       }
                   });
-                  this.currentPageList.caption.ttsVoice.start();
+                this.mediaRecorder.start();
               })
               .catch(error => {
                   alert("녹음 장치를 찾을 수 없습니다.");
@@ -566,16 +571,16 @@ export default {
               });
       },
       stopRecording() {
-          if (this.currentPageList.caption.ttsVoice && this.currentPageList.caption.ttsVoice.state === 'recording') {
-              this.currentPageList.caption.ttsVoice.addEventListener('stop', () => {
-                  const audioBlob = new Blob(this.currentPageList.caption.recordedChunks, {type: 'audio/wav'});
+          if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            this.mediaRecorder.addEventListener('stop', () => {
+                  const audioBlob = new Blob(this.recordedChunks, {type: 'audio/wav'});
                   this.sendRecording(audioBlob);
-                  this.currentPageList.caption.recordedChunks = [];
+                  this.recordedChunks = [];
                   this.recordingStarted = false;
                   clearInterval(this.timer);
                   this.elapsedTime = 0;
               });
-              this.currentPageList.caption.ttsVoice.stop();
+            this.mediaRecorder.stop();
           }
       },
       sendRecording(audioBlob) {
@@ -591,10 +596,10 @@ export default {
           axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/audio`, formData, config)
               .then(response => {
                   const fileName = `${process.env.VUE_APP_S3_PATH}/` + response.data;
-                  this.currentPageList.caption.ttsName = fileName;
+                  this.voicePageList.ttsName = fileName;
                   console.log('음성 녹음이 S3 서버로 전송되었습니다.');
-                  console.log(this.currentPageList.caption.ttsName);
-                  this.currentPageList.caption.voiceList.push(this.currentPageList.caption.ttsName);
+                  console.log(this.voicePageList.ttsName);
+                  this.voicePageList.voiceList.push(this.voicePageList.ttsName);
               })
               .catch(error => {
                   console.error('음성 녹음을 S3 서버로 전송하는 중 오류가 발생했습니다:', error);

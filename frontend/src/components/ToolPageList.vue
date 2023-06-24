@@ -62,7 +62,6 @@ export default {
   watch: {
     allPageList: {
       handler: function (newPageList, oldPageList) {
-        console.log("aa");
         if (!this.isStackChange && newPageList) {
           //pageList 첫번째 변경이 된지 확인하는 부분 -> 썸네일을 저장 해야하나 확인
           if (oldPageList) {
@@ -79,6 +78,10 @@ export default {
           };
 
           //음성 녹음 tts 들어오면 리스트 초기하고 새로 추가
+          if(this.$store.getters.getIsVoiceInput) {
+            this.stackStatus = [];
+            this.$store.commit('setIsVoiceInput', false);
+          }
           
           //stack 에 추가
           this.stackStatus.push(pageListMap);

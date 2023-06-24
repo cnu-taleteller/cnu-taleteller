@@ -15,7 +15,8 @@ export const store = new Vuex.Store({
     isChange : false,
     isFinishDrop : false,
     isCaptionInput : false,
-    bookName : ''
+    bookName : '',
+    isVoiceInput: false,
   },
   getters: {
     getBookId(state) {
@@ -47,6 +48,9 @@ export const store = new Vuex.Store({
     },
     getIsCaptionInput(state) {
       return state.isCaptionInput;
+    },
+    getIsVoiceInput(state) {
+      return state.isVoiceInput;
     }
   },
   mutations: {
@@ -79,6 +83,9 @@ export const store = new Vuex.Store({
     },
     setBookName(state, newBookName) {
       state.bookName = newBookName;
+    },
+    setIsVoiceInput(state, newIsVoiceInput) {
+      state.isVoiceInput = newIsVoiceInput;
     }
   },
   actions: {

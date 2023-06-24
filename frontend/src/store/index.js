@@ -11,10 +11,18 @@ export const store = new Vuex.Store({
     saveState : false,
     canvasCompleted: false,
     canSaveThumbNail: false,
+    currentPageIndexNo: 0,
+    isChange : false,
+    isFinishDrop : false,
+    isCaptionInput : false,
+    bookName : ''
   },
   getters: {
     getBookId(state) {
       return state.bookId;
+    },
+    getBookName(state) {
+      return state.bookName;
     },
     getPageList(state) {
       return state.pageList;
@@ -27,6 +35,18 @@ export const store = new Vuex.Store({
     },
     getCanSaveThumbNail(state) {
       return state.canSaveThumbNail;
+    },
+    getCurrentPageIndexNo(state) {
+      return state.currentPageIndexNo;
+    },
+    getIsChange(state) {
+      return state.isChange;
+    },
+    getIsFinishDrop(state) {
+      return state.isFinishDrop;
+    },
+    getIsCaptionInput(state) {
+      return state.isCaptionInput;
     }
   },
   mutations: {
@@ -44,6 +64,21 @@ export const store = new Vuex.Store({
     },
     setCanSaveThumbNail(state, newCanSaveThumbNail) {
       state.canSaveThumbNail = newCanSaveThumbNail;
+    },
+    setCurrentPageIndexNo(state, newCurrentPageIndexNo) {
+      state.currentPageIndexNo = newCurrentPageIndexNo;
+    },
+    setIsChange(state, isChange) {
+      state.isChange = isChange;
+    },
+    setIsFinishDrop(state, newIsFinishDrop) {
+      state.isFinishDrop = newIsFinishDrop;
+    },
+    setIsCaptionInput(state, newIsCaptionInput) {
+      state.isCaptionInput = newIsCaptionInput;
+    },
+    setBookName(state, newBookName) {
+      state.bookName = newBookName;
     }
   },
   actions: {

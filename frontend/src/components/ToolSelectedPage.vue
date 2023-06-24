@@ -59,6 +59,7 @@ export default {
       isDisabled: true,
       isCaptionChange: false,
       isResizable: false,
+      contentText: null,
     }
   },
   mounted() {
@@ -111,6 +112,7 @@ export default {
     });
 
     let toolMenu = this;
+    let isDrag = false;
     let active = false;
     let currentX;
     let currentY;
@@ -138,7 +140,33 @@ export default {
       contentText = textInput(e);
     });
 
-    //오른쪽 마우스 클릭
+    document.addEventListener("dblclick", function (e) {
+      if (e.target.dataset.textContent == "true" && e.button === 0) {
+        toolMenu.$store.commit('setIsCaptionInput', true);
+        toolMenu.inputValue = true;
+        e.target.contentEditable = true;
+        e.target.style.outline = "none";
+        e.target.focus();
+      };
+    });
+
+    document.addEventListener("click", function (e) {
+      popupMenu.style.display = "none";
+    });
+
+    function textInput(e) {
+      let target = e.target;
+      let parentDiv = target.closest('#textArea');
+      if (parentDiv) {
+        if (parentDiv.id == "textArea") {
+          let text = target.innerText;
+          return text;
+        };
+      };
+      return null;
+    };
+
+    // 오른쪽 마우스 클릭
     objArea.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       target = e.target;
@@ -174,40 +202,31 @@ export default {
         toolMenu.resizableElement(currentPageList, resizableElement, target);
       }
     });
-
+    
     document.addEventListener("mousedown", (e) => {
-      e.stopPropagation();
-      toolMenu.inputValue = false;
-      const textDiv = document.querySelector('[data-text-content="true"]');
-      if (textDiv) {
-        textDiv.contentEditable = false;
-        if (contentText && toolMenu.isCaptionChange && currentPageList) {
-          toolMenu.canvas().then((todataUrl) => {
-            currentPageList.caption.content = contentText;
-            currentPageList.thumbnail = todataUrl;
-            toolMenu.isCaptionChange = false;
-          });
-        }
+      if (!e.target.dataset.textContent) {
+        this.$store.commit('setIsCaptionInput', false);
+        toolMenu.inputValue = false;
+        const textDiv = document.querySelector('[data-text-content="true"]');
+        if (textDiv) {
+          textDiv.contentEditable = false;
+          if (contentText && toolMenu.isCaptionChange && currentPageList) {
+            toolMenu.canvas().then((todataUrl) => {
+              currentPageList.caption.content = contentText;
+              currentPageList.thumbnail = todataUrl;
+              toolMenu.isCaptionChange = false;
+            });
+          };
+        };
       };
+
       if (e.target.dataset.objType !== "character" && e.target.dataset.objType !== "background" && e.target.dataset.objType !== "caption" && e.target.dataset.objType !== 'popupMenu') {
         popupMenu.style.display = "none";
         toolMenu.removeResizableElement(resizableElement, e);
-      }
+      };
     });
 
-    document.addEventListener("click", function (e) {
-      popupMenu.style.display = "none";
-    })
-
-    document.addEventListener("dblclick", function (e) {
-      if (e.target.dataset.textContent == "true" && e.button === 0) {
-        toolMenu.inputValue = true;
-        e.target.contentEditable = true;
-        e.target.focus();
-      }
-    });
-
-    //드래그 시작부분(selected page)
+    //드래그 시작 부분
     function dragStart(e) {
       e.stopPropagation();
 
@@ -223,6 +242,14 @@ export default {
         if (textDiv) {
           textDiv.contentEditable = false;
           toolMenu.inputValue = false;
+          toolMenu.$store.commit('setIsCaptionInput', false);
+          if (contentText && toolMenu.isCaptionChange && currentPageList) {
+            toolMenu.canvas().then((todataUrl) => {
+              currentPageList.caption.content = contentText;
+              currentPageList.thumbnail = todataUrl;
+              toolMenu.isCaptionChange = false;
+            });
+          };
         }
       };
 
@@ -252,7 +279,7 @@ export default {
         currentObj.style.opacity = '0.5';
         active = true;
         document.addEventListener("mousemove", drag);
-      }
+      };
     };
 
     //드래그 (selected page)
@@ -261,6 +288,7 @@ export default {
       e.preventDefault();
 
       if (active) {
+        isDrag = true;
         moveX = e.pageX - dragArea.offsetLeft;
         moveY = e.pageY - dragArea.offsetTop;
         requestAnimationFrame(() => {
@@ -273,39 +301,28 @@ export default {
     //드래그 끝내는 부분 (selected page)
     function dragEnd() {
       if (!active) return;
-
+      
       currentObj.style.opacity = '1';
 
-      if (targetObjId === 'textArea') {
+      if (targetObjId === 'textArea' && isDrag) {
         toolMenu.canvas().then((todataUrl) => {
           result.left = currentObj.style.left;
           result.top = currentObj.style.top;
           currentPageList.thumbnail = todataUrl;
         });
-      } else {
+      } else if(isDrag){
         toolMenu.canvas().then((todataUrl) => {
           result.style.left = currentObj.style.left;
           result.style.top = currentObj.style.top;
           currentPageList.thumbnail = todataUrl;
         });
       }
-
+      
+      isDrag = false;
       active = false;
       document.removeEventListener('mousemove', drag);
     };
 
-    //자막 입력 부분
-    function textInput(e) {
-      let target = e.target;
-      let parentDiv = target.closest('#textArea');
-      if (parentDiv) {
-        if (parentDiv.id == "textArea") {
-          let text = target.innerText;
-          return text;
-        }
-      }
-      return null;
-    };
   },
 
   watch: {
@@ -319,10 +336,9 @@ export default {
       this.fontSize = newVal;
       const textArea = document.querySelector('[data-text-content="true"]');
       if (textArea) {
-        console.log(newVal);
         textArea.style.fontSize = newVal + 'px';
         this.canvas().then((todataUrl) => {
-          this.currentPageList.caption.fontSize = newVal + '';
+          this.currentPageList.caption.fontSize = newVal + 'px';
           this.currentPageList.thumbnail = todataUrl;
         });
       }
@@ -332,7 +348,6 @@ export default {
   methods: {
     //자막 보이게 하는 변경 값
     showTextArea() {
-      console.log(this.currentPageList);
       this.$emit('change', true);
     },
     setFontSize() {
@@ -353,13 +368,13 @@ export default {
       const objectArea = this.$refs.pageObject;
       const addDiv = document.createElement("div");
       const textDiv = document.createElement("div");
-
-      textDiv.setAttribute("data-text-content", true);
+      textDiv.setAttribute("data-text-content", "true");
       addDiv.setAttribute('data-obj-type', 'caption');
       addDiv.style.width = "400px";
       addDiv.style.height = "200px";
       addDiv.style.left = "120px";
       addDiv.style.top = "200px"
+      textDiv.style.width = "100%";
       textDiv.style.height = "100%";
       textDiv.style.fontWeight = "bold";
       textDiv.style.fontSize = this.fontSize + "px";
@@ -368,6 +383,7 @@ export default {
       addDiv.style.position = "absolute";
       addDiv.id = "textArea";
       addDiv.style.zIndex = 2;
+      
       addDiv.appendChild(textDiv);
       objectArea.appendChild(addDiv);
 
@@ -579,7 +595,6 @@ export default {
             this.currentPageList.caption.left = '';
             this.currentPageList.caption.top = '';
             this.currentPageList.thumbnail = todataUrl;
-            this.currentPageList.caption.ttsName='';
           });
         }
       }
@@ -595,7 +610,6 @@ export default {
 
     //toolmenu 에서 selectedPage 로 드롭하는 부분
     imageEventDrop(element) {
-
       const toolSelectedPageDrag = this.$refs.pageForm;
       let nextId = this.nextId;
 
@@ -604,6 +618,7 @@ export default {
         e.stopPropagation();
 
         const currentPage = this.currentPageList;
+        this.$store.commit('setIsFinishDrop', false);
 
         const dragImageWidth = toolSelectedPageDrag.offsetWidth;
         const dragImageHeight = toolSelectedPageDrag.offsetHeight;
@@ -665,11 +680,13 @@ export default {
             this.canvas().then((todataUrl) => {
               currentPage.layerList.splice(0, 1, newImage);
               currentPage.thumbnail = todataUrl;
+              this.$store.commit('setIsFinishDrop', true);
             });
           } else {
             this.canvas().then((todataUrl) => {
               currentPage.layerList.unshift(newImage);
               currentPage.thumbnail = todataUrl;
+              this.$store.commit('setIsFinishDrop', true);
             });
           };
           //캐릭터 일 때
@@ -698,11 +715,11 @@ export default {
           newDiv.style.backgroundSize = 'contain';
 
           document.querySelector('.object').appendChild(newDiv);
-          this.imageIndex = currentPage.layerList.length;
-
+          
           this.canvas().then((todataUrl) => {
-            currentPage.layerList[this.imageIndex] = newImage;
+            currentPage.layerList[currentPage.layerList.length] = newImage;
             currentPage.thumbnail = todataUrl;
+            this.$store.commit('setIsFinishDrop', true);
           });
         };
       });
@@ -839,6 +856,7 @@ export default {
 }
 
 </script>
+
 <style scoped>
 .selected-page-form {
   width: 900px;
@@ -1011,4 +1029,5 @@ textarea {
   border: none;
   outline: 0;
 }
+
 </style>

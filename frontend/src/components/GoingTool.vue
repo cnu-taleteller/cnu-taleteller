@@ -8,7 +8,7 @@
       <div class="column-icon" v-for="bookData, index in bookList" :key=index>
         <input type="checkbox" :value="bookData.bookId" v-model="selectedBookList">
         <img :src="bookData.bookThumbnail" @click="updateExistingBook(bookData.bookId)">
-        <small>미완성작품리스트</small>
+        <small>{{bookData.bookName}}</small>
         <p></p>
       </div>
     </div>
@@ -40,8 +40,6 @@
 /* .container{
   text-align: center;
 } */
-
-
 
 
 .column {

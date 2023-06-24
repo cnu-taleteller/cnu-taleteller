@@ -62,7 +62,7 @@ export default {
   watch: {
     allPageList: {
       handler: function (newPageList, oldPageList) {
-        
+        console.log("aa");
         if (!this.isStackChange && newPageList) {
           //pageList 첫번째 변경이 된지 확인하는 부분 -> 썸네일을 저장 해야하나 확인
           if (oldPageList) {
@@ -263,7 +263,7 @@ export default {
             top: '',
             ttsVoice: '',
             ttsName: '',
-            recordedChunks: [],
+            voiceList: [],
           },
           thumbnail: '',
           pageId: newNo,
@@ -311,7 +311,7 @@ export default {
                 top: '',
                 ttsVoice: '',
                 ttsName: '',
-                recordedChunks: [],
+                voiceList: [],
               },
               thumbnail: '',
               pageId: newNo,

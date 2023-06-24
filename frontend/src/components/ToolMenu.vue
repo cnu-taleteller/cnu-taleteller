@@ -216,6 +216,7 @@ export default {
       uploadId: 0,
       isUpload: false,
       imageIndex: 0,
+      ttsVoiceName: null,
 
       file: null,
       s3: {
@@ -513,16 +514,21 @@ export default {
       },
       handleTtsChange(event) {
           const selectedValue = event.target.value;
-          this.currentPageList.caption.ttsVoice = selectedValue;
+          this.ttsVoiceName = selectedValue;
       },
       addTts() {
           const text = this.currentPageList.caption.content;
-          const voice = this.currentPageList.caption.ttsVoice;
+          const voice = this.ttsVoiceName;
           const language = "ko-KR";
-          console.log(text);
+          
           if(text==""){
-            alert("자막을 입력해주세요");
+            alert("자막을 입력해주세요!!");
             stop();
+            return;
+          } else if(voice === null) {
+            alert('TTS음성 선택해 주세요!!');
+            stop();
+            return;
           }
 
           axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/tts`, {
@@ -532,7 +538,7 @@ export default {
               }
           ).then(response => {
               const ttsUrl = response.data.ttsUrl;
-
+              this.$store.commit('setIsVoiceInput', true);
               this.currentPageList.caption.ttsName = `${process.env.VUE_APP_S3_PATH}/${response.data.encodedFileName}`;
               console.log(this.currentPageList.caption.ttsName);
               alert("tts 생성이 완료되었습니다.");
@@ -599,6 +605,7 @@ export default {
                   this.voicePageList.ttsName = fileName;
                   console.log('음성 녹음이 S3 서버로 전송되었습니다.');
                   console.log(this.voicePageList.ttsName);
+                  this.$store.commit('setIsVoiceInput', true);
                   this.voicePageList.voiceList.push(this.voicePageList.ttsName);
               })
               .catch(error => {

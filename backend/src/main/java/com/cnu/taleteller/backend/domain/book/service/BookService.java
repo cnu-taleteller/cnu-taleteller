@@ -248,7 +248,7 @@ public class BookService {
 
     @Transactional(readOnly = true)
     public List<Book> findUserBookList(String userEmail) {
-        List<Book> bookList = bookRepository.findMyBookList(userEmail);
+        List<Book> bookList = bookRepository.findMyBookList(userEmail, "temp");
         return bookList != null ? bookList : Collections.emptyList();
     }
 

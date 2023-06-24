@@ -52,6 +52,7 @@ export default {
   },
   methods: {
     editBookName() {
+      this.$store.commit('setSaveState', true);
       this.edit = !!!this.edit;
     },
     // 제출

@@ -115,6 +115,16 @@ export default {
   beforeUnmount() {
     window.removeEventListener('beforeunload', this.unLoadEvent);
   },
+  beforeRouteLeave(to, from, next) {
+    if (this.$route.path === '/tool') {
+      window.removeEventListener('beforeunload', this.unLoadEvent);
+      // document.removeEventListener('mousedown');
+      // document.removeEventListener('click');
+      // document.removeEventListener('dblclick');
+      // document.removeEventListener('input');
+    }
+    next();
+  },
   components: {
     ToolHeader: toolHeader,
     ToolPageList: toolPageList,
@@ -125,7 +135,8 @@ export default {
   methods: {
     // 새로고침 방지
     unLoadEvent(event) {
-      if (this.isLeaveSite) return;
+      const saveState = this.$store.getters.getSaveState;
+      if (!saveState) return;
       event.preventDefault();
       event.returnValue = '';
     },

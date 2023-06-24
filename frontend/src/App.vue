@@ -56,4 +56,21 @@ nav a.router-link-exact-active {
 .wrap .tab {
   font-family: 'Do Hyeon', sans-serif;
 }
+
+[data-text-content]  {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+[data-text-content] * {
+    word-break: break-all;
+}
 </style>

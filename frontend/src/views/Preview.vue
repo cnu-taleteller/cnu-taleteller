@@ -162,13 +162,14 @@ export default {
         const addDiv = document.createElement('div');
         const textDiv = document.createElement("div");
 
-        textDiv.setAttribute("data-text-content", true);
+        textDiv.setAttribute("data-text-content", "true");
         addDiv.setAttribute('data-obj-type', 'caption');
         addDiv.style.width = caption.width;
         addDiv.style.height = caption.height;
         addDiv.style.left = caption.left;
         addDiv.style.top = caption.top;
         textDiv.style.height = "100%";
+        textDiv.style.width = "100%";
         textDiv.style.fontWeight = "bold";
         textDiv.style.fontSize = caption.fontSize;
         textDiv.style.color = caption.fontColor;

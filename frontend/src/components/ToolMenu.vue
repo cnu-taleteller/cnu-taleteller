@@ -169,20 +169,21 @@
         </div>
         <div class="record" v-else-if="selectedMenu == 'recode'">
           <div v-if="!recordingStarted">
-            <button @click="startRecording()"><img src="@/assets/play.png" alt="녹음 시작"></button>
+            <button class="submit-btn" @click="startRecording()"><img src="@/assets/start.png" alt="녹음 시작"></button>
           </div>
           <div class="record" v-else>
-            <div>{{ timerDisplay }}</div>
-            <button @click="stopRecording()"><img src="@/assets/stop.png" alt="녹음 시작"></button>
+            {{ timerDisplay }}
+            <button class="submit-btn" @click="stopRecording()"><img src="@/assets/stop.png" alt="녹음 정지"></button>
           </div>
           <div>
             <div v-for="(audioUrl, index) in this.currentPageList.caption.voiceList" :key="index">
-              <audio :src="audioUrl" controls></audio><p></p>
+              <audio :src="audioUrl" controls></audio>
+              <p></p>
               <label>
                 <input type="radio" :value="audioUrl" v-model="selectedAudio">선택하기
               </label>
             </div>
-            <button @click="saveSelectedAudio">저장</button>
+            <button class="submit-btn" @click="saveSelectedAudio">저장</button>
           </div>
         </div>
       </div>
@@ -784,7 +785,7 @@ input[type=file]::file-selector-button:hover {
 }
 .record img {
   width: 100%;
-  max-width: 30px;
+  max-width: 50px;
 }
 
 .story-input {

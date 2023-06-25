@@ -13,7 +13,7 @@
         </thead>
         <tr v-for="result in detailsResult" :key="result.payId">
           <td>{{ result.paySort }}</td>
-          <td>{{ result.payDate }}</td>
+          <td>{{ result.payDate.replace('T',' ') }}</td>
           <td>{{ result.payCount }}</td>
           <td>{{ result.payType }}</td>
           <td>{{ Math.abs(result.payCount * 100) }}</td>

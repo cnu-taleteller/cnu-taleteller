@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,8 @@ import java.util.Map;
 public class MemberController {
     private final MemberService memberService;
     private final UserDetailsService memberDetailsService;
+    private final BCryptPasswordEncoder passwordEncoder;
+
 
 
     @PostMapping("/signup")
@@ -37,20 +40,23 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
+    @CrossOrigin(origins = "http://localhost:8200/")
     public Boolean login(@RequestBody Map<String, String> loginInfo, HttpSession session) {
         String memberEmail = loginInfo.get("memberEmail");
-//        String memberPassword = loginInfo.get("memberPassword");
+        String memberPassword = loginInfo.get("memberPassword");
 
         try {
-            UserDetails member = memberService.loadUserByUsername(memberEmail);
-//            UserDetails memberpw = memberService.loadUserByPassword(memberPassword);
+            Member member = memberService.loadUserByUsername(memberEmail);
+            if (!passwordEncoder.matches(memberPassword, member.getMemberPassword())) {
+                throw new UsernameNotFoundException(memberEmail);
+            }
             session.setAttribute("user", memberEmail);
             return memberService.loginDropCheck(memberEmail);
         } catch (UsernameNotFoundException e) {
             return false;
         }
     }
+
     @PostMapping("/checkemail")
     @CrossOrigin(origins = "http://localhost:8200/")  // 해당 출처 허용
     public Boolean checkemail(@RequestBody Map<String, String> loginInfo) {

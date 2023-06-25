@@ -86,10 +86,9 @@ export default {
   text-align: center;
 
 }
-/*기존 고잉 툴 백그라운드 컬러 */
-/* .tab-content{
+.tab-content{
   background-color: rgba(202, 179, 175, 0.203);
-} */
+}
 </style>
 
 

@@ -42,13 +42,6 @@ public class MemberService implements UserDetailsService {
     }
 
 
-//    public Member loadUserByPassword(String memberPassword) throws UsernameNotFoundException {
-//        String encodedPassword = passwordEncoder.encode(memberPassword);
-//        System.out.println(encodedPassword);
-//        return memberRepository.findByMemberPassword(memberPassword)
-//                .orElseThrow(() -> new UsernameNotFoundException(memberPassword));
-//    }
-
 
     public Boolean loginDropCheck(String email) {
         Member findMember = memberRepository.findDistinctByMemberEmail(email);

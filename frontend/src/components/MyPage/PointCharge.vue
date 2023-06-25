@@ -30,6 +30,17 @@
           <button @click="tossPayments('가상계좌', 100)">무통장입금</button>
         </li>
       </ul>
+      <form class="charge-form">
+        <select v-model="chargeType">
+          <option value="간편결제">카카오페이</option>
+          <option value="카드">토스페이-카드</option>
+          <option value="가상계좌">토스페이-무통장</option>
+        </select>
+        <div>
+          <input type="text" v-model="chargePoint" />
+          <button type="submit" @click="charge">충전</button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -44,7 +55,9 @@ export default {
   data() {
     return {
       kakaopayUrl: "",
-      clientKey: process.env.VUE_APP_CHARGE_KEY
+      clientKey: process.env.VUE_APP_CHARGE_KEY,
+      chargeType: "간편결제",
+      chargePoint: null,
     }
   },
   methods: {
@@ -75,7 +88,7 @@ export default {
 
       loadTossPayments(this.clientKey).then(tossPayments => {
         tossPayments.requestPayment(method, {
-          amount: 10000,
+          amount: amount*100,
           orderId: 'xnDIqpt7Dlfdtd99WwXgu',
           orderName: '엽전 충전',
           customerName: '회원',
@@ -90,7 +103,22 @@ export default {
             }
           });
       });
-    }
+    },
+
+    charge(event) {
+      event.preventDefault();
+
+        if (this.chargePoint === null) {
+          alert("충전할 엽전 개수를 입력해주세요.");
+        } else if(this.chargeType == "간편결제") {
+          this.pointCharge(this.chargeType,this.chargePoint);
+        } else if(this.chargeType == "카드") {
+          this.tossPayments(this.chargeType, this.chargePoint);
+        } else if(this.chargeType == "가상계좌") {
+          this.tossPayments(this.chargeType, this.chargePoint);
+        }
+         
+      },
 
   },
 }
@@ -152,5 +180,14 @@ button:hover {
 .point-package li {
   list-style: none;
   margin: 7px;
+}
+
+.charge-form {
+  padding-right: 15px;
+}
+
+.charge-form input {
+  margin: 10px;
+  width: 150px;
 }
 </style>

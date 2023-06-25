@@ -3,7 +3,7 @@
         <div class="chargeResult-main">
           <ul v-for="result in paymentResult" :key="result.payId">
             <li>{{ result.paySort }} 완료</li>
-            <li>일자 : {{ result.payDate }}</li>
+            <li>일자 : {{ result.payDate.replace('T',' ') }}</li>
             <li>수량 : {{ result.payCount }}개</li>
             <li>결제수단 : {{ result.payType }}</li>
             <li>금액 : {{ Math.abs(result.payCount*100) }}원</li>

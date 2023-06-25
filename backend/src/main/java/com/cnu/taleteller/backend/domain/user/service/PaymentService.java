@@ -12,6 +12,7 @@ import com.cnu.taleteller.backend.domain.user.dto.KakaopayReadyVO;
 import com.cnu.taleteller.backend.domain.user.dto.PaymentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -39,6 +40,8 @@ public class PaymentService {
     private KakaopayReadyVO kakaopayReadyVO;
     private KakaopayApprovalVO kakaopayApprovalVO;
 
+    @Value("${SITE_PATH}")
+    private String siteUri;
 
     public void pointChargeSet(int point, String method, String email) {
         Member findMember = memberRepository.findDistinctByMemberEmail(email);
@@ -130,9 +133,9 @@ public class PaymentService {
         params.add("quantity", String.valueOf(paymentDto.getPayCount())); //상품 수량
         params.add("total_amount", String.valueOf(paymentDto.getPayCount()*100)); //상품 총액
         params.add("tax_free_amount", String.valueOf(paymentDto.getPayCount()*100)); //상품 비과세 금액
-        params.add("approval_url", "http://localhost:8200/mypage/chargeResult");
-        params.add("cancel_url", "http://localhost:8200/mypage/pointmanage");
-        params.add("fail_url", "http://localhost:8200/mypage/pointmanage");
+        params.add("approval_url", siteUri+"/mypage/chargeResult");
+        params.add("cancel_url", siteUri+"/mypage/pointmanage");
+        params.add("fail_url", siteUri+"/mypage/pointmanage");
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<MultiValueMap<String, String>>(params, headers);
 

@@ -242,6 +242,7 @@ export default {
         path: '/tool',
       });
     },
+
     async deleteSelectedBooks() {
       await axios
         .delete(`${process.env.VUE_APP_API_PATH}/api/v1/book/deleteBookList`, {

@@ -61,8 +61,9 @@ export default {
   },
   watch: {
     allPageList: {
-      handler: function (newPageList, oldPageList) {
+      handler: async function (newPageList, oldPageList) {
         if (!this.isStackChange && newPageList) {
+          console.log(this.currentPageIndexNo);
           //pageList 첫번째 변경이 된지 확인하는 부분 -> 썸네일을 저장 해야하나 확인
           if (oldPageList) {
             if (!_.isEqual(newPageList[0], oldPageList[0])) {
@@ -189,7 +190,6 @@ export default {
 
           //z click
           if (event.key === 'z') {
-            console.log('z');
             if (this.prevSaveStackIndex - 1 >= 0 && stackLength >= 1 && this.$store.getters.getIsFinishDrop) {
               this.destroyPageOutLine();
               this.isStackChange = true;
@@ -199,6 +199,7 @@ export default {
               this.prevSaveStackIndex -= 1;
 
               this.currentPageIndexNo = this.mostRecentWorkPage;
+            
               this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
 
               this.toEmitCurrentPageList(this.currentPageIndexNo);
@@ -217,6 +218,7 @@ export default {
               this.prevSaveStackIndex += 1;
 
               this.currentPageIndexNo = this.mostRecentWorkPage;
+              
               this.$emit('currentPageList', this.pageList[this.mostRecentWorkPage]);
 
               this.toEmitCurrentPageList(this.currentPageIndexNo);
@@ -232,11 +234,37 @@ export default {
     },
 
     //페이지 변경 시 그 페이지의 내용들을 보냄
-    clickPage(index) {
+    async clickPage(index) {
       this.destroyPageOutLine();
       this.isRecentChange = true;
+
+      const isCanvasRunning = this.$store.getters.getCanvasCompleted;
+
+      if (!isCanvasRunning) {
+        await this.waitForCanvas();
+      }
+
       this.currentPageIndexNo = index;
       this.toEmitCurrentPageList(index);
+    },
+
+    async waitForCanvas() {
+      let timeout = 0;
+      const reconfirm = 200;
+
+      return new Promise((resolve, reject) => {
+        const checkCanvas = () => {
+          if (this.$store.getters.getCanvasCompleted) {
+            resolve();
+          } else if (timeout >= 5000) {
+            reject(new Error('Timeout'));
+          } else {
+            setTimeout(checkCanvas, reconfirm);
+            timeout += reconfirm;
+          }
+        };
+        checkCanvas();
+      });
     },
 
     //페이지 추가부분
@@ -368,11 +396,12 @@ export default {
     toEmitCurrentPageListForDrag(currentPageIndexNo) {
       this.$store.commit('setCurrentPageIndexNo', currentPageIndexNo);
       this.$emit('currentPageList', this.pageList[currentPageIndexNo]);
-      const previousSelectedElement = this.$refs.pageList.$el.querySelector('.sortable-chosen');
-
-      if (previousSelectedElement) {
-        const childElement = previousSelectedElement.querySelector('.page-body');
-        if (childElement) { childElement.style.outline = '1px solid rgb(39, 186, 255)'; }
+      if (this.$refs.pageList) {
+        const previousSelectedElement = this.$refs.pageList.$el.querySelector('.sortable-chosen');
+        if (previousSelectedElement) {
+          const childElement = previousSelectedElement.querySelector('.page-body');
+          if (childElement) { childElement.style.outline = '1px solid rgb(39, 186, 255)'; }
+        }
       }
     },
 
@@ -415,6 +444,24 @@ export default {
       } else {
         this.$store.commit('setSaveState', true);
       }
+    },
+    async waitForCanvas() {
+      let timeout = 0;
+      const reconfirm = 200;
+
+      return new Promise((resolve, reject) => {
+        const checkCanvas = () => {
+          if (this.$store.getters.getCanvasCompleted) {
+            resolve();
+          } else if (timeout >= 5000) {
+            reject(new Error('Timeout'));
+          } else {
+            setTimeout(checkCanvas, reconfirm);
+            timeout += reconfirm;
+          }
+        };
+        checkCanvas();
+      });
     },
   },
 }

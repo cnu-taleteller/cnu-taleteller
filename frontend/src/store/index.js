@@ -13,7 +13,7 @@ export const store = new Vuex.Store({
     canSaveThumbNail: false,
     currentPageIndexNo: 0,
     isChange : false,
-    isFinishDrop : false,
+    isFinishDrop : true,
     isCaptionInput : false,
     bookName : '',
     isVoiceInput: false,

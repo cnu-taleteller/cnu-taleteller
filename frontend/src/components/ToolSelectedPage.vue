@@ -38,6 +38,7 @@
 </template>
 <script>
 import html2canvas from 'html2canvas';
+import _ from 'lodash';
 
 export default {
   //props로 toolView에서 보낸 데이터를 받음
@@ -60,6 +61,7 @@ export default {
       isCaptionChange: false,
       isResizable: false,
       contentText: null,
+      tmp : null,
     }
   },
   mounted() {
@@ -88,12 +90,15 @@ export default {
       showInitial: true,
       change: function (color) {
         textArea = document.querySelector('[data-text-content="true"]');
+
         if (textArea) {
           textArea.style.color = currentColor;
         }
+
         currentColor = color.toHexString();
         colorPreview.style.backgroundColor = currentColor;
         this.currentColor = currentColor;
+
         this.canvas().then((todataUrl) => {
           this.currentPageList.caption.fontColor = currentColor;
           this.currentPageList.thumbnail = todataUrl;
@@ -101,13 +106,16 @@ export default {
       }.bind(this),
       move: function (color) {
         textArea = document.querySelector('[data-text-content="true"]');
+
         if (textArea) {
           textArea.style.color = currentColor;
         }
+
         currentColor = color.toHexString();
         colorPreview.style.backgroundColor = currentColor;
         this.currentColor = currentColor;
-        this.currentPageList.caption.fontColor = currentColor;
+
+        // this.currentPageList.caption.fontColor = currentColor;
       }.bind(this)
     });
 
@@ -129,6 +137,9 @@ export default {
     let resizableElement;
     let contentText;
     let currentPageList;
+    let resultX;
+    let resultY;
+    let resultThumb;
 
     this.imageEventDrop(imageArea);
     this.imageEventDragOver(imageArea);
@@ -171,6 +182,7 @@ export default {
       e.preventDefault();
       target = e.target;
       currentPageList = toolMenu.currentPageList;
+      this.tmp = currentPageList;
 
       if (target.id.includes('background') || target.dataset.textContent === 'true') {
         toolMenu.isDisabled = true;
@@ -249,12 +261,17 @@ export default {
               currentPageList.thumbnail = todataUrl;
               toolMenu.isCaptionChange = false;
             });
-          };
+          }
         }
-      };
+      }
 
       if (e.button === 0 && !toolMenu.inputValue && !e.target.classList.contains('ui-resizable-handle')) {
         toolMenu.removeResizableElement(resizableElement, e);
+
+        if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
+          toolMenu.resizableElement(currentPageList, resizableElement, target);
+        }
+
         popupMenu.style.display = "none";
         target.style.outline = '#27BAFF solid 1px';
 
@@ -263,10 +280,6 @@ export default {
 
         if (targetObjId === 'textArea') { result = currentPageList.caption; }
         else { result = currentPageList.layerList.find(el => el.id === targetObjId); };
-
-        if (target.dataset.objType === 'character' || target.dataset.objType === 'background' || target.dataset.objType === 'caption') {
-          toolMenu.resizableElement(currentPageList, resizableElement, target);
-        }
 
         currentObjId = targetObjId;
         currentObj = target;
@@ -301,32 +314,16 @@ export default {
     //드래그 끝내는 부분 (selected page)
     function dragEnd() {
       if (!active) return;
-      
       currentObj.style.opacity = '1';
-
-      if (targetObjId === 'textArea' && isDrag) {
-        toolMenu.canvas().then((todataUrl) => {
-          result.left = currentObj.style.left;
-          result.top = currentObj.style.top;
-          currentPageList.thumbnail = todataUrl;
-        });
-      } else if(isDrag){
-        toolMenu.canvas().then((todataUrl) => {
-          result.style.left = currentObj.style.left;
-          result.style.top = currentObj.style.top;
-          currentPageList.thumbnail = todataUrl;
-        });
-      }
-      
-      isDrag = false;
       active = false;
       document.removeEventListener('mousemove', drag);
+      toolMenu.updatePageList(targetObjId, isDrag, result, currentObj, currentPageList);
+      isDrag = false;
     };
 
   },
 
   watch: {
-    //currentPageList => pageList[현재 선택한 페이지 인덱스] 가 변경이 일어나면 실행이 되는 부분
     currentPageList() {
       this.updateContent();
       this.changeCaptionElement();
@@ -359,6 +356,7 @@ export default {
       textarea.style.color = this.fontColor;
     },
     addContent() {
+      this.$store.commit('setIsFinishDrop', false);
       if (this.currentPageList.caption.captionState === 1) {
         alert('한 페이지당 하나의 자막만 넣을 수 있습니다.');
         return;
@@ -398,6 +396,7 @@ export default {
         currentPageList.caption.captionState = 1;
         currentPageList.thumbnail = todataUrl;
       });
+      this.$store.commit('setIsFinishDrop', true);
     },
 
     async canvas() {
@@ -497,63 +496,82 @@ export default {
 
     //이미지를 가장 뒤로 보내는 메소드
     lastBack(id) {
+      const currentPageList = this.currentPageList;
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${id}`);
-      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
+      let indexOfElement = currentPageList.layerList.findIndex(obj => obj.id === id);
+
       const secondChild = objectElement.children[1];
+
       if (objectElement.firstChild.id.includes('background')) {
         if (secondChild) {
           objectElement.insertBefore(elementDoc, secondChild);
+          const item = currentPageList.layerList[indexOfElement];
+
+          this.canvas().then((todataUrl) => {
+            currentPageList.thumbnail = todataUrl;
+            currentPageList.layerList.splice(indexOfElement, 1);
+            currentPageList.layerList.splice(1, 0, item);
+          });
+
         } else {
           return;
         }
       } else {
         const firstChild = objectElement.firstChild;
         objectElement.insertBefore(elementDoc, firstChild);
+        const item = currentPageList.layerList[indexOfElement];
+
+        this.canvas().then((todataUrl) => {
+          currentPageList.thumbnail = todataUrl;
+          currentPageList.layerList.splice(indexOfElement, 1);
+          currentPageList.layerList.splice(0, 0, item);
+        });
+
       }
-      this.canvas().then((todataUrl) => {
-        const item = this.currentPageList.layerList[indexOfElement];
-        this.currentPageList.layerList.splice(indexOfElement, 1);
-        this.currentPageList.layerList.splice(0, 0, item);
-        this.currentPageList.thumbnail = todataUrl;
-      });
     },
 
     //이미지를 가장 앞으로 보내는 메소드
     frontmost(id) {
+      const currentPageList = this.currentPageList;
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${id}`);
-      let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
-      const item = this.currentPageList.layerList[indexOfElement];
+      let indexOfElement = currentPageList.layerList.findIndex(obj => obj.id === id);
+      const item = currentPageList.layerList[indexOfElement];
       objectElement.appendChild(elementDoc);
       this.canvas().then((todataUrl) => {
-        this.currentPageList.layerList.splice(indexOfElement, 1);
-        this.currentPageList.layerList.splice(this.currentPageList.layerList.length, 0, item);
-        this.currentPageList.thumbnail = todataUrl;
+        currentPageList.layerList.splice(indexOfElement, 1);
+        currentPageList.layerList.splice(this.currentPageList.layerList.length, 0, item);
+        currentPageList.thumbnail = todataUrl;
       });
     },
 
     //이미지를 앞으로 보내는 메소드
     next(id) {
+      const currentPageList = this.currentPageList;
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${id}`);
       const nextImage = elementDoc.nextElementSibling;
+      
       if (nextImage) {
-        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
-        const item = this.currentPageList.layerList[indexOfElement];
-        this.currentPageList.layerList.splice(indexOfElement, 1);
-        this.currentPageList.layerList.splice(indexOfElement + 1, 0, item);
+        let indexOfElement = currentPageList.layerList.findIndex(obj => obj.id === id);
+        const item = currentPageList.layerList[indexOfElement];
+        currentPageList.layerList.splice(indexOfElement, 1);
+        currentPageList.layerList.splice(indexOfElement + 1, 0, item);
         objectElement.insertBefore(elementDoc, nextImage.nextElementSibling);
+
         this.canvas().then((todataUrl) => {
+          this.currentPageList.thumbnail = todataUrl;
           this.currentPageList.layerList.splice(indexOfElement, 1);
           this.currentPageList.layerList.splice(indexOfElement + 1, 0, item);
-          this.currentPageList.thumbnail = todataUrl;
         });
+
       }
     },
 
     //이미지를 뒤로 보내는 메소드
     back(id) {
+      const currentPageList = this.currentPageList;
       const objectElement = this.$refs.pageObject;
       const elementDoc = objectElement.querySelector(`#${id}`);
       const previusImage = elementDoc.previousElementSibling;
@@ -561,14 +579,16 @@ export default {
         return;
       }
       if (previusImage) {
-        let indexOfElement = this.currentPageList.layerList.findIndex(obj => obj.id === id);
-        const item = this.currentPageList.layerList[indexOfElement];
+        let indexOfElement = currentPageList.layerList.findIndex(obj => obj.id === id);
+        const item = currentPageList.layerList[indexOfElement];
         objectElement.insertBefore(elementDoc, elementDoc.previousElementSibling);
+
         this.canvas().then((todataUrl) => {
-          this.currentPageList.layerList.splice(indexOfElement, 1);
-          this.currentPageList.layerList.splice(indexOfElement - 1, 0, item);
-          this.currentPageList.thumbnail = todataUrl;
+          currentPageList.thumbnail = todataUrl;
+          currentPageList.layerList.splice(indexOfElement, 1);
+          currentPageList.layerList.splice(indexOfElement - 1, 0, item);
         });
+
       }
     },
 
@@ -851,7 +871,23 @@ export default {
       }
 
       colorPreview.style.backgroundColor = this.currentColor;
-    }
+    },
+
+    async updatePageList(targetObjId, isDrag, result, currentObj, currentPageList) {
+      if (targetObjId === 'textArea' && isDrag) {
+        this.canvas().then((todataUrl) => {
+          currentPageList.thumbnail = todataUrl;
+          result.left = currentObj.style.left;
+          result.top = currentObj.style.top;
+        });
+      } else if(isDrag) {
+        this.canvas().then((todataUrl) => {
+          currentPageList.thumbnail = todataUrl;
+          result.style.left = currentObj.style.left;
+          result.style.top = currentObj.style.top;
+        });
+      }
+    },
   },
 }
 

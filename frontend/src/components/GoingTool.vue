@@ -128,7 +128,6 @@ export default {
     },
     async deleteSelectedBooks() { 
       await axios.delete(`${process.env.VUE_APP_API_PATH}/api/v1/book/deleteBookList`, { data : this.selectedBookList }).then(response => {
-        console.log(response);
         sessionStorage.setItem('goingtool','go');
         this.$router.go();
       }).catch(err => {

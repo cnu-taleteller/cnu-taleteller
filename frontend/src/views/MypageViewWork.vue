@@ -236,6 +236,10 @@ export default {
       },
     },
   created() {
+    if(this.$route.query.tabSort){
+      this.workList = "bookmark";
+    }
+
     this.getWorkInfo()
     this.getBookMark()
     this.getPayWork()

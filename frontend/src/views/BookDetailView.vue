@@ -11,7 +11,7 @@
     </div>
     <div class="book-button">
       <button class="btn1" @click="toggleRecommend">{{ bookRecommend }} 추천</button>
-      <button class="btn2" @click="toggleBookmark">즐겨찾기</button>
+      <button class="btn2" @click="toggleBookmark">{{ this.bookmarkCheck }}</button>
       <button class="btn3" @click="togglePreview">{{ this.paymentCheck }}</button>
     </div>
     <Reply :replies="replies" @addReply="addReply" @editReply="editReply" @deleteReply="deleteReply" />
@@ -35,6 +35,7 @@ export default {
       replies: [],
       memberId: null,
       memberName: null,
+      bookmarkCheck: '즐겨찾기',
       paymentCheck: '결제',
       isRecommended: false,
       isBookmark: false,
@@ -199,9 +200,10 @@ export default {
             .then(() => {
               this.isBookmark = true;
               this.fetchBookDetail(id);
+              // this.bookmarkCheck = "즐겨찾기 해제";
               const bookmark = confirm("즐겨찾기되었습니다! 즐겨찾기 창으로이동하시겠습니까?");
               if (bookmark == true) {
-                this.$router.push({ path: `/mypage/bookmark` });
+                this.$router.push({ path: `/mypage/workmanage`, query: { tabSort : bookmark } });
               } else {
                 e.preventDefault();
                 console.log("페이지 이동 안 함")

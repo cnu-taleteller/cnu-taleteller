@@ -1,5 +1,6 @@
 package com.cnu.taleteller.backend.domain.user.service;
 
+import com.amazonaws.util.IOUtils;
 import com.cnu.taleteller.backend.domain.user.Repository.MemberRepository;
 import com.cnu.taleteller.backend.domain.user.dto.MailDTO;
 import com.cnu.taleteller.backend.domain.user.dto.MemberManagementDto;
@@ -23,6 +24,8 @@ import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -65,11 +68,13 @@ public class MemberService implements UserDetailsService {
                 .memberPhone(infoDto.getMemberPhone())
                 .memberAccount(infoDto.getMemberAccount()).build()).getMemberId();
     }
+
+
     private String readHtmlTemplate(String templatePath) {
         try {
-            Resource resource = new ClassPathResource("templates/" + templatePath);
-            File file = resource.getFile();
-            byte[] bytes = Files.readAllBytes(file.toPath());
+            URL url = new URL(templatePath);
+            InputStream inputStream = url.openStream();
+            byte[] bytes = IOUtils.toByteArray(inputStream);
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
             return "HTML 템플릿 파일 읽기 실패";
@@ -87,7 +92,7 @@ public class MemberService implements UserDetailsService {
             helper.setSubject(mailDTO.getTitle());
 
 
-            String htmlContent = readHtmlTemplate("index.html");
+            String htmlContent = readHtmlTemplate("https://taleteller.s3.ap-northeast-2.amazonaws.com/default/index.html");
             htmlContent = htmlContent.replace("{str}", mailDTO.getStr());
 
             helper.setText(htmlContent, true);

@@ -196,7 +196,7 @@ export default {
         })
         .catch((err) => {
           this.gpt = false;
-          alert('서버 오류로 시나리오 요청에 실패하였습니다.');
+          // alert('서버 오류로 시나리오 요청에 실패하였습니다.');
           console.log(err);
         })
     },

@@ -181,24 +181,47 @@ export default {
       this.gpt = true;
       this.goTool();
       console.log("axios 통신 요청");
-      axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/`, {
-        who: this.scenarioKeyword.who,
-        when: this.scenarioKeyword.when,
-        where: this.scenarioKeyword.where,
-        event: this.scenarioKeyword.event
-      })
-        .then((res) => {
-          this.resultScenario = res.data;
-          sessionStorage.setItem('scenario', this.resultScenario);
-          this.setScenarioArr();
-          console.log(this.finalScenario);
-          this.gpt = false;
-        })
-        .catch((err) => {
-          this.gpt = false;
-          // alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-          console.log(err);
-        })
+      setTimeout(() => {
+        this.resultScenario = `[도입]
+        한번쯤은 동화 속 난쟁이가 되어보고 싶다는 아이가 있었다. 초등학생 시절, 그는 어머니로부터 난쟁이 이야기를 듣고 자꾸만 찾고 싶은 마음에 낮에 벌판으로 향해 떠났다
+
+        [전개]
+        그러던 어느날, 그는 눈앞에 서 있는 작고 귀여운 난쟁이를 발견했다. 난쟁이는 아이를 바라보며 웃으며 손짓을 하며 다가왔다. "어서 와!"라며 손을 내밀었다. 아이는 부끄럽게 손을 내밀며 등을 돌리고 있었다. 
+
+        그러나 난쟁이는 끝없는 이야기와 함께 아이를 괴롭혔다. 난쟁이는 아이가 돌아올 때마다 다양한 상황에서 이야기를 풀어내기 위해 질문을 던져주었다. 그러면서도 어린 아이의 상상력은 끊임없이 발휘되었다.
+
+        [위기]
+        떠나고 싶은 마음보다 더 커졌던 위기가 찾아왔다. 어느 날, 그러나 벌판에서 이상한 소리가 들려왔다. "푸우우우웅!" 아이는 놀라서 용감한 난쟁이에게 달려갔다. 그리고 알고보니 선녀들의 장치가 깨어나 선녀들이 고쳐야 할 것이 있다고 했다. 
+
+        "하지만 어디에 가야할지 모르겠어!" 난쟁이가 말했다. 아이는 일어났다. "내가 알아낼게요!"
+
+        [결말]
+        그리고 이야기의 막바지, 아이는 선녀들이 모인 선창을 찾아냈다. 그리고 바로 이 곳에서 아이는 선녀들과 같이 문제를 해결하면서 최고의 용기를 발휘했다. 그리고 결국 난쟁이들도 돌아가기 시작했다. 마지막으로 난쟁이집에서는 아이를 위해 상쾌한 차를 내리고 아이와 난쟁이들이 함께 즐기며, 이야기는 페임과 열렬한 박수로 끝난다. 
+
+        우리 모두는 이처럼 꿈꾸는 아이들에게 마찬가지로 자신의 꿈을 실현할 용기를 가져보자.`;
+        sessionStorage.setItem('scenario', this.resultScenario);
+        this.setScenarioArr();
+        console.log(this.finalScenario);
+        this.gpt = false;
+      }, 5000);
+      // axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/`, {
+      //   who: this.scenarioKeyword.who,
+      //   when: this.scenarioKeyword.when,
+      //   where: this.scenarioKeyword.where,
+      //   event: this.scenarioKeyword.event
+      // })
+      //   .then((res) => {
+      //     this.resultScenario = res.data;
+      //     sessionStorage.setItem('scenario', this.resultScenario);
+      //     this.setScenarioArr();
+      //     console.log(this.finalScenario);
+      //     this.gpt = false;
+      //   })
+      //   .catch((err) => {
+      //     this.gpt = false;
+      //     // alert('서버 오류로 시나리오 요청에 실패하였습니다.');
+      //     console.log(err);
+      //   })
     },
     setScenarioArr() {
       // 스토리 도입, 전개, 위기, 결말로 나눠서 배열에 저장(대괄호 글자는 제거)

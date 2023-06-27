@@ -490,20 +490,25 @@ export default {
           const story = sessionStorage.getItem('scenario');
           const captions = this.allCaption;
 
-          console.log("axios 통신 요청");
-          axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/flow`, {
-              story, captions
+          setTimeout(() => {
+            this.flowResult = `현재까지의 진행을 파악한 결과 강아지 "클로이"는 공주를 찾아 떠났던 산책로에서 희미한 공주의 냄새를 맡고 따라가다 냄새가 끊겼고, 꽃 밭에서 공주를 찾은 상태입니다. 현재 상태는 [도입], [전개], [위기] 까지 진행이 된 상태입니다. 따라서 [결말]인 공주를 데리고 왕국으로 돌아가는 이야기를 작성하시면 이야기가 완성될 것 같습니다.`;
+            this.loading = false;
+          }, 5000);
 
-          })
-              .then((res) => {
-                  this.flowResult = res.data;
-                  this.loading = false;
-              })
-              .catch((err) => {
-                  // this.gpt = false;
-                  // alert('서버 오류로 시나리오 요청에 실패하였습니다.');
-                  console.log(err);
-              })
+          // console.log("axios 통신 요청");
+          // axios.post(`${process.env.VUE_APP_API_PATH}/api/v1/tool/scenario/flow`, {
+          //     story, captions
+
+          // })
+          //     .then((res) => {
+          //         this.flowResult = res.data;
+          //         this.loading = false;
+          //     })
+          //     .catch((err) => {
+          //         // this.gpt = false;
+          //         // alert('서버 오류로 시나리오 요청에 실패하였습니다.');
+          //         console.log(err);
+          //     })
       },
       // 키워드 변경
       reKeyword() {

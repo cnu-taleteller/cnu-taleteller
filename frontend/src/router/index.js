@@ -17,6 +17,8 @@ import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
 import ModalPassword from '../views/ModalPassword.vue'
 import GoingTool from '../components/GoingTool.vue';
 import AdminView from "@/views/AdminView.vue";
+import ErrorView from "@/views/ErrorView.vue";
+
 
 
 Vue.use(VueRouter)
@@ -107,6 +109,11 @@ const routes = [
     name: 'Admin',
     component: AdminView
   },
+  {
+    path: '/error',
+    name: 'Error',
+    component: ErrorView
+  }
 ]
 
 const router = new VueRouter({

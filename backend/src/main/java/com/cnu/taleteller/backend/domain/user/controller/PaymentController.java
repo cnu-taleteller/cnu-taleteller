@@ -65,6 +65,12 @@ public class PaymentController {
         return Math.abs(point.returnPoint);
     }
 
+    @GetMapping("/returnResult")
+    public ResponseEntity<List<Payment>> returnResult(){
+        List<Payment> lastDetails = paymentService.findByLast();
+        return ResponseEntity.ok(lastDetails);
+    }
+
 //    @GetMapping("/kakaoPay")
 //    public void kakaoPayGet() {
 //

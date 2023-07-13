@@ -112,4 +112,12 @@ public class MemberController {
     public String memberModify(@PathVariable String email, @RequestBody MemberInfoDto params) {
         return memberService.memModify(email, params);
     }
+
+    @PatchMapping("/accountModify/{email}")
+    public String memberAccountModify(@PathVariable String email, @RequestBody MemberInfoDto params) {
+        memberService.memAccountModify(email, params);
+
+        MailDTO dto = memberService.createConfirmMail(email);
+        return memberService.confirmMailSend(dto);
+    }
 }

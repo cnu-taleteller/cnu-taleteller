@@ -5,6 +5,7 @@ import ToolView from '../views/ToolView.vue';
 import MyPageWork from '../views/MypageViewWork.vue';
 import MyPagePoint from '../views/MypageViewPoint.vue';
 import MyPageChargeResult from '../views/MypageViewChargeResult.vue';
+import MyPageReturnResult from '../views/MypageViewReturnResult.vue';
 import MyPageMemInfo from '../views/MypageViewMemInfo.vue';
 import MyPageBookMark from '../views/MypageViewBookMark.vue';
 import ToolSubmitView from '../views/ToolSubmitView.vue';
@@ -61,6 +62,11 @@ const routes = [
     path: '/mypage/chargeResult',
     name: 'MyPageChargeResult',
     component: MyPageChargeResult
+  },
+  {
+    path: '/mypage/returnResult',
+    name: 'MyPageReturnResult',
+    component: MyPageReturnResult
   },
   {
     path: '/mypage/member',

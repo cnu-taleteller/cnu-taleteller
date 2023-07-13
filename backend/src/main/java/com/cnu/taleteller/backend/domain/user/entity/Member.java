@@ -74,6 +74,10 @@ public class Member implements UserDetails {
         this.memberAccount = memberAccount;
     }
 
+    public void modifyAccount(String memberAccount) {
+        this.memberAccount = memberAccount;
+    }
+
     // 사용자의 권한을 콜렉션 형태로 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -86,24 +86,47 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
       },
 
       pointReturn(returnValue){
-        if(confirm("환급하시겠습니까?")){
+        
           if(this.pointTotal<=0){
             alert("환급할 엽전이 없습니다.")
           }
           else{
-            this.memberEmail = sessionStorage.getItem('user')
-            axios.post(`${process.env.VUE_APP_API_PATH}/api/point/return/${this.memberEmail}`, {
-              returnPoint: returnValue,
-            })
-            .then((res) => {
-              alert("환급 완료 : 엽전 "+res.data+"개");
-              window.location.reload(true);
-            })
-            .catch((err) => {
-              console.log(err);
-            }); 
+            const account=prompt('환급받을 계좌번호를 입력하십시오');
+            if(account!=""){
+              this.memberEmail = sessionStorage.getItem('user')
+              axios.patch(`${process.env.VUE_APP_API_PATH}/api/member/accountModify/${this.memberEmail}`, { 
+                memberAccount: account,
+              })
+              .then((res) => {
+                if (res.data) {
+                  // console.log("인증 코드 : "+res.data);
+                  const confirmCode = res.data;
+
+                  const emailCheck=prompt('이메일로 발송된 코드를 입력하십시오');
+                  if(emailCheck==confirmCode){
+                    axios.post(`${process.env.VUE_APP_API_PATH}/api/point/return/${this.memberEmail}`, {
+                      returnPoint: returnValue,
+                    })
+                    .then((res) => {
+                      alert("환급 완료 : 엽전 "+res.data+"개");
+                      window.location.href = '/mypage/returnResult';
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                  }
+                  else{
+                    alert('유효한 코드가 아닙니다.');
+                  }
+                } 
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+
+            }
           }
-        }
+        
       },
       
   },

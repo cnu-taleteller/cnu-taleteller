@@ -94,6 +94,8 @@ export default {
           customerName: '회원',
           successUrl: window.location.origin + '/mypage/chargeResult',
           failUrl: window.location.origin + '/mypage/chargeResult',
+          
+          cardNumber: '4330123412341234',
         })
           .catch(function (error) {
             if (error.code === 'USER_CANCEL') {

@@ -37,7 +37,7 @@
           <option value="가상계좌">토스페이-무통장</option>
         </select>
         <div>
-          <input type="text" v-model="chargePoint" />
+          <input type="number" v-model="chargePoint" />
           <button type="submit" @click="charge">충전</button>
         </div>
       </form>
@@ -189,5 +189,12 @@ button:hover {
 .charge-form input {
   margin: 10px;
   width: 150px;
+}
+
+.charge-form input,select {
+  border-radius: 5px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #bbbbbb;
 }
 </style>

@@ -108,7 +108,7 @@ import sideMenu from '@/components/MyPage/SideMenu.vue';
                       returnPoint: returnValue,
                     })
                     .then((res) => {
-                      alert("환급 완료 : 엽전 "+res.data+"개");
+                      console.log("환급 완료 : 엽전 "+res.data+"개");
                       window.location.href = '/mypage/returnResult';
                     })
                     .catch((err) => {

@@ -121,6 +121,44 @@ public class MemberService implements UserDetailsService {
         return dto;
     }
 
+    public MailDTO createConfirmMail(String memberEmail) {
+        String str = getTempPassword();
+        MailDTO dto = new MailDTO();
+        dto.setAddress(memberEmail);
+        dto.setTitle("TaleTeller(이야기꾼) 환급 관련 인증 코드 이메일 입니다.");
+        dto.setStr(str);
+        return dto;
+    }
+
+    //환급 관련 인증 코드 이메일 전송
+    public String confirmMailSend(MailDTO mailDTO) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(mailDTO.getAddress());
+            helper.setSubject(mailDTO.getTitle());
+
+
+            String htmlContent = readHtmlTemplate("emailConfirm.html");
+            htmlContent = htmlContent.replace("{str}", mailDTO.getStr());
+
+            helper.setText(htmlContent, true);
+
+            String senderAddress = env.getProperty("spring.mail.username") + "@naver.com";
+            helper.setFrom(senderAddress);
+            helper.setReplyTo(senderAddress);
+
+            System.out.println("message: " + message);
+
+            mailSender.send(message);
+            System.out.println("전송 완료!");
+        } catch (MessagingException e) {
+            System.out.println("전송 실패: " + e.getMessage());
+        }
+        return mailDTO.getStr();
+    }
+
     //임시 비밀번호로 업데이트
     public void updatePasswordByEmail(String newPassword, String memberEmail) {
         Member member = memberRepository.findByMemberEmail(memberEmail)
@@ -186,6 +224,15 @@ public class MemberService implements UserDetailsService {
         Long memId = findMember.getMemberId();
         Member entity = memberRepository.findById(memId).orElseThrow();
         entity.modifyUpdate(params.getMemberPassword(), params.getMemberPhone(), params.getMemberAccount());
+        return email;
+    }
+
+    @Transactional
+    public String memAccountModify(String email, MemberInfoDto params) {
+        Member findMember = memberRepository.findDistinctByMemberEmail(email);
+        Long memId = findMember.getMemberId();
+        Member entity = memberRepository.findById(memId).orElseThrow();
+        entity.modifyAccount(params.getMemberAccount());
         return email;
     }
 

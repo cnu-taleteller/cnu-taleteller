@@ -5,6 +5,7 @@ import ToolView from '../views/ToolView.vue';
 import MyPageWork from '../views/MypageViewWork.vue';
 import MyPagePoint from '../views/MypageViewPoint.vue';
 import MyPageChargeResult from '../views/MypageViewChargeResult.vue';
+import MyPageReturnResult from '../views/MypageViewReturnResult.vue';
 import MyPageMemInfo from '../views/MypageViewMemInfo.vue';
 import MyPageBookMark from '../views/MypageViewBookMark.vue';
 import ToolSubmitView from '../views/ToolSubmitView.vue';
@@ -17,6 +18,8 @@ import ChangeKeyword from '../views/ToolChangeKeywordView.vue'
 import ModalPassword from '../views/ModalPassword.vue'
 import GoingTool from '../components/GoingTool.vue';
 import AdminView from "@/views/AdminView.vue";
+import ErrorView from "@/views/ErrorView.vue";
+
 
 
 Vue.use(VueRouter)
@@ -63,6 +66,11 @@ const routes = [
     component: MyPageChargeResult
   },
   {
+    path: '/mypage/returnResult',
+    name: 'MyPageReturnResult',
+    component: MyPageReturnResult
+  },
+  {
     path: '/mypage/member',
     name: 'MyPageMemInfo',
     component: MyPageMemInfo
@@ -107,6 +115,11 @@ const routes = [
     name: 'Admin',
     component: AdminView
   },
+  {
+    path: '/error',
+    name: 'Error',
+    component: ErrorView
+  }
 ]
 
 const router = new VueRouter({

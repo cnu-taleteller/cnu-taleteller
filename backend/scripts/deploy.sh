@@ -16,7 +16,7 @@ echo "> build 파일 복사" >> $DEPLOY_LOG_PATH
 cp $BUILD_JAR $DEPLOY_PATH
 
 echo "> 현재 동작중인 어플리케이션 pid 체크" >> $DEPLOY_LOG_PATH
-CURRENT_PID=$(pgrep -f $JAR_NAME)
+CURRENT_PID=$(sudo pgrep -f $JAR_NAME)
 
 if [ -z $CURRENT_PID ]
 then
@@ -26,7 +26,6 @@ else
   echo "> 현재 동작중인 어플리케이션 강제 종료 진행" >> $DEPLOY_LOG_PATH
   echo "> kill 15 $CURRENT_PID" >> $DEPLOY_LOG_PATH
   sudo kill -15 $CURRENT_PID
-  sleep 5
 fi
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME

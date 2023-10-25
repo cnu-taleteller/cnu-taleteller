@@ -250,38 +250,12 @@ export default {
 }
 </script>
 <style scoped>
-.mypage-side {
-  width: 15%;
-  float: left;
-  height: 100%;
-  font-weight: bold;
-}
-
-.mypage-side ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.mypage-side li {
-  padding: 15px;
-  margin-bottom: 5px;
-  border-radius: 0px;
-}
-
-.mypage-side li:hover {
-  background-color: #c3f0ff;
-}
-
-.mypage-side li:nth-child(3) {
-  background-color: #c3f0ff;
-}
-
 .mypage-main {
   width: 80%;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #ccc;
+  min-height: 80vh;
 }
 
 .mypage-content {
@@ -294,7 +268,6 @@ export default {
   overflow: hidden;
   display: flex;
   margin: 5px 10px 10px 0;
-  overflow-y: auto;
 }
 
 .mypage-search {

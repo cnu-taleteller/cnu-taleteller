@@ -43,6 +43,8 @@
     float: left;
     height: 100%;
     font-weight: bold;
+    position: sticky;
+    top:5%;
   }
 
   .mypage-side ul {
@@ -53,7 +55,7 @@
 
   .mypage-side li {
     padding: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 7px;
     border-radius: 0px;
   }
 
@@ -70,7 +72,8 @@
     padding-top: 15px;
     padding-bottom: 15px;
     padding-left: 20px;
-    padding-right: 20px
+    padding-right: 20px;
+    font-size: 19px;
   }
   .side-link {
     text-decoration: none;

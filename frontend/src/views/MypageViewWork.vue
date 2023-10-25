@@ -286,10 +286,15 @@ export default {
 
 .mypage-content {
   padding: 20px;
-  margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
+  width: 100%;
+  border-top: 1px solid #ccc;
+  overflow: hidden;
+  display: flex;
+  margin: 5px 10px 10px 0;
+  overflow-y: auto;
 }
 
 .mypage-search {
@@ -300,7 +305,6 @@ export default {
   display: flex;
   margin-top: 10px;
   border-radius: 15px;
-  
 }
 
 .search-bar {
@@ -327,20 +331,8 @@ export default {
   margin-left: 10px;
 }
 
-.mypage-content {
-  width: 100%;
-  height: 80vh;
-  border-top: 1px solid #ccc;
-  /* background:rgba(233, 233, 233, 0.6); */
-  padding: 20px;
-  overflow: hidden;
-  display: flex;
-  margin: 5px 10px 10px 0;
-  /* border-radius: 15px; */
-}
-
 .thumbnail {
-  margin-left: 5%;
+  margin : 10px 2% 40px 2%;
   width: 200px;
   height: 200px;
   border: none;
